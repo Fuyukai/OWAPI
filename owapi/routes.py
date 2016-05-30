@@ -45,11 +45,12 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
 
-    stats = parsed.xpath(mo.stats_xpath)[0]
-
     kills = 0
     # Parse out the HTML.
-    for child in stats.iterchildren():
+
+    stats = parsed.xpath(".//div[contains(@class, 'stats-list-box')]")
+
+    for child in stats:
         title, avg, count = child[::-1]
 
         # Unfuck numbers
