@@ -19,13 +19,6 @@ BASE_URL = "https://masteroverwatch.com/"
 PROFILE_URL = BASE_URL + "profile/pc/"
 PAGE_URL = PROFILE_URL + "{region}/{btag}"
 
-# This will break if Master Overwatch changes layout
-# Make sure to change it if it does
-heroes_xpath = "/html/body[@class='player']/main[@class='player-data']/div[@class='container']" \
-               "/div[@class='row']/div[@class='col-md-4']/div[@class='data-heroes']/div[@class='heroes-list']"
-stats_xpath = "/html/body[@class='player']/main[@class='player-data']/div[@class='container']/div[@class='row']" \
-              "/div[@class='col-md-8']/div[@class='data-stats']/div[@class='stats-list']/div"
-
 logger = logging.getLogger("OWAPI")
 
 async def get_page_body(ctx: HTTPRequestContext, url: str) -> str:
