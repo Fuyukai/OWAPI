@@ -2,11 +2,13 @@
 Useful utilities.
 """
 import json
+import logging
 
 import aioredis
 from kyokai import Request
 from kyokai.context import HTTPRequestContext
 
+logger = logging.getLogger("OWAPI")
 
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     """
@@ -20,7 +22,10 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     # Uses a simple func name + repr(args) as the key to use.
     got = await ctx.redis.get(built)
     if got:
+        logger.info("Cache hit for `{}`".format(built))
         return got.decode()
+
+    logger.info("Cache miss for `{}`".format(built))
 
     # Call the function.
     result = await func(ctx, *args)
