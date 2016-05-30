@@ -4,6 +4,7 @@ This interfaces with MasterOverwatch to download stats.
 import functools
 
 import asyncio
+import json
 import logging
 import typing
 
@@ -18,6 +19,7 @@ from owapi import util
 BASE_URL = "https://masteroverwatch.com/"
 PROFILE_URL = BASE_URL + "profile/pc/"
 PAGE_URL = PROFILE_URL + "{region}/{btag}"
+UPDATE_URL = PAGE_URL + "/update"
 
 logger = logging.getLogger("OWAPI")
 
@@ -32,7 +34,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str) -> str:
         logger.info("GET => {}".format(url))
         async with session.get(url) as req:
             assert isinstance(req, aiohttp.ClientResponse)
-            return await req.read()
+            return (await req.read()).decode()
 
     result = await util.with_cache(ctx, _real_get_body, url)
     session.close()
@@ -61,6 +63,18 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu
 
     return parsed
 
+async def update_user(ctx, battletag, reg) -> bool:
+    """
+    Attempt to update a user on the MasterOverwatch side.
+    """
+    body = await get_page_body(ctx, UPDATE_URL.format(btag=battletag, region=reg))
+    data = json.loads(body)
+    if data["status"] == "error":
+        if data["message"] == "We couldn't find a player with that name.":
+            return False
+
+    return True
+
 
 async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, extra=""):
     """
@@ -71,12 +85,14 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, ex
     result = (None, None)
     if region is None:
         for reg in ["eu", "us", "kr"]:
+            # Try and update the user.
+            updated = await update_user(ctx, battletag, reg)
             page = await get_user_page(ctx, battletag, reg, extra)
-            h_body = page.xpath("/html/body")[0].values()[0]
             # MO doesn't return a 404.
             # Instead, we check the body for an error class.
             # If it has it, just continue.
-            if h_body == "error":
+            if not updated:
+                # Try and update it.
                 continue
             else:
                 # Return the parsed page, and the region.
@@ -86,9 +102,9 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, ex
             return result
 
     else:
+        updated = await update_user(ctx, battletag, region)
         page = await get_user_page(ctx, battletag, region)
-        h_body = page.xpath("/html/body")[0].values()[0]
-        if h_body == "error":
+        if not updated:
             return result
         else:
             # Return the parsed page, and the region.
