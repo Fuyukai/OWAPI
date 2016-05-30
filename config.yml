@@ -1,0 +1,7 @@
+---
+component:
+  type: owapi.app:APIComponent
+  components:
+    kyoukai:
+      app: owapi.app:app
+      debug: True

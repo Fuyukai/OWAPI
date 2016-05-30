@@ -70,3 +70,4 @@ docs/_build/
 target/
 
 aeiou.py
+.idea/

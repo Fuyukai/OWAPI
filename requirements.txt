@@ -1,0 +1,4 @@
+Kyokai>=1.3.0
+lxml
+aiohttp
+aioredis
