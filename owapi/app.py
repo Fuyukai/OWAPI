@@ -7,6 +7,7 @@ import logging
 from asphalt.core import ContainerComponent
 
 import kyokai
+from asphalt.redis.component import RedisComponent
 from kyokai.asphalt import KyoukaiComponent
 from kyokai.context import HTTPRequestContext
 
@@ -32,6 +33,7 @@ class APIComponent(ContainerComponent):
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
                            app="app:app", template_renderer=None)
+        self.add_component('redis', RedisComponent)
         await super().start(ctx)
 
         logger.info("Started OWAPI server.")
@@ -39,3 +41,7 @@ class APIComponent(ContainerComponent):
 
 app = kyokai.Kyokai("owapi")
 
+
+@app.errorhandler(404)
+async def e404(ctx: HTTPRequestContext):
+    ...
