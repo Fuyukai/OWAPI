@@ -11,6 +11,8 @@ from asphalt.redis.component import RedisComponent
 from kyokai.asphalt import KyoukaiComponent
 from kyokai.context import HTTPRequestContext
 
+from owapi import util, routes
+
 # Fuck your logging config.
 
 logging.basicConfig(filename='/dev/null', level=logging.INFO)
@@ -43,5 +45,8 @@ app = kyokai.Kyokai("owapi")
 
 
 @app.errorhandler(404)
+@util.jsonify
 async def e404(ctx: HTTPRequestContext):
-    ...
+    return {"error": 404}, 404
+
+app.register_blueprint(routes.bp)
