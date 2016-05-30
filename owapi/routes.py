@@ -43,7 +43,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
 
     parsed, region = data
     # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "stats": []}
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
 
     stats = parsed.xpath(mo.stats_xpath)[0]
 
@@ -61,10 +61,19 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             kills = int(count)
         elif title.text == "Deaths":
             # Add the KDA.
-            built_dict["stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
+            built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
 
         # Add it to the dict.
-        built_dict["stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
+        built_dict["game_stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
+
+    # Load up overall stats.
+    ov_stats = parsed.findall(".//div[@class='header-stat']/strong")
+    # Don't even loop over these.
+    built_dict["overall_stats"]["rank"] = int(ov_stats[0].text[1:].replace(",", ""))
+    built_dict["overall_stats"]["games"] = int(ov_stats[1].text.replace(",", ""))
+    built_dict["overall_stats"]["wins"] = int(ov_stats[2].text.split("/")[0])
+    built_dict["overall_stats"]["losses"] = int(ov_stats[2].text.split("/")[1])
+    built_dict["overall_stats"]["win_rate"] = float(ov_stats[3].text[:-1])
 
     return built_dict
 
