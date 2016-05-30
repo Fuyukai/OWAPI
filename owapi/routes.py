@@ -38,3 +38,30 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
     if data == (None, None):
         raise HTTPException(404)
+
+    parsed, region = data
+    # Start the dict.
+    built_dict = {"region": region, "battletag": battletag, "stats": []}
+
+    stats = parsed.xpath(mo.stats_xpath)[0]
+
+    kills = 0
+    # Parse out the HTML.
+    for child in stats.iterchildren():
+        title, avg, count = child[::-1]
+
+        # Unfuck numbers
+        count = int(count.text.replace(",", ""))
+        avg = float(avg.text.replace(" AVG", "").replace(",", ""))
+
+        if title.text == "Eliminations":
+            # Set kills.
+            kills = int(count)
+        elif title.text == "Deaths":
+            # Add the KDA.
+            built_dict["stats"].append({"name": "kpd", "avg": None, "value": kills/int(count)})
+
+        # Add it to the dict.
+        built_dict["stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
+
+    return built_dict

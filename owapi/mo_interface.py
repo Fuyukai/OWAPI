@@ -38,9 +38,9 @@ async def get_page_body(ctx: HTTPRequestContext, url: str) -> str:
             assert isinstance(req, aiohttp.ClientResponse)
             return await req.read()
 
+    result = await util.with_cache(ctx, _real_get_body, url)
     session.close()
-
-    return await util.with_cache(ctx, _real_get_body, url)
+    return result
 
 
 def _parse_page(content: str) -> etree._Element:
