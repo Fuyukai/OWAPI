@@ -1,3 +1,5 @@
+from lxml import etree
+
 from kyokai import Request
 from kyokai.blueprints import Blueprint
 from kyokai.context import HTTPRequestContext
@@ -29,7 +31,7 @@ async def root(ctx: HTTPRequestContext):
     return {}
 
 
-@bp.route("/stats/(.*)")
+@bp.route("/u/(.*)/stats")
 @util.jsonify
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
@@ -59,9 +61,49 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             kills = int(count)
         elif title.text == "Deaths":
             # Add the KDA.
-            built_dict["stats"].append({"name": "kpd", "avg": None, "value": kills/int(count)})
+            built_dict["stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
 
         # Add it to the dict.
         built_dict["stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
+
+    return built_dict
+
+
+@bp.route("/u/(.*)/heroes")
+@util.jsonify
+async def get_heroes(ctx: HTTPRequestContext, battletag: str):
+    """
+    Returns the top 5 heroes for the battletag specified.
+    """
+    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    # Start the dict.
+    built_dict = {"region": region, "battletag": battletag, "heroes": []}
+
+    # Get the hero data and deconstruct it.
+    hero_info = parsed.findall(".//div[@class='heroes-list']")[0]
+    for child in hero_info:
+        assert isinstance(child, etree._Element)
+        # The `see more` tag at the bottom.
+        if child.tag != "div":
+            continue
+
+        # Load the hero name.
+        name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text
+        # Load the stats KPD.
+        kpd = float(child.xpath(".//div[contains(@class, 'heroes-stats')]/div/strong")[0].text)
+        # Load the winrate.
+        win_stats = child.xpath(".//div[contains(@class, 'heroes-winrate')]")[0]
+        # Get the win rate and the games played.
+        winrate_raw = win_stats.xpath(".//strong")[0].text
+        winrate = float(winrate_raw[:-1])
+        games_played_raw = win_stats.xpath(".//span")[0].text
+        games_played = int(games_played_raw.split(" ")[0])
+        # Create the dict.
+        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games_played})
 
     return built_dict
