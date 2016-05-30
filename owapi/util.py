@@ -10,6 +10,7 @@ from kyokai.context import HTTPRequestContext
 
 logger = logging.getLogger("OWAPI")
 
+
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     """
     Run a coroutine with cache.
@@ -39,6 +40,7 @@ def jsonify(func):
     """
     JSON-ify the response from a function.
     """
+
     async def res(ctx: HTTPRequestContext, *args):
         result = await func(ctx, *args)
         assert isinstance(ctx.request, Request)
@@ -60,3 +62,16 @@ def jsonify(func):
             return json.dumps(new_result), 200, {"Content-Type": "application/json"}
 
     return res
+
+
+def int_or_string(val: str):
+    """
+    Loads a value from MO into either an int or string value.
+
+    String is returned if we can't turn it into an int.
+    """
+    new_s = val.replace(",", "")
+    try:
+        return float(new_s)
+    except ValueError:
+        return val

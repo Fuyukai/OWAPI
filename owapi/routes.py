@@ -78,6 +78,41 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
+@bp.route("/u/(.*)/heroes/([0-9]*)")
+@util.jsonify
+async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_id: str):
+    """
+    Gets extended information about a hero on a player.
+    """
+    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  extra="/heroes/" + hero_id)
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    # Start the dict.
+    built_dict = {"region": region, "battletag": battletag, "stats": []}
+
+    stats = parsed.findall(".//div[@class='hero-stats']")
+
+    # Loop over each block of stats.
+    for block in stats:
+        title = block.findall(".//div[@class='stats-title']")[0].text.lower()
+        stat_groups = block.findall(".//div[@class='stats-box']")
+
+        l_stats = []
+        # Loop over each stat group, and add it to l_stats.
+        for stat in stat_groups:
+            name = stat.xpath(".//span")[0].text.lower()
+            count = util.int_or_string(stat.xpath(".//strong")[0].text)
+            l_stats.append({"name": name, "value": count})
+
+        built_dict["stats"].append({"name": title, "stats": l_stats})
+
+    return built_dict
+
+
 @bp.route("/u/(.*)/heroes")
 @util.jsonify
 async def get_heroes(ctx: HTTPRequestContext, battletag: str):
@@ -101,8 +136,14 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         if child.tag != "div":
             continue
 
+        # Split out the last part of the `data-href` so we can provide a link to extended hero data.
+        url = child.values()[1]
+        id = int(url.split("/")[-1])
+
+        built_url = "/api/u/{}/heroes/{}".format(battletag, id)
+
         # Load the hero name.
-        name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text
+        name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text.lower()
         # Load the stats KPD.
         kpd = float(child.xpath(".//div[contains(@class, 'heroes-stats')]/div/strong")[0].text)
         # Load the winrate.
@@ -113,6 +154,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         games_played_raw = win_stats.xpath(".//span")[0].text
         games_played = int(games_played_raw.split(" ")[0])
         # Create the dict.
-        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games_played})
+        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games_played,
+                                     "extended_url": built_url})
 
     return built_dict

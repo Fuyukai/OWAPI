@@ -4,6 +4,7 @@ This interfaces with MasterOverwatch to download stats.
 import functools
 
 import asyncio
+import logging
 import typing
 
 from lxml import etree
@@ -25,6 +26,7 @@ heroes_xpath = "/html/body[@class='player']/main[@class='player-data']/div[@clas
 stats_xpath = "/html/body[@class='player']/main[@class='player-data']/div[@class='container']/div[@class='row']" \
               "/div[@class='col-md-8']/div[@class='data-stats']/div[@class='stats-list']/div"
 
+logger = logging.getLogger("OWAPI")
 
 async def get_page_body(ctx: HTTPRequestContext, url: str) -> str:
     """
@@ -34,6 +36,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str) -> str:
 
     async def _real_get_body(_, url: str):
         # Real function.
+        logger.info("GET => {}".format(url))
         async with session.get(url) as req:
             assert isinstance(req, aiohttp.ClientResponse)
             return await req.read()
@@ -51,11 +54,11 @@ def _parse_page(content: str) -> etree._Element:
     return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu") -> etree._Element:
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu", extra="") -> etree._Element:
     """
     Downloads the MO page for a user, and parses it.
     """
-    built_url = PAGE_URL.format(region=region, btag=battletag.replace("#", "-"))
+    built_url = PAGE_URL.format(region=region, btag=battletag.replace("#", "-")) + "{}".format(extra)
     page_body = await get_page_body(ctx, built_url)
 
     # parse the page
@@ -66,7 +69,7 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu
     return parsed
 
 
-async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None):
+async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, extra=""):
     """
     Downloads the correct page for a user in the right region.
 
@@ -75,7 +78,7 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None):
     result = (None, None)
     if region is None:
         for reg in ["eu", "us", "kr"]:
-            page = await get_user_page(ctx, battletag, reg)
+            page = await get_user_page(ctx, battletag, reg, extra)
             h_body = page.xpath("/html/body")[0].values()[0]
             # MO doesn't return a 404.
             # Instead, we check the body for an error class.
