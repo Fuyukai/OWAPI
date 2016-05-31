@@ -146,7 +146,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         url = child.values()[1]
         id = int(url.split("/")[-1])
 
-        built_url = "/api/u/{}/heroes/{}".format(battletag, id)
+        built_url = "/api/v1/u/{}/heroes/{}".format(battletag, id)
 
         # Load the hero name.
         name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text.lower()
