@@ -70,11 +70,15 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     # Load up overall stats.
     ov_stats = parsed.findall(".//div[@class='header-stat']/strong")
     # Don't even loop over these.
-    built_dict["overall_stats"]["rank"] = int(ov_stats[0].text[1:].replace(",", ""))
-    built_dict["overall_stats"]["games"] = int(ov_stats[1].text.replace(",", ""))
-    built_dict["overall_stats"]["wins"] = int(ov_stats[2].text.split("/")[0])
-    built_dict["overall_stats"]["losses"] = int(ov_stats[2].text.split("/")[1])
-    built_dict["overall_stats"]["win_rate"] = float(ov_stats[3].text[:-1])
+
+    if len(ov_stats) > 3:
+        built_dict["overall_stats"]["rank"] = int(ov_stats[0].text[1:].replace(",", ""))
+    else:
+        built_dict["overall_stats"]["rank"] = None
+    built_dict["overall_stats"]["games"] = int(ov_stats[-3].text.replace(",", ""))
+    built_dict["overall_stats"]["wins"] = int(ov_stats[-2].text.split("/")[0])
+    built_dict["overall_stats"]["losses"] = int(ov_stats[-2].text.split("/")[1])
+    built_dict["overall_stats"]["win_rate"] = float(ov_stats[-1].text[:-1])
 
     return built_dict
 
