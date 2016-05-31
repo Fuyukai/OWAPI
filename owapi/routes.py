@@ -8,7 +8,7 @@ from kyokai.exc import HTTPException
 from owapi import util
 from owapi import mo_interface as mo
 
-bp = Blueprint("routes", url_prefix="/api")
+bp = Blueprint("routes", url_prefix="/api/v1")
 
 
 @bp.errorhandler(404)
