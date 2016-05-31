@@ -73,6 +73,8 @@ async def update_user(ctx, battletag, reg) -> bool:
         if data["message"] == "We couldn't find a player with that name.":
             return False
 
+    logger.info("Updated user `{}` => `{}`".format(battletag, data))
+
     return True
 
 

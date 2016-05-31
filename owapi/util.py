@@ -75,3 +75,18 @@ def int_or_string(val: str):
         return float(new_s)
     except ValueError:
         return val
+
+
+def parse_time(val: str) -> float:
+    """
+    Parse the time out into minutes.
+    """
+    unit = val.split(" ")[1]
+    if 'minute' in unit:
+        # Calculate the hour.
+        mins = int(val.split(" ")[0])
+        hours = round(mins/60, 3)
+        return hours
+    else:
+        hours = val.split(" ")[0]
+        return float(hours)

@@ -131,11 +131,16 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
 
     # Get the hero data and deconstruct it.
     hero_info = parsed.findall(".//div[@class='heroes-list']")[0]
-    for child in hero_info:
+    # Get the time info, and zip it together with the hero_info.
+    times = parsed.findall(".//div[@class='heroes-details-title']/time")
+    for child, time in zip(hero_info, times):
         assert isinstance(child, etree._Element)
         # The `see more` tag at the bottom.
         if child.tag != "div":
             continue
+
+        # Parse the time into hours.
+        hours = util.parse_time(time.text)
 
         # Split out the last part of the `data-href` so we can provide a link to extended hero data.
         url = child.values()[1]
@@ -156,6 +161,6 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         games_played = int(games_played_raw.split(" ")[0])
         # Create the dict.
         built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games_played,
-                                     "extended_url": built_url})
+                                     "extended_url": built_url, "hours": hours})
 
     return built_dict

@@ -1,7 +1,6 @@
 """
 Main OWAPI App.
 """
-import json
 import logging
 
 from asphalt.core import ContainerComponent
