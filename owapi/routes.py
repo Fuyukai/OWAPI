@@ -6,7 +6,7 @@ from kyokai.context import HTTPRequestContext
 from kyokai.exc import HTTPException
 
 from owapi import util
-from owapi import mo_interface as mo
+from owapi import interface as mo
 
 bp = Blueprint("routes", url_prefix="/api/v1")
 

@@ -24,6 +24,8 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     got = await ctx.redis.get(built)
     if got:
         logger.info("Cache hit for `{}`".format(built))
+        if got == b"None":
+            return None
         return got.decode()
 
     logger.info("Cache miss for `{}`".format(built))
@@ -32,6 +34,8 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     result = await func(ctx, *args)
 
     # Store the result as cached.
+    if result is None:
+        result = "None"
     await ctx.redis.set(built, result, expire=expires)
     return result
 
