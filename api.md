@@ -1,6 +1,6 @@
 # OWAPI API Docs
 
-### `GET /api/u/:battletag/stats`
+### `GET /api/v1/u/:battletag/stats`
 
 **Get the basic stats of a user.**
 
@@ -74,7 +74,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 }
 ```
 
-### `GET /api/u/:battletag/heroes`
+### `GET /api/v1/u/:battletag/heroes`
 
 **Get the top 5 played heroes of a user.**
 
@@ -141,7 +141,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 }
 ```
 
-### `GET http://127.0.0.1:4444/api/u/:battletag/heroes/:id`
+### `GET /api/v1/u/:battletag/heroes/:id`
 
 **Get detailed information about a player's performance as a hero.**
 
