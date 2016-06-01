@@ -62,7 +62,10 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             kills = int(count)
         elif title.text == "Deaths":
             # Add the KDA.
-            built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
+            try:
+                built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
+            except ZeroDivisionError:
+                built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": float("inf")})
 
         # Add it to the dict.
         built_dict["game_stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
