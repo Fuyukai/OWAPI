@@ -20,9 +20,10 @@ B_BASE_URL = "https://playoverwatch.com/en-gb/"
 B_PAGE_URL = B_BASE_URL + "career/pc/{region}/{btag}"
 
 MO_BASE_URL = "https://masteroverwatch.com/"
-MO_PROFILE_URL = MO_BASE_URL + "profile/pc/"
-MO_PAGE_URL = MO_PROFILE_URL + "{region}/{btag}"
+MO_PROFILE_URL = MO_BASE_URL + "profile/"
+MO_PAGE_URL = MO_PROFILE_URL + "pc/{region}/{btag}"
 MO_UPDATE_URL = MO_PAGE_URL + "/update"
+MO_LOOKUP_URL = MO_PROFILE_URL + "{btag}/lookup"
 
 logger = logging.getLogger("OWAPI")
 
@@ -69,21 +70,6 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu
 
     return parsed
 
-async def get_blizzard_page(ctx: HTTPRequestContext, battletag: str, region: str="eu"):
-    """
-    Gets the blizzard page for the player,
-    """
-    # These pages should be cached infinitely as we don't use them for anything other than checking the status.
-    built_url = B_PAGE_URL.format(region=region, btag=battletag.replace("#", "-"), cache_time=0)
-    page_body = await get_page_body(ctx, built_url)
-
-    if page_body is not None:
-        parse_partial = functools.partial(_parse_page, page_body)
-        loop = asyncio.get_event_loop()
-        parsed = await loop.run_in_executor(None, parse_partial)
-
-        return parsed
-    return None
 
 async def update_user(ctx, battletag, reg) -> bool:
     """
@@ -99,6 +85,21 @@ async def update_user(ctx, battletag, reg) -> bool:
 
     return True
 
+async def lookup_user(ctx, battletag) -> dict:
+    """
+    Forces MO to look up a user.
+
+    We discard the info here anyway.
+    """
+    data = await get_page_body(ctx, MO_LOOKUP_URL.format(btag=battletag))
+    body = json.loads(data)
+
+    if body["status"] == "error":
+        return False
+
+    else:
+        return True
+
 
 async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, extra=""):
     """
@@ -107,20 +108,19 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, ex
     This will return either (etree._Element, region) or (None, None).
     """
     result = (None, None)
+    # Look up the player on MO.
+    lookup = await lookup_user(ctx, battletag)
+    if not lookup:
+        # This means their user doesn't exist, at all.
+        # We return here to show that they don't exist.
+        return result
+
     if region is None:
         reg_l = ["eu", "us", "kr"]
     else:
         reg_l = [region]
 
     for reg in reg_l:
-        # Force the blizzard page to download, if possible.
-        # This allows MO to fetch the new data.
-        blizz = await get_blizzard_page(ctx, battletag, reg)
-        if blizz is None:
-            # The blizzard page doesn't exist.
-            # This means MO won't have the data.
-            # Therefore, we can skip it.
-            continue
         # Try and update the user.
         updated = await update_user(ctx, battletag, reg)
         if not updated:
