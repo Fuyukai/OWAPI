@@ -9,7 +9,7 @@ Like all API requests, this will automatically determine the region of the user.
 *Example:*
 
 ```
-$ http GET "http://127.0.0.1:4444/api/u/SunDwarf-21353/stats"
+$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/stats"
 ```
 
 *Result:*
@@ -23,7 +23,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/u/SunDwarf-21353/stats"
+        "route": "/api/v1/u/SunDwarf-21353/stats"
     },
     "battletag": "SunDwarf-21353",
     "game_stats": [
@@ -83,7 +83,7 @@ There is not currently a way to get heroes past the top 5.
 *Example:*
 
 ```
-$ http GET "http://127.0.0.1:4444/api/u/SunDwarf-21353/heroes"
+$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/heroes"
 ```
 
 *Result:*
@@ -97,7 +97,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/u/SunDwarf-21353/heroes"
+        "route": "/api/v1/u/SunDwarf-21353/heroes"
     },
     "battletag": "SunDwarf-21353",
     "heroes": [
@@ -147,7 +147,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 
 *Example*:
 ```
-$ http GET "http://127.0.0.1:4444/api/u/SunDwarf-21353/heroes/11"
+$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/heroes/11"
 ```
 
 *Result*:
@@ -162,7 +162,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/u/SunDwarf-21353/heroes/11"
+        "route": "/api/v1/u/SunDwarf-21353/heroes/11"
     },
     "battletag": "SunDwarf-21353",
     "region": "eu",
