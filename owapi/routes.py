@@ -153,7 +153,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         hours = util.parse_time(time.text)
 
         # Split out the last part of the `data-href` so we can provide a link to extended hero data.
-        url = child.values()[1]
+        url = child.xpath(".//a[@class='heroes-row-link']")[0].values()[1]
         id = int(url.split("/")[-1])
 
         built_url = "/api/v1/u/{}/heroes/{}".format(battletag, id)
