@@ -1,6 +1,6 @@
 ## OW API
 
-This server is a simple way to get read-only information about players and heroes in Overwatch.
+This server is a simple way to get read-only information about players and heroes in Overwatch.  
 **A live version runs on https://owapi.net.**
  
 ## API Docs
