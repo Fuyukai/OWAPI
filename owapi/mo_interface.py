@@ -16,9 +16,6 @@ import aiohttp
 # Constants.
 from owapi import util
 
-B_BASE_URL = "https://playoverwatch.com/en-gb/"
-B_PAGE_URL = B_BASE_URL + "career/pc/{region}/{btag}"
-
 MO_BASE_URL = "https://masteroverwatch.com/"
 MO_PROFILE_URL = MO_BASE_URL + "profile/"
 MO_PAGE_URL = MO_PROFILE_URL + "pc/{region}/{btag}"

@@ -1,3 +1,5 @@
+from math import floor
+
 from lxml import etree
 
 from kyokai import Request
@@ -6,7 +8,8 @@ from kyokai.context import HTTPRequestContext
 from kyokai.exc import HTTPException
 
 from owapi import util
-from owapi import interface as mo
+from owapi import mo_interface as mo
+from owapi import blizz_interface as bz
 
 bp = Blueprint("routes", url_prefix="/api/v1")
 
@@ -32,6 +35,66 @@ async def root(ctx: HTTPRequestContext):
 
 
 @bp.route("/u/(.*)/stats")
+@util.jsonify
+async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
+    """
+    Get stats for a user using the Blizzard sources.
+    """
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    # Start the dict.
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
+
+    kills = 0
+
+    # Parse out the HTML.
+    level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
+    built_dict["overall_stats"]["level"] = level
+
+    stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+    # Highlight specific stat groups.
+    death_box = stat_groups[4]
+    game_box = stat_groups[6]
+
+    # Calculate the wins, losses, and win rate.
+    gamebox_trs = game_box.findall(".//tbody/tr")
+    wins = int(gamebox_trs[0][1].text)
+    games = int(gamebox_trs[1][1].text)
+    losses = games - wins
+    wr = floor((wins / games) * 100)
+
+    # Update the dictionary.
+    built_dict["overall_stats"]["games"] = games
+    built_dict["overall_stats"]["losses"] = losses
+    built_dict["overall_stats"]["wins"] = wins
+    built_dict["overall_stats"]["win_rate"] = wr
+    built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+
+    # Build a dict using the stats.
+    _t_d = {}
+    for subbox in stat_groups:
+        trs = subbox.findall(".//tbody/tr")
+        # Update the dict with [0]: [1]
+        for subval in trs:
+            name, value = subval[0].text, subval[1].text
+            if 'average' in name.lower():
+                # No averages, ty
+                continue
+            nvl = util.int_or_string(value)
+            _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+
+    # Manually add the KPD.
+    _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+
+    built_dict["game_stats"] = _t_d
+
+    return built_dict
+
+@bp.route("/u/mo/(.*)/stats")
 @util.jsonify
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
