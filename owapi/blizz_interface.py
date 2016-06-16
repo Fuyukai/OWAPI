@@ -17,6 +17,7 @@ B_PAGE_URL = B_BASE_URL + "career/pc/{region}/{btag}"
 
 logger = logging.getLogger("OWAPI")
 
+
 async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> str:
     """
     Downloads page body from MasterOverwatch and caches it.
@@ -36,15 +37,17 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> st
     session.close()
     return result
 
+
 def _parse_page(content: str) -> etree._Element:
     """
     Internal function to parse a page and return the data.
     """
-    data = etree.HTML(content)
-    return data
+    if content:
+        data = etree.HTML(content)
+        return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu", extra="",
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "eu", extra="",
                         cache_time=300) -> etree._Element:
     """
     Downloads the MO page for a user, and parses it.
@@ -58,6 +61,7 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str="eu
     parsed = await loop.run_in_executor(None, parse_partial)
 
     return parsed
+
 
 async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, extra=""):
     """
@@ -73,9 +77,10 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, ex
     for reg in reg_l:
         # Get the user page.
         page = await get_user_page(ctx, battletag, reg, extra)
-        # At this point, if we haven't gotten the double 404, we can continue.
-        # Return the parsed page, and the region.
-        return page, reg
+        # Check if the page was returned successfully.
+        # If it was, return it.
+        if page is not None:
+            return page, reg
     else:
         # Since we continued without returning, give back the None, None.
         return None, None
