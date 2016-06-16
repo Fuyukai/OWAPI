@@ -42,11 +42,16 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
         raise HTTPException(404)
 
     parsed, region = data
+
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
 
     kills = 0
     # Parse out the HTML.
+
+    # Load the level.
+    level = int(parsed.findall(".//div[@class='header-avatar']/span")[0].text)
+    built_dict["overall_stats"]["level"] = level
 
     stats = parsed.xpath(".//div[contains(@class, 'stats-list-box')]")
 

@@ -65,6 +65,7 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
     ],
     "overall_stats": {
         "games": 30,
+        "level": 19,
         "losses": 16,
         "rank": 46789,
         "win_rate": 46.7,
