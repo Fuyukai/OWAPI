@@ -11,7 +11,7 @@ from owapi import util
 from owapi import mo_interface as mo
 from owapi import blizz_interface as bz
 
-bp = Blueprint("routes", url_prefix="/api/v1")
+bp = Blueprint("routes", url_prefix="/api")
 
 
 @bp.errorhandler(404)
@@ -34,7 +34,7 @@ async def root(ctx: HTTPRequestContext):
     return {}
 
 
-@bp.route("/u/(.*)/stats")
+@bp.route("/v2/u/(.*)/stats")
 @util.jsonify
 async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     """
@@ -94,7 +94,8 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
 
     return built_dict
 
-@bp.route("/u/mo/(.*)/stats")
+
+@bp.route("/v1/u/(.*)/stats")
 @util.jsonify
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
@@ -157,7 +158,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@bp.route("/u/(.*)/heroes/([0-9]*)")
+@bp.route("/v1/u/(.*)/heroes/([0-9]*)")
 @util.jsonify
 async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_id: str):
     """
@@ -192,9 +193,17 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_id: st
     return built_dict
 
 
-@bp.route("/u/(.*)/heroes")
+@bp.route("/v2/u/(.*)/heroes")
 @util.jsonify
 async def get_heroes(ctx: HTTPRequestContext, battletag: str):
+    """
+    Returns the top 5 heroes for the battletag specified.
+    """
+
+
+@bp.route("/v1/u/mo/(.*)/heroes")
+@util.jsonify
+async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes for the battletag specified.
     """
