@@ -201,7 +201,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
 
 
-@bp.route("/v1/u/mo/(.*)/heroes")
+@bp.route("/v1/u/(.*)/heroes")
 @util.jsonify
 async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
