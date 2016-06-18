@@ -34,9 +34,8 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     result = await func(ctx, *args)
 
     # Store the result as cached.
-    if result is None:
-        result = "None"
-    await ctx.redis.set(built, result, expire=expires)
+    to_set = result if result else "None"
+    await ctx.redis.set(built, to_set, expire=expires)
     return result
 
 

@@ -55,6 +55,9 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "
     built_url = B_PAGE_URL.format(region=region, btag=battletag.replace("#", "-")) + "{}".format(extra)
     page_body = await get_page_body(ctx, built_url, cache_time=cache_time)
 
+    if not page_body:
+        return None
+
     # parse the page
     parse_partial = functools.partial(_parse_page, page_body)
     loop = asyncio.get_event_loop()
