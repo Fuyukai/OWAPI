@@ -164,6 +164,8 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_id: st
     """
     Gets extended information about a hero on a player.
     """
+    if not hero_id:
+        return {"error": 400, "msg": "bad hero id"}, 400
     data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
                                   extra="/heroes/" + hero_id)
     if data == (None, None):
