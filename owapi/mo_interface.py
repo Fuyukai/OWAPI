@@ -113,7 +113,7 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, ex
         return result
 
     if region is None:
-        reg_l = ["eu", "us", "kr"]
+        reg_l = ["eu", "us", "cn", "kr"]
     else:
         reg_l = [region]
 
