@@ -62,8 +62,8 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
 
     # Calculate the wins, losses, and win rate.
     gamebox_trs = game_box.findall(".//tbody/tr")
-    wins = int(gamebox_trs[0][1].text)
-    games = int(gamebox_trs[1][1].text)
+    wins = int(gamebox_trs[0][1].text.replace(",", ""))
+    games = int(gamebox_trs[1][1].text.replace(",", ""))
     losses = games - wins
     wr = floor((wins / games) * 100)
 
