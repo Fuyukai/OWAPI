@@ -143,17 +143,25 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     ov_stats = parsed.findall(".//div[@class='header-stat']/strong")
     # Don't even loop over these.
 
-    if len(ov_stats) > 3:
-        built_dict["overall_stats"]["rank"] = int(ov_stats[0].text[1:].replace(",", ""))
-    else:
-        built_dict["overall_stats"]["rank"] = None
-    try:
-        built_dict["overall_stats"]["games"] = int(ov_stats[-3].text.replace(",", ""))
-    except IndexError:
-        built_dict["overall_stats"]["games"] = 0
-    built_dict["overall_stats"]["wins"] = int(ov_stats[-2].text.split("/")[0])
-    built_dict["overall_stats"]["losses"] = int(ov_stats[-2].text.split("/")[1])
-    built_dict["overall_stats"]["win_rate"] = float(ov_stats[-1].text[:-1])
+    #if len(ov_stats) > 3:
+    #    built_dict["overall_stats"]["rank"] = int(ov_stats[0].text[1:].replace(",", ""))
+    #else:
+    #    built_dict["overall_stats"]["rank"] = None
+    #try:
+    #    built_dict["overall_stats"]["games"] = int(ov_stats[-3].text.replace(",", ""))
+    #except IndexError:
+    #    built_dict["overall_stats"]["games"] = 0
+    #built_dict["overall_stats"]["wins"] = int(ov_stats[-2].text.split("/")[0])
+    #built_dict["overall_stats"]["losses"] = int(ov_stats[-2].text.split("/")[1])
+    #built_dict["overall_stats"]["win_rate"] = float(ov_stats[-1].text[:-1])
+
+    wins, losses = map(int, ov_stats[0].text.replace(" ", "").replace("\t", "").split("/"))
+
+    built_dict["overall_stats"]["wins"] = wins
+    built_dict["overall_stats"]["losses"] = losses
+    # The less things we have to scrape, the better.
+    built_dict["overall_stats"]["games"] = wins + losses
+    built_dict["overall_stats"]["winrate"] = round(wins/(wins + losses) * 100, 2)
 
     return built_dict
 
