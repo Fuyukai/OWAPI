@@ -55,6 +55,13 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
     built_dict["overall_stats"]["level"] = level
 
+    hasrank = parsed.findall(".//div[@class='competitive-rank']/div")
+    if hasrank:
+        comprank = int(hasrank[0].text)
+    else:
+        comprank = None
+    built_dict["overall_stats"]["comprank"] = comprank
+
     stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
     # Highlight specific stat groups.
     death_box = stat_groups[4]
