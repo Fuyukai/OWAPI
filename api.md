@@ -1,7 +1,6 @@
 # OWAPI API Docs
 
-### `GET /api/v1/u/:battletag/stats`
-
+### `GET /api/v2/u/:battletag/stats`
 **Get the basic stats of a user.**
 
 Like all API requests, this will automatically determine the region of the user.
@@ -9,21 +8,21 @@ Like all API requests, this will automatically determine the region of the user.
 *Example:*
 
 ```
-$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/stats"
+$ http GET "https://owapi.net/api/v2/u/SunDwarf-21353/stats"
 ```
 
 *Result:*
 ```
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 1303
 Content-Type: application/json
-Date: Mon, 30 May 2016 21:12:03 -0000
-Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
+Date: Thu, 30 Jun 2016 18:45:35 -0000
+Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
 
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/v1/u/SunDwarf-21353/stats"
+        "route": "/api/v2/u/SunDwarf-21353/stats"
     },
     "battletag": "SunDwarf-21353",
     "game_stats": {
@@ -73,6 +72,81 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
         "losses": 41,
         "rank": null,
         "win_rate": 49,
+        "wins": 40
+    },
+    "region": "eu"
+}
+```
+
+
+### `GET /api/v1/u/:battletag/stats`
+***Deprecated - use /api/v2/u/:battletag/stats.***
+**Get the basic stats of a user.**
+
+Like all API requests, this will automatically determine the region of the user.
+
+*Example:*
+
+```
+$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/stats"
+```
+
+*Result:*
+```
+{HTTP/1.1 200 OK
+Content-Length: 584
+Content-Type: application/json
+Date: Thu, 30 Jun 2016 18:45:56 -0000
+Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
+
+{
+    "_request": {
+        "api_ver": 1,
+        "route": "/api/v1/u/SunDwarf-21353/stats"
+    },
+    "battletag": "SunDwarf-21353",
+    "game_stats": [
+        {
+            "avg": 5.44,
+            "name": "final blows",
+            "value": 441
+        },
+        {
+            "avg": 9.73,
+            "name": "eliminations",
+            "value": 788
+        },
+        {
+            "avg": null,
+            "name": "kpd",
+            "value": 1.6659619450317125
+        },
+        {
+            "avg": 5.84,
+            "name": "deaths",
+            "value": 473
+        },
+        {
+            "avg": 3756.0,
+            "name": "damage",
+            "value": 304242
+        },
+        {
+            "avg": 609.95,
+            "name": "healing",
+            "value": 49406
+        },
+        {
+            "avg": 2.2,
+            "name": "medals",
+            "value": 178
+        }
+    ],
+    "overall_stats": {
+        "games": 81,
+        "level": 19,
+        "losses": 41,
+        "winrate": 49.38,
         "wins": 40
     },
     "region": "eu"
