@@ -130,7 +130,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     if hasrank:
         comprank = int(hasrank[0].text)
     else:
-        comprank = "Uncalibrated"
+        comprank = None
     built_dict["overall_stats"]["comprank"] = comprank
 
     stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
