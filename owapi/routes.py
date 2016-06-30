@@ -162,7 +162,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     #built_dict["overall_stats"]["losses"] = int(ov_stats[-2].text.split("/")[1])
     #built_dict["overall_stats"]["win_rate"] = float(ov_stats[-1].text[:-1])
 
-    wins, losses = map(int, ov_stats[0].text.replace(" ", "").replace("\t", "").split("/"))
+    wins, losses = map(int, ov_stats[-2].text.replace(" ", "").replace("\t", "").split("/"))
 
     built_dict["overall_stats"]["wins"] = wins
     built_dict["overall_stats"]["losses"] = losses
