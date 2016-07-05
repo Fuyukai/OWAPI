@@ -289,7 +289,7 @@ async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes for the battletag specified.
     """
-    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
+    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None), extra="/heroes")
     if data == (None, None):
         raise HTTPException(404)
 
@@ -301,9 +301,13 @@ async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
     # Get the hero data and deconstruct it.
     hero_info = parsed.findall(".//div[@class='heroes-list']")[0]
     # Get the time info, and zip it together with the hero_info.
-    times = parsed.findall(".//div[@class='heroes-details-title']/time")
+    times = parsed.findall(".//div[@class='heroes-stats-time']")
     for child, time in zip(hero_info, times):
         assert isinstance(child, etree._Element)
+        # Don't check `heroes-columns`.
+        kls = child.values()
+        if any('heroes-columns' in x for x in kls):
+            continue
         # The `see more` tag at the bottom.
         if child.tag != "div":
             continue
@@ -320,16 +324,20 @@ async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
         # Load the hero name.
         name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text.lower()
         # Load the stats KPD.
-        kpd = float(child.xpath(".//div[contains(@class, 'heroes-stats')]/div/strong")[0].text)
+        kpd = float(child.xpath(".//div[contains(@class, 'heroes-stats-kda')]/strong")[0].text)
         # Load the winrate.
-        win_stats = child.xpath(".//div[contains(@class, 'heroes-winrate')]")[0]
+        win_stats = child.xpath(".//span[contains(@class, 'heroes-stats-winrate')]/..")[0]
         # Get the win rate and the games played.
-        winrate_raw = win_stats.xpath(".//strong")[0].text
+        winrate_raw = win_stats.xpath(".//span[@data-column = 'winrate']")[0].text
         winrate = float(winrate_raw[:-1])
-        games_played_raw = win_stats.xpath(".//span")[0].text
-        games_played = int(games_played_raw.split(" ")[0])
+
+        wins = win_stats.xpath(".//small[@class='bar-left']")[0].text[:-1]
+        losses = win_stats.xpath(".//small[@class='bar-right']")[0].text[:-1]
+        wins, losses = int(wins), int(losses)
+        games = wins + losses
+
         # Create the dict.
-        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games_played,
-                                     "extended_url": built_url, "hours": hours})
+        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games,
+                                     "extended_url": built_url, "hours": hours, "wins": wins, "losses": losses})
 
     return built_dict
