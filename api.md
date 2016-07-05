@@ -155,9 +155,9 @@ Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
 
 ### `GET /api/v1/u/:battletag/heroes`
 
-**Get the top 5 played heroes of a user.**
+**Get the played heroes of a user.**
 
-There is not currently a way to get heroes past the top 5.
+This is ordered by your play time.
 
 *Example:*
 
@@ -168,10 +168,10 @@ $ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/heroes"
 *Result:*
 ```
 HTTP/1.1 200 OK
-Content-Length: 691
+Content-Length: 2162
 Content-Type: application/json
-Date: Mon, 30 May 2016 21:40:17 -0000
-Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
+Date: Tue, 05 Jul 2016 10:58:53 -0000
+Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
 
 {
     "_request": {
@@ -181,43 +181,139 @@ Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
     "battletag": "SunDwarf-21353",
     "heroes": [
         {
-            "extended_url": "/api/u/SunDwarf-21353/heroes/11",
-            "games": 19,
-            "kpd": 2.2,
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/11",
+            "games": 26,
+            "hours": 2.0,
+            "kpd": 2.12,
+            "losses": 12,
             "name": "pharah",
-            "winrate": 52.6
+            "winrate": 54.0,
+            "wins": 14
         },
         {
-            "extended_url": "/api/u/SunDwarf-21353/heroes/16",
-            "games": 3,
-            "kpd": 1.24,
-            "name": "hanzo",
-            "winrate": 33.3
-        },
-        {
-            "extended_url": "/api/u/SunDwarf-21353/heroes/22",
-            "games": 3,
-            "kpd": 2.86,
-            "name": "d.va",
-            "winrate": 66.7
-        },
-        {
-            "extended_url": "/api/u/SunDwarf-21353/heroes/12",
-            "games": 2,
-            "kpd": 0.86,
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/12",
+            "games": 18,
+            "hours": 1.0,
+            "kpd": 1.25,
+            "losses": 11,
             "name": "reinhardt",
-            "winrate": 0.0
+            "winrate": 39.0,
+            "wins": 7
         },
         {
-            "extended_url": "/api/u/SunDwarf-21353/heroes/6",
-            "games": 2,
-            "kpd": 0.88,
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/22",
+            "games": 8,
+            "hours": 0.7,
+            "kpd": 3.52,
+            "losses": 3,
+            "name": "d.va",
+            "winrate": 63.0,
+            "wins": 5
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/3",
+            "games": 6,
+            "hours": 0.467,
+            "kpd": 1.91,
+            "losses": 2,
+            "name": "lúcio",
+            "winrate": 67.0,
+            "wins": 4
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/9",
+            "games": 4,
+            "hours": 0.383,
+            "kpd": 1.55,
+            "losses": 1,
+            "name": "widowmaker",
+            "winrate": 75.0,
+            "wins": 3
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/17",
+            "games": 4,
+            "hours": 0.4,
+            "kpd": 0.25,
+            "losses": 1,
+            "name": "mercy",
+            "winrate": 75.0,
+            "wins": 3
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/7",
+            "games": 3,
+            "hours": 0.417,
+            "kpd": 1.09,
+            "losses": 3,
+            "name": "tracer",
+            "winrate": 0.0,
+            "wins": 0
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/6",
+            "games": 3,
+            "hours": 0.467,
+            "kpd": 1.19,
+            "losses": 1,
             "name": "mccree",
-            "winrate": 50.0
+            "winrate": 67.0,
+            "wins": 2
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/16",
+            "games": 3,
+            "hours": 0.45,
+            "kpd": 1.24,
+            "losses": 2,
+            "name": "hanzo",
+            "winrate": 33.0,
+            "wins": 1
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/4",
+            "games": 2,
+            "hours": 0.15,
+            "kpd": 1.21,
+            "losses": 2,
+            "name": "soldier: 76",
+            "winrate": 0.0,
+            "wins": 0
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/8",
+            "games": 1,
+            "hours": 0.067,
+            "kpd": 2.0,
+            "losses": 1,
+            "name": "reaper",
+            "winrate": 0.0,
+            "wins": 0
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/15",
+            "games": 1,
+            "hours": 0.083,
+            "kpd": 2.0,
+            "losses": 0,
+            "name": "bastion",
+            "winrate": 100.0,
+            "wins": 1
+        },
+        {
+            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/14",
+            "games": 1,
+            "hours": 0.15,
+            "kpd": 0.83,
+            "losses": 1,
+            "name": "torbjörn",
+            "winrate": 0.0,
+            "wins": 0
         }
     ],
     "region": "eu"
 }
+
 ```
 
 ### `GET /api/v1/u/:battletag/heroes/:id`
