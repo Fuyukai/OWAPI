@@ -189,47 +189,46 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     """
 
     hero_data_div_ids = {
-        "reaper":     "0x02E0000000000002",
-        "tracer":     "0x02E0000000000003",
-        "mercy":      "0x02E0000000000004",
-        "hanzo":      "0x02E0000000000005",
-        "torbjorn":   "0x02E0000000000006",
-        "reinhardt":  "0x02E0000000000007",
-        "pharah":     "0x02E0000000000008",
-        "winston":    "0x02E0000000000009",
+        "reaper": "0x02E0000000000002",
+        "tracer": "0x02E0000000000003",
+        "mercy": "0x02E0000000000004",
+        "hanzo": "0x02E0000000000005",
+        "torbjorn": "0x02E0000000000006",
+        "reinhardt": "0x02E0000000000007",
+        "pharah": "0x02E0000000000008",
+        "winston": "0x02E0000000000009",
         "widowmaker": "0x02E000000000000A",
-        "bastion":    "0x02E0000000000015",
-        "symmetra":   "0x02E0000000000016",
-        "zenyatta":   "0x02E0000000000020",
-        "genji":      "0x02E0000000000029",
-        "roadhog":    "0x02E0000000000040",
-        "mccree":     "0x02E0000000000042",
-        "junkrat":    "0x02E0000000000065",
-        "zarya":      "0x02E0000000000068",
-        "s76":        "0x02E000000000006E",
-        "soldier76":  "0x02E000000000006E",
-        "lucio":      "0x02E0000000000079",
-        "d.va":       "0x02E000000000007A",
-        "dva":        "0x02E000000000007A",
-        "mei":        "0x02E00000000000DD"
+        "bastion": "0x02E0000000000015",
+        "symmetra": "0x02E0000000000016",
+        "zenyatta": "0x02E0000000000020",
+        "genji": "0x02E0000000000029",
+        "roadhog": "0x02E0000000000040",
+        "mccree": "0x02E0000000000042",
+        "junkrat": "0x02E0000000000065",
+        "zarya": "0x02E0000000000068",
+        "s76": "0x02E000000000006E",
+        "soldier76": "0x02E000000000006E",
+        "lucio": "0x02E0000000000079",
+        "d.va": "0x02E000000000007A",
+        "dva": "0x02E000000000007A",
+        "mei": "0x02E00000000000DD"
     }
 
     if not hero_name:
         return {
-            "error": 400,
-            "msg": "missing hero name"
-            }, 400
+                   "error": 400,
+                   "msg": "missing hero name"
+               }, 400
 
-    if (hero_name) in hero_data_div_ids:
+    if hero_name in hero_data_div_ids:
         requested_hero_div_id = hero_data_div_ids[hero_name]
     else:
         return {
-        "error": 400,
-        "msg": "bad hero name"
-        }, 400
+                   "error": 400,
+                   "msg": "bad hero name"
+               }, 400
 
-
-    data = await bz.region_helper(ctx, battletag, region="us")
+    data = await bz.region_helper(ctx, battletag)
 
     if data == (None, None):
         raise HTTPException(404)
@@ -239,12 +238,14 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag}
 
-    stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id))[0]
+    stat_groups = parsed.xpath(
+            ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
+    )[0]
 
     _t_d = {}
     hero_specific_box = stat_groups[0]
     trs = hero_specific_box.findall(".//tbody/tr")
-        # Update the dict with [0]: [1]
+    # Update the dict with [0]: [1]
     for subval in trs:
         name, value = subval[0].text, subval[1].text
         if 'average' in name.lower():
@@ -327,6 +328,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["winrate"] = round(wins / (wins + losses) * 100, 2)
 
     return built_dict
+
 
 @bp.route("/v2/u/(.*)/heroes")
 @util.jsonify
