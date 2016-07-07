@@ -12,7 +12,7 @@ from kyokai.context import HTTPRequestContext
 
 from owapi import util
 
-B_BASE_URL = "https://playoverwatch.com/en-gb/"
+B_BASE_URL = "https://playoverwatch.com/en-us/"
 B_PAGE_URL = B_BASE_URL + "career/pc/{region}/{btag}"
 
 logger = logging.getLogger("OWAPI")
@@ -47,10 +47,10 @@ def _parse_page(content: str) -> etree._Element:
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "eu", extra="",
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "us", extra="",
                         cache_time=300) -> etree._Element:
     """
-    Downloads the MO page for a user, and parses it.
+    Downloads the BZ page for a user, and parses it.
     """
     built_url = B_PAGE_URL.format(region=region, btag=battletag.replace("#", "-")) + "{}".format(extra)
     page_body = await get_page_body(ctx, built_url, cache_time=cache_time)

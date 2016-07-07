@@ -181,6 +181,97 @@ async def redir_stats(ctx: HTTPRequestContext, battletag: str):
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
+@bp.route("/v2/u/(.*)/heroes/(.*)")
+@util.jsonify
+async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
+    """
+    Gets extended information about a hero on a player.
+    """
+
+    hero_data_div_ids = {
+        "reaper":     "0x02E0000000000002",
+        "tracer":     "0x02E0000000000003",
+        "mercy":      "0x02E0000000000004",
+        "hanzo":      "0x02E0000000000005",
+        "torbjorn":   "0x02E0000000000006",
+        "reinhardt":  "0x02E0000000000007",
+        "pharah":     "0x02E0000000000008",
+        "winston":    "0x02E0000000000009",
+        "widowmaker": "0x02E000000000000A",
+        "bastion":    "0x02E0000000000015",
+        "symmetra":   "0x02E0000000000016",
+        "zenyatta":   "0x02E0000000000020",
+        "genji":      "0x02E0000000000029",
+        "roadhog":    "0x02E0000000000040",
+        "mccree":     "0x02E0000000000042",
+        "junkrat":    "0x02E0000000000065",
+        "zarya":      "0x02E0000000000068",
+        "s76":        "0x02E000000000006E",
+        "soldier76":  "0x02E000000000006E",
+        "lucio":      "0x02E0000000000079",
+        "d.va":       "0x02E000000000007A",
+        "dva":        "0x02E000000000007A",
+        "mei":        "0x02E00000000000DD"
+    }
+
+    if not hero_name:
+        return {
+            "error": 400,
+            "msg": "missing hero name"
+            }, 400
+
+    if (hero_name) in hero_data_div_ids:
+        requested_hero_div_id = hero_data_div_ids[hero_name]
+    else:
+        return {
+        "error": 400,
+        "msg": "bad hero name"
+        }, 400
+
+
+    data = await bz.region_helper(ctx, battletag, region="us")
+
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    # Start the dict.
+    built_dict = {"region": region, "battletag": battletag}
+
+    stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id))[0]
+
+    _t_d = {}
+    hero_specific_box = stat_groups[0]
+    trs = hero_specific_box.findall(".//tbody/tr")
+        # Update the dict with [0]: [1]
+    for subval in trs:
+        name, value = subval[0].text, subval[1].text
+        if 'average' in name.lower():
+            # No averages, ty
+            continue
+        nvl = util.int_or_string(value)
+        _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+
+    built_dict["hero_stats"] = _t_d
+
+    _t_d = {}
+    for subbox in stat_groups[1:]:
+        trs = subbox.findall(".//tbody/tr")
+        # Update the dict with [0]: [1]
+        for subval in trs:
+            name, value = subval[0].text, subval[1].text
+            if 'average' in name.lower():
+                # No averages, ty
+                continue
+            nvl = util.int_or_string(value)
+            _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+
+    built_dict["general_stats"] = _t_d
+
+    return built_dict
+
+
 @bp.route("/v1/u/(.*)/stats")
 @util.jsonify
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
@@ -236,44 +327,6 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["winrate"] = round(wins / (wins + losses) * 100, 2)
 
     return built_dict
-
-
-@bp.route("/v1/u/(.*)/heroes/([0-9]*)")
-@util.jsonify
-async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_id: str):
-    """
-    Gets extended information about a hero on a player.
-    """
-    if not hero_id:
-        return {"error": 400, "msg": "bad hero id"}, 400
-    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
-                                  extra="/heroes/" + hero_id)
-    if data == (None, None):
-        raise HTTPException(404)
-
-    parsed, region = data
-
-    # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "stats": []}
-
-    stats = parsed.findall(".//div[@class='hero-stats']")
-
-    # Loop over each block of stats.
-    for block in stats:
-        title = block.findall(".//div[@class='stats-title']")[0].text.lower()
-        stat_groups = block.findall(".//div[@class='stats-box']")
-
-        l_stats = []
-        # Loop over each stat group, and add it to l_stats.
-        for stat in stat_groups:
-            name = stat.xpath(".//span")[0].text.lower()
-            count = util.int_or_string(stat.xpath(".//strong")[0].text)
-            l_stats.append({"name": name, "value": count})
-
-        built_dict["stats"].append({"name": title, "stats": l_stats})
-
-    return built_dict
-
 
 @bp.route("/v2/u/(.*)/heroes")
 @util.jsonify

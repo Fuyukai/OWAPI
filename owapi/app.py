@@ -1,6 +1,10 @@
 """
 Main OWAPI App.
 """
+
+#import sys
+#sys.path.append('/Users/andrew/Desktop/Dropbox/_programming/Python/OWAPI')
+
 import logging
 
 from asphalt.core import ContainerComponent

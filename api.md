@@ -1,5 +1,7 @@
 # OWAPI API Docs
 
+##V2
+
 ### `GET /api/v2/u/:battletag/stats`
 **Get the basic stats of a user.**
 
@@ -77,6 +79,148 @@ Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
     "region": "eu"
 }
 ```
+
+### `GET /api/v2/u/:battletag/stats/competitive`
+**Get the basic competitive stats of a user.**
+
+Like all API requests, this will automatically determine the region of the user.
+
+*Example:*
+
+```
+$ http GET "https://owapi.net/api/v2/u/Aurelius-1648/stats/competitive"
+```
+
+*Result:*
+```
+{
+    "battletag": "Aurelius-1648",
+    "_request": {
+        "api_ver": 1,
+        "route": "/api/v2/u/Aurelius-1648/stats/competitive"
+    },
+    "game_stats": {
+        "environmental_deaths": 9.0,
+        "games_won": 10.0,
+        "medals_gold": 19.0,
+        "eliminations": 412.0,
+        "damage_done": 201970.0,
+        "multikill_best": 4.0,
+        "time_spent_on_fire": "35:03",
+        "medals_bronze": 23.0,
+        "healing_done": 37755.0,
+        "offensive_assists": 4.0,
+        "eliminations_most_in_game": 39.0,
+        "medals_silver": 15.0,
+        "objective_time": "32:33",
+        "healing_done_most_in_game": 10380.0,
+        "offensive_assists_most_in_game": 3.0,
+        "final_blows_most_in_game": 22.0,
+        "medals": 57.0,
+        "environmental_kills": 2.0,
+        "time_played": "5 hours",
+        "teleporter_pads_destroyed": 1.0,
+        "melee_final_blows": 2.0,
+        "melee_final_blows_most_in_game": 1.0,
+        "solo_kills": 40.0,
+        "defensive_assists_most_in_game": 25.0,
+        "recon_assists": 2.0,
+        "objective_time_most_in_game": "03:22",
+        "cards": 5.0,
+        "objective_kills_most_in_game": 21.0,
+        "multikills": 5.0,
+        "defensive_assists": 45.0,
+        "kpd": 1.55,
+        "games_played": 27.0,
+        "final_blows": 212.0,
+        "time_spent_on_fire_most_in_game": "07:23",
+        "solo_kills_most_in_game": 22.0,
+        "damage_done_most_in_game": 18981.0,
+        "deaths": 265.0,
+        "objective_kills": 197.0
+    },
+    "region": "us",
+    "overall_stats": {
+        "games": 27,
+        "comprank": 54,
+        "rank": null,
+        "level": 80,
+        "losses": 17,
+        "wins": 10,
+        "win_rate": 37
+    }
+}
+```
+
+### `GET /api/v2/u/:battletag/heroes/:heroname`
+
+**Get detailed information about a player's performance as a hero.**
+
+Note that hero names do not have special characters (lucio not lúcio) and
+are lowercase. Use `d.va` or `dva` for D.va and `s76` or `soldier76` for S76.
+
+*Example*:
+```
+$ http GET "https://owapi.net/api/v2/u/Aurelius-1648/heroes/reinhardt"
+```
+
+*Result*:
+
+```
+{
+    "hero_stats": {
+        "damage_blocked_most_in_game": 27137.0,
+        "charge_kills": 385.0,
+        "fire_strike_kills_most_in_game": 13.0,
+        "earthshatter_kills": 487.0,
+        "charge_kills_most_in_game": 9.0,
+        "damage_blocked": 2046918.0,
+        "earthshatter_kills_most_in_game": 9.0,
+        "fire_strike_kills": 690.0
+    },
+    "battletag": "Aurelius-1648",
+    "_request": {
+        "api_ver": 1,
+        "route": "/api/v2/u/Aurelius-1648/heroes/reinhardt"
+    },
+    "general_stats": {
+        "games_won": 104.0,
+        "medals_gold": 204.0,
+        "eliminations": 2279.0,
+        "damage_done": 882436.0,
+        "multikill_best": 5.0,
+        "medals_bronze": 139.0,
+        "eliminations_most_in_life": 18.0,
+        "medals": 513.0,
+        "games_played": 197.0,
+        "eliminations_per_life": 1.65,
+        "objective_time": 13426.0,
+        "time_spent_on_fire": 12365.0,
+        "final_blows_most_in_game": 20.0,
+        "medals_silver": 171.0,
+        "solo_kills": 335.0,
+        "time_played": "25 hours",
+        "teleporter_pads_destroyed": 1.0,
+        "eliminations_most_in_game": 33.0,
+        "environmental_kills": 13.0,
+        "environmental_deaths": 40.0,
+        "damage_done_most_in_life": 5630.0,
+        "objective_time_most_in_game": 249.0,
+        "cards": 91.0,
+        "objective_kills_most_in_game": 17.0,
+        "multikills": 33.0,
+        "win_percentage": "52%",
+        "final_blows": 1340.0,
+        "solo_kills_most_in_game": 6.0,
+        "damage_done_most_in_game": 13569.0,
+        "deaths": 1378.0,
+        "objective_kills": 957.0
+    },
+    "region": "us"
+}
+```
+
+##V1
 
 
 ### `GET /api/v1/u/:battletag/stats`
@@ -314,199 +458,4 @@ Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
     "region": "eu"
 }
 
-```
-
-### `GET /api/v1/u/:battletag/heroes/:id`
-
-**Get detailed information about a player's performance as a hero.**
-
-*Example*:
-```
-$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/heroes/11"
-```
-
-*Result*:
-
-```
-HTTP/1.1 200 OK
-Content-Length: 1843
-Content-Type: application/json
-Date: Mon, 30 May 2016 21:41:17 -0000
-Server: Kyoukai/1.3.0 (see https://github.com/SunDwarf/Kyoukai)
-
-{
-    "_request": {
-        "api_ver": 1,
-        "route": "/api/v1/u/SunDwarf-21353/heroes/11"
-    },
-    "battletag": "SunDwarf-21353",
-    "region": "eu",
-    "stats": [
-        {
-            "name": "hero-specific stats",
-            "stats": [
-                {
-                    "name": "average barrage kills",
-                    "value": 1.0
-                },
-                {
-                    "name": "average rocket direct hits",
-                    "value": 28.0
-                },
-                {
-                    "name": "best barrage kills",
-                    "value": 4.0
-                },
-                {
-                    "name": "best rocket direct hits",
-                    "value": 74.0
-                },
-                {
-                    "name": "total barrage kills",
-                    "value": 12.0
-                },
-                {
-                    "name": "total rocket direct hits",
-                    "value": 542.0
-                }
-            ]
-        },
-        {
-            "name": "overall",
-            "stats": [
-                {
-                    "name": "final blows",
-                    "value": 148.0
-                },
-                {
-                    "name": "eliminations",
-                    "value": 235.0
-                },
-                {
-                    "name": "deaths",
-                    "value": 107.0
-                },
-                {
-                    "name": "damage done",
-                    "value": 98981.0
-                },
-                {
-                    "name": "score",
-                    "value": 15944.0
-                },
-                {
-                    "name": "melee kills",
-                    "value": 0.0
-                },
-                {
-                    "name": "time played",
-                    "value": "2 hours"
-                },
-                {
-                    "name": "time on fire",
-                    "value": "7 minutes"
-                },
-                {
-                    "name": "objective kills",
-                    "value": 47.0
-                },
-                {
-                    "name": "objective time",
-                    "value": "4 minutes"
-                },
-                {
-                    "name": "accuracy",
-                    "value": "52%"
-                },
-                {
-                    "name": "medals earned",
-                    "value": 41.0
-                },
-                {
-                    "name": "cards earned",
-                    "value": 10.0
-                }
-            ]
-        },
-        {
-            "name": "averages per game",
-            "stats": [
-                {
-                    "name": "final blows",
-                    "value": 7.69
-                },
-                {
-                    "name": "eliminations",
-                    "value": 12.22
-                },
-                {
-                    "name": "deaths",
-                    "value": 5.56
-                },
-                {
-                    "name": "damage done",
-                    "value": 5149.0
-                },
-                {
-                    "name": "objective kills",
-                    "value": 2.44
-                },
-                {
-                    "name": "objective time",
-                    "value": "13.12 seconds"
-                }
-            ]
-        },
-        {
-            "name": "best in one game",
-            "stats": [
-                {
-                    "name": "final blows",
-                    "value": 15.0
-                },
-                {
-                    "name": "eliminations",
-                    "value": 26.0
-                },
-                {
-                    "name": "killstreak",
-                    "value": 12.0
-                },
-                {
-                    "name": "damage done",
-                    "value": 13303.0
-                },
-                {
-                    "name": "objective kills",
-                    "value": 8.0
-                },
-                {
-                    "name": "objective time",
-                    "value": 37.0
-                },
-                {
-                    "name": "accuracy",
-                    "value": "69%"
-                }
-            ]
-        },
-        {
-            "name": "best in one life",
-            "stats": [
-                {
-                    "name": "eliminations",
-                    "value": 12.0
-                },
-                {
-                    "name": "damage done",
-                    "value": 3481.0
-                },
-                {
-                    "name": "score",
-                    "value": 1077.0
-                }
-            ]
-        }
-    ]
-}
 ```
