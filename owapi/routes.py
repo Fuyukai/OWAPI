@@ -107,7 +107,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     astats = []
     for astat in _a_s:
         if _t_d[astat] is not None:
-            astats.append({ "name": astat, "avg": _a_s[astat], "value": _t_d[astat]})
+            astats.append({ "name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
         
     build_dict["featured_stats"] = astats
 
@@ -182,7 +182,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     astats = []
     for astat in _a_s:
         if _t_d[astat] is not None:
-            astats.append({ "name": astat, "avg": _a_s[astat], "value": _t_d[astat]})
+            astats.append({ "name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
         
     build_dict["featured_stats"] = astats
 
