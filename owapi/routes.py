@@ -47,7 +47,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     parsed, region = data
 
     # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
 
     kills = 0
 
@@ -86,22 +86,30 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
 
     # Build a dict using the stats.
+    _a_s = {}
     _t_d = {}
     for subbox in stat_groups:
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
         for subval in trs:
-            name, value = subval[0].text, subval[1].text
-            if 'average' in name.lower():
-                # No averages, ty
-                continue
+            name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
             nvl = util.int_or_string(value)
-            _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+            if 'average' in name.lower():
+                _a_s[name.replace("_average", "") = nvl
+            else:
+                _t_d[name] = nvl
 
     # Manually add the KPD.
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
+    
+    astats = []
+    for astat in _a_s:
+        if _t_d[astat] is not None:
+            astats.append({ "name": astat, "avg": _a_s[astat], "value": _t_d[astat]})
+        
+    build_dict["featured_stats"] = astats
 
     return built_dict
 
@@ -119,7 +127,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     parsed, region = data
 
     # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
 
     kills = 0
 
@@ -159,17 +167,24 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
         for subval in trs:
-            name, value = subval[0].text, subval[1].text
-            if 'average' in name.lower():
-                # No averages, ty
-                continue
+            name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
             nvl = util.int_or_string(value)
-            _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+            if 'average' in name.lower():
+                _a_s[name.replace("_average", "") = nvl
+            else:
+                _t_d[name] = nvl
 
     # Manually add the KPD.
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
+    
+    astats = []
+    for astat in _a_s:
+        if _t_d[astat] is not None:
+            astats.append({ "name": astat, "avg": _a_s[astat], "value": _t_d[astat]})
+        
+    build_dict["featured_stats"] = astats
 
     return built_dict
 
