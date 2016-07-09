@@ -95,7 +95,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
             name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
             nvl = util.int_or_string(value)
             if 'average' in name.lower():
-                _a_s[name.replace("_average", "") = nvl
+                _a_s[name.replace("_average", "")] = nvl
             else:
                 _t_d[name] = nvl
 
@@ -103,13 +103,13 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
-    
+
     astats = []
     for astat in _a_s:
         if _t_d[astat] is not None:
-            astats.append({ "name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
-        
-    build_dict["featured_stats"] = astats
+            astats.append({"name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
+
+    built_dict["featured_stats"] = astats
 
     return built_dict
 
@@ -163,6 +163,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
 
     # Build a dict using the stats.
     _t_d = {}
+    _a_s = {}
     for subbox in stat_groups:
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
@@ -170,7 +171,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
             name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
             nvl = util.int_or_string(value)
             if 'average' in name.lower():
-                _a_s[name.replace("_average", "") = nvl
+                _a_s[name.replace("_average", "")] = nvl
             else:
                 _t_d[name] = nvl
 
@@ -178,13 +179,13 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
-    
+
     astats = []
     for astat in _a_s:
         if _t_d[astat] is not None:
-            astats.append({ "name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
-        
-    build_dict["featured_stats"] = astats
+            astats.append({"name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
+
+    built_dict["featured_stats"] = astats
 
     return built_dict
 
@@ -254,7 +255,7 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     built_dict = {"region": region, "battletag": battletag}
 
     stat_groups = parsed.xpath(
-            ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
+        ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
     )[0]
 
     _t_d = {}
