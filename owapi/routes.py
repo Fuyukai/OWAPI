@@ -240,9 +240,9 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
         requested_hero_div_id = hero_data_div_ids[hero_name]
     else:
         return {
-                   "error": 400,
+                   "error": 404,
                    "msg": "bad hero name"
-               }, 400
+               }, 404
 
     data = await bz.region_helper(ctx, battletag)
 
