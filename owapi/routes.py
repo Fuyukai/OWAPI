@@ -14,7 +14,7 @@ from owapi import blizz_interface as bz
 bp = Blueprint("routes", url_prefix="/api")
 
 PRESTIGE = {
-    "0x0250000000000921": None,
+    "0x0250000000000921": 0,
     "0x025000000000094C": 1,
     "0x0250000000000937": 2,
     "0x0250000000000949": 3,
@@ -58,7 +58,25 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
 
-    kills = 0
+    # Get the prestige.
+    prestige = parsed.xpath(".//div[@class='player-level']")[0]
+    # Extract the background-image from the styles.
+    try:
+        bg_image = [x for x in prestige.values() if 'background-image' in x][0]
+    except IndexError:
+        # Cannot find background-image.
+        # Yikes!
+        # Don't set a prestige.
+        pass
+    else:
+        for key, val in PRESTIGE.items():
+            if key in bg_image:
+                prestige_num = val
+                break
+        else:
+            # Unknown.
+            prestige_num = None
+        built_dict["overall_stats"]["prestige"] = prestige_num
 
     # Parse out the HTML.
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
@@ -137,6 +155,27 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
 
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
+
+    # Get the prestige.
+    prestige = parsed.xpath(".//div[@class='player-level']")[0]
+    # Extract the background-image from the styles.
+    try:
+        bg_image = [x for x in prestige.values() if 'background-image' in x][0]
+    except IndexError:
+        # Cannot find background-image.
+        # Yikes!
+        # Don't set a prestige.
+        pass
+    else:
+        for key, val in PRESTIGE.items():
+            if key in bg_image:
+                prestige_num = val
+                break
+        else:
+            # Unknown.
+            prestige_num = None
+        built_dict["overall_stats"]["prestige"] = prestige_num
+
 
     # Parse out the HTML.
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
