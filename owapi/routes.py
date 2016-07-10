@@ -67,7 +67,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
         # Cannot find background-image.
         # Yikes!
         # Don't set a prestige.
-        pass
+        built_dict["overall_stats"]["prestige"] = 0
     else:
         for key, val in PRESTIGE.items():
             if key in bg_image:
@@ -165,7 +165,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
         # Cannot find background-image.
         # Yikes!
         # Don't set a prestige.
-        pass
+        built_dict["overall_stats"]["prestige"] = 0
     else:
         for key, val in PRESTIGE.items():
             if key in bg_image:
