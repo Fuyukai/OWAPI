@@ -13,6 +13,15 @@ from owapi import blizz_interface as bz
 
 bp = Blueprint("routes", url_prefix="/api")
 
+PRESTIGE = {
+    "0x0250000000000921": None,
+    "0x025000000000094C": 1,
+    "0x0250000000000937": 2,
+    "0x0250000000000949": 3,
+    "0x0250000000000941": 4,
+    # 5 will be added once somebody gets it
+}
+
 
 @bp.errorhandler(404)
 @util.jsonify
@@ -128,8 +137,6 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
 
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
-
-    kills = 0
 
     # Parse out the HTML.
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
