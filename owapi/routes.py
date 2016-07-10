@@ -120,7 +120,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
         # Update the dict with [0]: [1]
         for subval in trs:
             name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
-            nvl = util.int_or_string(value)
+            nvl = util.try_extract(value)
             if 'average' in name.lower():
                 _a_s[name.replace("_average", "")] = nvl
             else:
