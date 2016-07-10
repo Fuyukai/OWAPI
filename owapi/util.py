@@ -124,7 +124,6 @@ def try_extract(value):
         # Formula is hours + ((minutes + (seconds / 60)) / 60).
         elif len(sp) == 3:
             hours, mins, seconds = map(int, sp)
-            print(hours, mins, seconds)
             mins += (seconds / 60)
             hours += (mins / 60)
             return hours

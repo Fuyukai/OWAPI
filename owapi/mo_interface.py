@@ -6,7 +6,6 @@ import functools
 import asyncio
 import json
 import logging
-import typing
 
 from lxml import etree
 
