@@ -48,7 +48,7 @@ def jsonify(func):
         result = await func(ctx, *args)
         assert isinstance(ctx.request, Request)
         if isinstance(result, tuple):
-            new_result = {**{"_request": {"route": ctx.request.path, "api_ver": 1}},
+            new_result = {**{"_request": {"route": ctx.request.path, "api_ver": 2}},
                           **result[0]}
             if len(result) == 1:
                 return json.dumps(new_result), 200, {"Content-Type": "application/json"}
@@ -93,3 +93,41 @@ def parse_time(val: str) -> float:
     else:
         hours = val.split(" ")[0]
         return float(hours)
+
+
+def try_extract(value):
+    """
+    Attempt to extract a meaningful value from the time.
+    """
+    get_float = int_or_string(value)
+    # If it's changed, return the new int value.
+    if get_float != value:
+        return get_float
+
+    # Next, try and get a time out of it.
+    if 'hours' in value:
+        val = float(value.replace("hours", ""))
+        return val
+
+    # Check if there's an ':' in it.
+    if ':' in value:
+        sp = value.split(':')
+        # If it's only two, it's mm:ss.
+        # Formula is (minutes + (seconds / 60)) / 60
+        if len(sp) == 2:
+            mins, seconds = map(int, sp)
+            mins += seconds / 60
+            hours = mins / 60
+            return hours
+
+        # If it's three, it's hh:mm:ss.
+        # Formula is hours + ((minutes + (seconds / 60)) / 60).
+        elif len(sp) == 3:
+            hours, mins, seconds = map(int, sp)
+            print(hours, mins, seconds)
+            mins += (seconds / 60)
+            hours += (mins / 60)
+            return hours
+    else:
+        # Just return the value.
+        return value

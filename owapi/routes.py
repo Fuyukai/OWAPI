@@ -176,7 +176,6 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
             prestige_num = None
         built_dict["overall_stats"]["prestige"] = prestige_num
 
-
     # Parse out the HTML.
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
     built_dict["overall_stats"]["level"] = level
@@ -215,7 +214,9 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
         # Update the dict with [0]: [1]
         for subval in trs:
             name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
-            nvl = util.int_or_string(value)
+            # Try and parse out the value. It might be a time!
+            # If so, try and extract the time.
+            nvl = util.try_extract(value)
             if 'average' in name.lower():
                 _a_s[name.replace("_average", "")] = nvl
             else:
@@ -313,7 +314,7 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
         if 'average' in name.lower():
             # No averages, ty
             continue
-        nvl = util.int_or_string(value)
+        nvl = util.try_extract(value)
         _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
 
     built_dict["hero_stats"] = _t_d
