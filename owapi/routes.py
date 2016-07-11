@@ -14,12 +14,17 @@ from owapi import blizz_interface as bz
 bp = Blueprint("routes", url_prefix="/api")
 
 PRESTIGE = {
-    "0x0250000000000921": 0,
+    # There are 10 borders for each prestige (including non-prestige)...
+    "0x0250000000000921": 0, #096
+    "0x0250000000000924": 1,
     "0x025000000000094C": 1,
     "0x0250000000000928": 1,
-    "0x0250000000000937": 2,
-    "0x0250000000000949": 3,
-    "0x0250000000000941": 4,
+    "0x0250000000000950": 1, #196
+    "0x0250000000000937": 2, #230 ?
+    "0x025000000000093B": 2, #249
+    "0x0250000000000949": 3, #370
+    "0x0250000000000941": 4, #457
+    "0x0250000000000953": 4  #490
     # 5 will be added once somebody gets it
 }
 
@@ -57,7 +62,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     parsed, region = data
 
     # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "average_stats": []}
 
     # Get the prestige.
     prestige = parsed.xpath(".//div[@class='player-level']")[0]
@@ -111,11 +116,13 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["losses"] = losses
     built_dict["overall_stats"]["wins"] = wins
     built_dict["overall_stats"]["win_rate"] = wr
-    built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+
+    #built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+    #since it always returns Null, this should be disabled for now
 
     # Build a dict using the stats.
-    _a_s = {}
     _t_d = {}
+    _a_d = {}
     for subbox in stat_groups:
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
@@ -123,7 +130,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
             name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
             nvl = util.try_extract(value)
             if 'average' in name.lower():
-                _a_s[name.replace("_average", "")] = nvl
+                _a_d[name.replace("_average", "_avg")] = nvl
             else:
                 _t_d[name] = nvl
 
@@ -131,13 +138,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
-
-    astats = []
-    for astat in _a_s:
-        if _t_d[astat] is not None:
-            astats.append({"name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
-
-    built_dict["featured_stats"] = astats
+    built_dict["average_stats"] = _a_d
 
     return built_dict
 
@@ -155,7 +156,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     parsed, region = data
 
     # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "featured_stats": []}
+    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "average_stats": []}
 
     # Get the prestige.
     prestige = parsed.xpath(".//div[@class='player-level']")[0]
@@ -205,11 +206,13 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["losses"] = losses
     built_dict["overall_stats"]["wins"] = wins
     built_dict["overall_stats"]["win_rate"] = wr
-    built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+
+    #built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+    #since it always returns Null, it should be disabled for now
 
     # Build a dict using the stats.
     _t_d = {}
-    _a_s = {}
+    _a_d = {}
     for subbox in stat_groups:
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
@@ -219,7 +222,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
             # If so, try and extract the time.
             nvl = util.try_extract(value)
             if 'average' in name.lower():
-                _a_s[name.replace("_average", "")] = nvl
+                _a_d[name.replace("_average", "_avg")] = nvl
             else:
                 _t_d[name] = nvl
 
@@ -227,13 +230,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
 
     built_dict["game_stats"] = _t_d
-
-    astats = []
-    for astat in _a_s:
-        if _t_d[astat] is not None:
-            astats.append({"name": astat.replace("_", " "), "avg": _a_s[astat], "value": _t_d[astat]})
-
-    built_dict["featured_stats"] = astats
+    built_dict["average_stats"] = _a_d
 
     return built_dict
 
