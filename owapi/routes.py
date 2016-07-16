@@ -177,6 +177,9 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     else:
         comprank = None
     built_dict["overall_stats"]["comprank"] = comprank
+    
+    # Fetch Avatar
+    built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
 
     stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
     # Highlight specific stat groups.
