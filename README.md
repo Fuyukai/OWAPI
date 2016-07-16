@@ -28,11 +28,22 @@ OWAPI has a few requirements:
  
      `python3.5 -m venv ./venv`
      
- 3. **Install the requirements.**
+ 3. **Setup a Redis server.**
+ 
+     Redis should be running on the default port - 6379. You can override this in config.yml; however.  
+     Redis is used for caching lots of data so that there's not a 10 second delay on EVERY request as the data is fetched and scraped; it is essential. 
+     
+     For Debian/Ubuntu, you can install one with:
+     `sudo apt install redis-server`
+     
+     You can enable it with:
+     `sudo systemctl enable redis-server && sudo systemctl start redis-server`.
+     
+ 4. **Install the requirements.**
  
      `source ./venv/activate && pip install -r requirements.txt`
      
- 4. **Start the OWAPI server.**
+ 5. **Start the OWAPI server.**
  
      `PYTHONPATH=. asphalt run config.yml`
           
