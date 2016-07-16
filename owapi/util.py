@@ -3,12 +3,15 @@ Useful utilities.
 """
 import json
 import logging
+import re
 
 import aioredis
 from kyokai import Request
 from kyokai.context import HTTPRequestContext
 
 logger = logging.getLogger("OWAPI")
+
+HOUR_REGEX = re.compile(r"hours?")
 
 
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
@@ -105,8 +108,9 @@ def try_extract(value):
         return get_float
 
     # Next, try and get a time out of it.
-    if 'hours' in value:
-        val = float(value.replace("hours", ""))
+    if HOUR_REGEX.search(value) is not None:
+        val = HOUR_REGEX.sub("", value)
+        val = float(value)
         return val
 
     # Check if there's an ':' in it.
