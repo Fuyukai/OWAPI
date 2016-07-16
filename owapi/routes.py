@@ -80,6 +80,9 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     else:
         comprank = None
     built_dict["overall_stats"]["comprank"] = comprank
+    
+    # Fetch Avatar
+    built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
 
     hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
     if len(hascompstats) != 2:
