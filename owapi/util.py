@@ -110,7 +110,7 @@ def try_extract(value):
     # Next, try and get a time out of it.
     if HOUR_REGEX.search(value) is not None:
         val = HOUR_REGEX.sub("", value)
-        val = float(value)
+        val = float(val)
         return val
 
     # Check if there's an ':' in it.
