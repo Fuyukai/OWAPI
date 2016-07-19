@@ -264,7 +264,8 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
         "lucio": "0x02E0000000000079",
         "d.va": "0x02E000000000007A",
         "dva": "0x02E000000000007A",
-        "mei": "0x02E00000000000DD"
+        "mei": "0x02E00000000000DD",
+        "ana": "0x02E000000000013B"
     }
 
     if not hero_name:
