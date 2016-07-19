@@ -27,14 +27,15 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     got = await ctx.redis.get(built)
     if got:
         logger.info("Cache hit for `{}`".format(built))
-        if got == b"None":
-            return None
         return got.decode()
 
     logger.info("Cache miss for `{}`".format(built))
 
     # Call the function.
     result = await func(ctx, *args)
+    if result is None:
+        # return None, no caching for 404s.
+        return None
 
     # Store the result as cached.
     to_set = result if result else "None"

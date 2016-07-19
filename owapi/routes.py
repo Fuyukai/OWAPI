@@ -23,7 +23,7 @@ async def a404(ctx: HTTPRequestContext):
     """
     assert isinstance(ctx.request, Request)
     region = ctx.request.values.get("region", None)
-    return {"error": 404, "msg": "profile not found", "region": region}, 404
+    return {"error": 404, "msg": "profile not found", "region": region}, 404, {"Retry-After": 5}
 
 
 @bp.route("/")
