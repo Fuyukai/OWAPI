@@ -4,6 +4,18 @@
 
 ** All times are in *HOURS* unless specified otherwise. **
 
+#### Note about regions&platforms
+
+Regions and platforms can be overriden with URL parameters.
+
+For example, if you wanted to force fetching of US stats:
+
+```
+$ http GET "https://owapi.net/api/v2/SunDwarf-21353/stats/general?region=us"
+```
+
+This also applies to platforms - you can override the platform with `?platform=<pc|xbox|psn>`.
+
 ### `GET /api/v2/u/:battletag/stats`
 **Get the basic stats of a user.**
 
