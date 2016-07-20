@@ -86,7 +86,7 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, platform="pc", 
         # Check if the page was returned successfully.
         # If it was, return it.
         if page is not None:
-            return page, reg
+            return page, reg[1:]
     else:
         # Since we continued without returning, give back the None, None.
         return None, None
