@@ -11,8 +11,9 @@ from kyokai.context import HTTPRequestContext
 
 logger = logging.getLogger("OWAPI")
 
-HOUR_REGEX = re.compile(r"hours?")
-
+HOUR_REGEX = re.compile(r"([0-9]*) hours?")
+MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
+SECOND_REGEX = re.compile(r"([0-9]*) seconds?")
 
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
     """
@@ -109,9 +110,25 @@ def try_extract(value):
         return get_float
 
     # Next, try and get a time out of it.
-    if HOUR_REGEX.search(value) is not None:
-        val = HOUR_REGEX.sub("", value)
+    matched = HOUR_REGEX.match(value)
+    if matched:
+        val = matched.groups()[0]
         val = float(val)
+        return val
+
+    matched = MINUTE_REGEX.match(value)
+    if matched:
+        val = matched.groups()[0]
+        val = float(val)
+        val /= 60
+        return val
+
+    matched = SECOND_REGEX.match(value)
+    if matched:
+        val = matched.groups()[0]
+        val = float(val)
+        val = (val / 60 / 60)
+
         return val
 
     # Check if there's an ':' in it.
