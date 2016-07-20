@@ -41,7 +41,8 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
     """
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  platform=ctx.request.values.get("platform", "pc"))
     if data == (None, None):
         raise HTTPException(404)
 
@@ -138,7 +139,8 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
     """
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  platform=ctx.request.values.get("platform", "pc"))
     if data == (None, None):
         raise HTTPException(404)
 
@@ -282,7 +284,8 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
                    "msg": "bad hero name"
                }, 404
 
-    data = await bz.region_helper(ctx, battletag)
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  platform=ctx.request.values.get("platform", "pc"))
 
     if data == (None, None):
         raise HTTPException(404)

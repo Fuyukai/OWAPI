@@ -13,7 +13,7 @@ from kyokai.context import HTTPRequestContext
 from owapi import util
 
 B_BASE_URL = "https://playoverwatch.com/en-us/"
-B_PAGE_URL = B_BASE_URL + "career/pc/{region}/{btag}"
+B_PAGE_URL = B_BASE_URL + "career/{platform}{region}/{btag}"
 
 logger = logging.getLogger("OWAPI")
 
@@ -47,12 +47,15 @@ def _parse_page(content: str) -> etree._Element:
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "us", extra="",
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str="pc", region: str = "us", extra="",
                         cache_time=300) -> etree._Element:
     """
     Downloads the BZ page for a user, and parses it.
     """
-    built_url = B_PAGE_URL.format(region=region, btag=battletag.replace("#", "-")) + "{}".format(extra)
+    if platform != "pc":
+        region = ""
+    built_url = B_PAGE_URL.format(
+        region=region, btag=battletag.replace("#", "-"), platform=platform) + "{}".format(extra)
     page_body = await get_page_body(ctx, built_url, cache_time=cache_time)
 
     if not page_body:
@@ -66,20 +69,20 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, region: str = "
     return parsed
 
 
-async def region_helper(ctx: HTTPRequestContext, battletag: str, region=None, extra=""):
+async def region_helper(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""):
     """
     Downloads the correct page for a user in the right region.
 
     This will return either (etree._Element, region) or (None, None).
     """
     if region is None:
-        reg_l = ["eu", "us", "cn", "kr"]
+        reg_l = ["/eu", "/us", "/cn", "/kr"]
     else:
         reg_l = [region]
 
     for reg in reg_l:
         # Get the user page.
-        page = await get_user_page(ctx, battletag, reg, extra)
+        page = await get_user_page(ctx, battletag, platform, reg, extra)
         # Check if the page was returned successfully.
         # If it was, return it.
         if page is not None:
