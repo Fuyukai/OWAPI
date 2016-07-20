@@ -4,7 +4,7 @@
 
 ** All times are in *HOURS* unless specified otherwise. **
 
-#### Note about regions&platforms
+#### Note about Regions & Platforms
 
 Regions and platforms can be overriden with URL parameters.
 
@@ -14,147 +14,99 @@ For example, if you wanted to force fetching of US stats:
 $ http GET "https://owapi.net/api/v2/SunDwarf-21353/stats/general?region=us"
 ```
 
-This also applies to platforms - you can override the platform with `?platform=<pc|xbox|psn>`.
+Note that if they are not overriden, the API will automatically determine which region to use.
+
+This also applies to platforms - you can override the platform with `?platform=<pc|xbox|psn>`. This defaults to `pc`.
 
 ### `GET /api/v2/u/:battletag/stats`
 **Get the basic stats of a user.**
 
-Like all API requests, this will automatically determine the region of the user.
-
 *Example:*
 
 ```
-$ http GET "https://owapi.net/api/v2/u/z1Ad-1583/stats/general"
+$ http GET "https://owapi.net/api/v2/u/SunDwarf-21353/stats/general"
 ```
 
 *Result:*
 ```
 HTTP/1.1 200 OK
-Content-Length: 2138
+Content-Length: 1788
 Content-Type: application/json
-Date: Sun, 10 Jul 2016 12:16:33 -0000
-Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
+Date: Wed, 20 Jul 2016 17:19:37 -0000
+Server: Kyoukai/1.3.8 (see https://github.com/SunDwarf/Kyoukai)
 
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/v2/u/z1Ad-1583/stats/general"
+        "route": "/api/v2/u/SunDwarf-21353/stats/general"
     },
-    "battletag": "z1Ad-1583",
-    "featured_stats": [
-        {
-            "avg": 0.16,
-            "name": "melee final blows",
-            "value": 165.0
-        },
-        {
-            "avg": 6845.0,
-            "name": "damage done",
-            "value": 6722098.0
-        },
-        {
-            "avg": 1.0,
-            "name": "defensive assists",
-            "value": 563.0
-        },
-        {
-            "avg": 6.11,
-            "name": "objective kills",
-            "value": 6005.0
-        },
-        {
-            "avg": 955.0,
-            "name": "healing done",
-            "value": 937741.0
-        },
-        {
-            "avg": 5.44,
-            "name": "deaths",
-            "value": 5344.0
-        },
-        {
-            "avg": 0.0,
-            "name": "offensive assists",
-            "value": 234.0
-        },
-        {
-            "avg": 2.39,
-            "name": "solo kills",
-            "value": 2348.0
-        },
-        {
-            "avg": 0.029166666666666667,
-            "name": "time spent on fire",
-            "value": 28.641666666666666
-        },
-        {
-            "avg": 0.012222222222222221,
-            "name": "objective time",
-            "value": 12.104444444444445
-        },
-        {
-            "avg": 9.5,
-            "name": "final blows",
-            "value": 9330.0
-        },
-        {
-            "avg": 17.76,
-            "name": "eliminations",
-            "value": 17450.0
-        }
-    ],
+    "average_stats": {
+        "damage_done_avg": 3987.0,
+        "deaths_avg": 5.68,
+        "defensive_assists_avg": 0.0,
+        "eliminations_avg": 10.47,
+        "final_blows_avg": 6.12,
+        "healing_done_avg": 589.0,
+        "melee_final_blows_avg": 0.03,
+        "objective_kills_avg": 3.06,
+        "objective_time_avg": 0.007222222222222223,
+        "offensive_assists_avg": 0.0,
+        "solo_kills_avg": 2.3,
+        "time_spent_on_fire_avg": 0.008055555555555555
+    },
+    "battletag": "SunDwarf-21353",
     "game_stats": {
-        "cards": 519.0,
-        "damage_done": 6722098.0,
-        "damage_done_most_in_game": 25687.0,
-        "deaths": 5344.0,
-        "defensive_assists": 563.0,
-        "defensive_assists_most_in_game": 19.0,
-        "eliminations": 17450.0,
-        "eliminations_most_in_game": 49.0,
-        "environmental_deaths": 58.0,
-        "environmental_kills": 62.0,
-        "final_blows": 9330.0,
-        "final_blows_most_in_game": 34.0,
-        "games_played": 982.0,
-        "games_won": 654.0,
-        "healing_done": 937741.0,
-        "healing_done_most_in_game": 11669.0,
-        "kpd": 3.27,
-        "medals": 3544.0,
-        "medals_bronze": 763.0,
-        "medals_gold": 1617.0,
-        "medals_silver": 1164.0,
-        "melee_final_blows": 165.0,
-        "melee_final_blows_most_in_game": 5.0,
-        "multikill_best": 5.0,
-        "multikills": 191.0,
-        "objective_kills": 6005.0,
-        "objective_kills_most_in_game": 27.0,
-        "objective_time": 12.104444444444445,
-        "objective_time_most_in_game": 0.065,
-        "offensive_assists": 234.0,
-        "offensive_assists_most_in_game": 13.0,
-        "recon_assists": 6.0,
-        "solo_kills": 2348.0,
-        "solo_kills_most_in_game": 34.0,
-        "teleporter_pads_destroyed": 20.0,
-        "time_played": 121.0,
-        "time_spent_on_fire": 28.641666666666666,
-        "time_spent_on_fire_most_in_game": 0.18472222222222223
+        "cards": 36.0,
+        "damage_done": 478462.0,
+        "damage_done_most_in_game": 13303.0,
+        "deaths": 682.0,
+        "defensive_assists": 39.0,
+        "defensive_assists_most_in_game": 11.0,
+        "eliminations": 1257.0,
+        "eliminations_most_in_game": 26.0,
+        "environmental_deaths": 12.0,
+        "environmental_kills": 8.0,
+        "final_blows": 735.0,
+        "final_blows_most_in_game": 16.0,
+        "games_played": 120.0,
+        "games_won": 59.0,
+        "healing_done": 70670.0,
+        "healing_done_most_in_game": 7832.0,
+        "kpd": 1.84,
+        "medals": 304.0,
+        "medals_bronze": 102.0,
+        "medals_gold": 100.0,
+        "medals_silver": 102.0,
+        "melee_final_blows": 4.0,
+        "melee_final_blows_most_in_game": 2.0,
+        "multikill_best": 3.0,
+        "multikills": 5.0,
+        "objective_kills": 368.0,
+        "objective_kills_most_in_game": 10.0,
+        "objective_time": 0.8880555555555555,
+        "objective_time_most_in_game": 0.026944444444444444,
+        "offensive_assists": 13.0,
+        "offensive_assists_most_in_game": 7.0,
+        "recon_assists": 9.0,
+        "solo_kills": 277.0,
+        "solo_kills_most_in_game": 16.0,
+        "time_played": 15.0,
+        "time_spent_on_fire": 0.9961111111111111,
+        "time_spent_on_fire_most_in_game": 0.08833333333333333
     },
     "overall_stats": {
-        "comprank": 80,
-        "games": 982,
-        "level": 86,
-        "losses": 328,
-        "prestige": 1,
-        "rank": null,
-        "win_rate": 66,
-        "wins": 654
+        "avatar": "https://blzgdapipro-a.akamaihd.net/game/unlocks/0x02500000000008E8.png",
+        "comprank": null,
+        "games": 120,
+        "level": 24,
+        "losses": 61,
+        "prestige": 0,
+        "win_rate": 49,
+        "wins": 59
     },
-    "region": "us"
+    "region": "eu"
 }
+
 
 ```
 
@@ -172,132 +124,137 @@ $ http GET "https://owapi.net/api/v2/u/Aurelius-1648/stats/competitive"
 *Result:*
 ```
 HTTP/1.1 200 OK
-Content-Length: 2123
+Content-Length: 1811
 Content-Type: application/json
-Date: Sun, 10 Jul 2016 12:19:01 -0000
+Date: Wed, 20 Jul 2016 17:24:06 -0000
 Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
 
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/v2/u/Aurelius-1648/stats/general"
+        "route": "/api/v2/u/Aurelius-1648/stats/competitive"
+    },
+    "average_stats": {
+        "damage_done_avg": 7469.0,
+        "deaths_avg": 10.35,
+        "defensive_assists_avg": 2.0,
+        "eliminations_avg": 16.16,
+        "final_blows_avg": 8.37,
+        "healing_done_avg": 1440.0,
+        "melee_final_blows_avg": 0.1,
+        "objective_kills_avg": 7.43,
+        "objective_time_avg": 0.02027777777777778,
+        "offensive_assists_avg": 0.0,
+        "solo_kills_avg": 1.78,
+        "time_spent_on_fire_avg": 0.01972222222222222
     },
     "battletag": "Aurelius-1648",
-    "featured_stats": [
-        {
-            "avg": 0.14,
-            "name": "melee final blows",
-            "value": 71.0
-        },
-        {
-            "avg": 4637.0,
-            "name": "damage done",
-            "value": 2337039.0
-        },
-        {
-            "avg": 1.0,
-            "name": "defensive assists",
-            "value": 372.0
-        },
-        {
-            "avg": 5.49,
-            "name": "objective kills",
-            "value": 2771.0
-        },
-        {
-            "avg": 747.0,
-            "name": "healing done",
-            "value": 376474.0
-        },
-        {
-            "avg": 6.66,
-            "name": "deaths",
-            "value": 3360.0
-        },
-        {
-            "avg": 0.0,
-            "name": "offensive assists",
-            "value": 80.0
-        },
-        {
-            "avg": 1.59,
-            "name": "solo kills",
-            "value": 806.0
-        },
-        {
-            "avg": 0.014444444444444446,
-            "name": "time spent on fire",
-            "value": 7.339444444444444
-        },
-        {
-            "avg": 0.014166666666666666,
-            "name": "objective time",
-            "value": 7.2525
-        },
-        {
-            "avg": 5.9,
-            "name": "final blows",
-            "value": 2977.0
-        },
-        {
-            "avg": 11.91,
-            "name": "eliminations",
-            "value": 6003.0
-        }
-    ],
     "game_stats": {
-        "cards": 192.0,
-        "damage_done": 2337039.0,
-        "damage_done_most_in_game": 16268.0,
-        "deaths": 3360.0,
-        "defensive_assists": 372.0,
-        "defensive_assists_most_in_game": 18.0,
-        "eliminations": 6003.0,
-        "eliminations_most_in_game": 37.0,
-        "environmental_deaths": 108.0,
-        "environmental_kills": 32.0,
-        "final_blows": 2977.0,
-        "final_blows_most_in_game": 20.0,
-        "games_played": 504.0,
-        "games_won": 256.0,
-        "healing_done": 376474.0,
-        "healing_done_most_in_game": 9994.0,
-        "kpd": 1.79,
-        "medals": 1393.0,
-        "medals_bronze": 381.0,
-        "medals_gold": 530.0,
-        "medals_silver": 482.0,
-        "melee_final_blows": 71.0,
-        "melee_final_blows_most_in_game": 4.0,
-        "multikill_best": 5.0,
-        "multikills": 62.0,
-        "objective_kills": 2771.0,
-        "objective_kills_most_in_game": 30.0,
-        "objective_time": 7.2525,
-        "objective_time_most_in_game": 0.06916666666666667,
-        "offensive_assists": 80.0,
-        "offensive_assists_most_in_game": 5.0,
+        "cards": 5.0,
+        "damage_done": 276363.0,
+        "damage_done_most_in_game": 22155.0,
+        "deaths": 383.0,
+        "defensive_assists": 62.0,
+        "defensive_assists_most_in_game": 25.0,
+        "eliminations": 598.0,
+        "eliminations_most_in_game": 50.0,
+        "environmental_deaths": 12.0,
+        "environmental_kills": 4.0,
+        "final_blows": 310.0,
+        "final_blows_most_in_game": 24.0,
+        "games_played": 37.0,
+        "games_won": 15.0,
+        "healing_done": 53276.0,
+        "healing_done_most_in_game": 10380.0,
+        "kpd": 1.56,
+        "medals": 74.0,
+        "medals_bronze": 29.0,
+        "medals_gold": 23.0,
+        "medals_silver": 22.0,
+        "melee_final_blows": 4.0,
+        "melee_final_blows_most_in_game": 2.0,
+        "multikill_best": 4.0,
+        "multikills": 8.0,
+        "objective_kills": 275.0,
+        "objective_kills_most_in_game": 27.0,
+        "objective_time": 0.7519444444444444,
+        "objective_time_most_in_game": 0.05611111111111111,
+        "offensive_assists": 13.0,
+        "offensive_assists_most_in_game": 7.0,
         "recon_assists": 2.0,
-        "solo_kills": 806.0,
-        "solo_kills_most_in_game": 20.0,
-        "teleporter_pads_destroyed": 2.0,
-        "time_played": 65.0,
-        "time_spent_on_fire": 7.339444444444444,
-        "time_spent_on_fire_most_in_game": 0.19027777777777777
+        "solo_kills": 66.0,
+        "solo_kills_most_in_game": 24.0,
+        "teleporter_pad_destroyed": 1.0,
+        "time_played": 7.0,
+        "time_spent_on_fire": 0.7347222222222223,
+        "time_spent_on_fire_most_in_game": 0.12305555555555556
     },
     "overall_stats": {
-        "comprank": 53,
-        "games": 504,
-        "level": 81,
-        "losses": 248,
-        "prestige": null,
-        "rank": null,
-        "win_rate": 50,
-        "wins": 256
+        "avatar": "https://blzgdapipro-a.akamaihd.net/game/unlocks/0x02500000000008C1.png",
+        "comprank": 52,
+        "games": 37,
+        "level": 83,
+        "losses": 22,
+        "prestige": 0,
+        "win_rate": 40,
+        "wins": 15
     },
     "region": "us"
 }
 
+
+```
+
+### `GET /api/v2/u/:battletag/heroes`
+
+**Get the list of heroes that a person has played as, and the time.**
+
+*Example*:
+```
+$ http GET https://owapi.net/api/v2/u/SunDwarf-21353/heroes
+```
+
+*Result*:
+
+```
+HTTP/1.1 200 OK
+Content-Length: 619
+Content-Type: application/json
+Date: Wed, 20 Jul 2016 17:19:21 -0000
+Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
+
+{
+    "_request": {
+        "api_ver": 1,
+        "route": "/api/v2/u/SunDwarf-21353/heroes"
+    },
+    "battletag": "SunDwarf-21353",
+    "heroes": {
+        "ana": 0,
+        "bastion": 0.2833333333333333,
+        "dva": 1.0,
+        "genji": 0.1,
+        "hanzo": 0.4666666666666667,
+        "junkrat": 0.9333333333333333,
+        "lucio": 0.85,
+        "mccree": 0.7333333333333333,
+        "mei": 0.4166666666666667,
+        "mercy": 0.38333333333333336,
+        "pharah": 3.0,
+        "reaper": 0.25,
+        "reinhardt": 2.0,
+        "roadhog": 0.16666666666666666,
+        "soldier76": 1.0,
+        "symmetra": 0.010277777777777778,
+        "torbjorn": 0.08333333333333333,
+        "tracer": 0.4,
+        "widowmaker": 0.7333333333333333,
+        "winston": 0,
+        "zarya": 0,
+        "zenyatta": 0.05
+    },
+    "region": "eu"
+}
 ```
 
 ### `GET /api/v2/u/:battletag/heroes/:heroname`
@@ -366,244 +323,4 @@ $ http GET "https://owapi.net/api/v2/u/Aurelius-1648/heroes/reinhardt"
     },
     "region": "us"
 }
-```
-
-##V1
-
-
-### `GET /api/v1/u/:battletag/stats`
-***Deprecated - use /api/v2/u/:battletag/stats.***
-**Get the basic stats of a user.**
-
-Like all API requests, this will automatically determine the region of the user.
-
-*Example:*
-
-```
-$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/stats"
-```
-
-*Result:*
-```
-{HTTP/1.1 200 OK
-Content-Length: 584
-Content-Type: application/json
-Date: Thu, 30 Jun 2016 18:45:56 -0000
-Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
-
-{
-    "_request": {
-        "api_ver": 1,
-        "route": "/api/v1/u/SunDwarf-21353/stats"
-    },
-    "battletag": "SunDwarf-21353",
-    "game_stats": [
-        {
-            "avg": 5.44,
-            "name": "final blows",
-            "value": 441
-        },
-        {
-            "avg": 9.73,
-            "name": "eliminations",
-            "value": 788
-        },
-        {
-            "avg": null,
-            "name": "kpd",
-            "value": 1.6659619450317125
-        },
-        {
-            "avg": 5.84,
-            "name": "deaths",
-            "value": 473
-        },
-        {
-            "avg": 3756.0,
-            "name": "damage",
-            "value": 304242
-        },
-        {
-            "avg": 609.95,
-            "name": "healing",
-            "value": 49406
-        },
-        {
-            "avg": 2.2,
-            "name": "medals",
-            "value": 178
-        }
-    ],
-    "overall_stats": {
-        "games": 81,
-        "level": 19,
-        "losses": 41,
-        "winrate": 49.38,
-        "wins": 40
-    },
-    "region": "eu"
-}
-```
-
-### `GET /api/v1/u/:battletag/heroes`
-
-**Get the played heroes of a user.**
-
-This is ordered by your play time.
-
-*Example:*
-
-```
-$ http GET "https://owapi.net/api/v1/u/SunDwarf-21353/heroes"
-```
-
-*Result:*
-```
-HTTP/1.1 200 OK
-Content-Length: 2162
-Content-Type: application/json
-Date: Tue, 05 Jul 2016 10:58:53 -0000
-Server: Kyoukai/1.3.1 (see https://github.com/SunDwarf/Kyoukai)
-
-{
-    "_request": {
-        "api_ver": 1,
-        "route": "/api/v1/u/SunDwarf-21353/heroes"
-    },
-    "battletag": "SunDwarf-21353",
-    "heroes": [
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/11",
-            "games": 26,
-            "hours": 2.0,
-            "kpd": 2.12,
-            "losses": 12,
-            "name": "pharah",
-            "winrate": 54.0,
-            "wins": 14
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/12",
-            "games": 18,
-            "hours": 1.0,
-            "kpd": 1.25,
-            "losses": 11,
-            "name": "reinhardt",
-            "winrate": 39.0,
-            "wins": 7
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/22",
-            "games": 8,
-            "hours": 0.7,
-            "kpd": 3.52,
-            "losses": 3,
-            "name": "d.va",
-            "winrate": 63.0,
-            "wins": 5
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/3",
-            "games": 6,
-            "hours": 0.467,
-            "kpd": 1.91,
-            "losses": 2,
-            "name": "lúcio",
-            "winrate": 67.0,
-            "wins": 4
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/9",
-            "games": 4,
-            "hours": 0.383,
-            "kpd": 1.55,
-            "losses": 1,
-            "name": "widowmaker",
-            "winrate": 75.0,
-            "wins": 3
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/17",
-            "games": 4,
-            "hours": 0.4,
-            "kpd": 0.25,
-            "losses": 1,
-            "name": "mercy",
-            "winrate": 75.0,
-            "wins": 3
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/7",
-            "games": 3,
-            "hours": 0.417,
-            "kpd": 1.09,
-            "losses": 3,
-            "name": "tracer",
-            "winrate": 0.0,
-            "wins": 0
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/6",
-            "games": 3,
-            "hours": 0.467,
-            "kpd": 1.19,
-            "losses": 1,
-            "name": "mccree",
-            "winrate": 67.0,
-            "wins": 2
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/16",
-            "games": 3,
-            "hours": 0.45,
-            "kpd": 1.24,
-            "losses": 2,
-            "name": "hanzo",
-            "winrate": 33.0,
-            "wins": 1
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/4",
-            "games": 2,
-            "hours": 0.15,
-            "kpd": 1.21,
-            "losses": 2,
-            "name": "soldier: 76",
-            "winrate": 0.0,
-            "wins": 0
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/8",
-            "games": 1,
-            "hours": 0.067,
-            "kpd": 2.0,
-            "losses": 1,
-            "name": "reaper",
-            "winrate": 0.0,
-            "wins": 0
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/15",
-            "games": 1,
-            "hours": 0.083,
-            "kpd": 2.0,
-            "losses": 0,
-            "name": "bastion",
-            "winrate": 100.0,
-            "wins": 1
-        },
-        {
-            "extended_url": "/api/v1/u/SunDwarf-21353/heroes/14",
-            "games": 1,
-            "hours": 0.15,
-            "kpd": 0.83,
-            "losses": 1,
-            "name": "torbjörn",
-            "winrate": 0.0,
-            "wins": 0
-        }
-    ],
-    "region": "eu"
-}
-
 ```
