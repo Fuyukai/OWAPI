@@ -292,9 +292,15 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag}
 
-    stat_groups = parsed.xpath(
+    _stat_groups = parsed.xpath(
         ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
-    )[0]
+    )
+    if len(_stat_groups) == 0:
+        # no hero data
+        return {"error": 404,
+                "msg": "hero data not found"}, 404
+
+    stat_groups = _stat_groups[0]
 
     _t_d = {}
     hero_specific_box = stat_groups[0]
