@@ -1,5 +1,6 @@
 from math import floor
 
+import unidecode
 from lxml import etree
 
 from kyokai import Request
@@ -81,7 +82,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     else:
         comprank = None
     built_dict["overall_stats"]["comprank"] = comprank
-    
+
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
 
@@ -107,8 +108,8 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["wins"] = wins
     built_dict["overall_stats"]["win_rate"] = wr
 
-    #built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
-    #since it always returns Null, this should be disabled for now
+    # built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
+    # since it always returns Null, this should be disabled for now
 
     # Build a dict using the stats.
     _t_d = {}
@@ -179,7 +180,7 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     else:
         comprank = None
     built_dict["overall_stats"]["comprank"] = comprank
-    
+
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
 
@@ -200,9 +201,6 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict["overall_stats"]["losses"] = losses
     built_dict["overall_stats"]["wins"] = wins
     built_dict["overall_stats"]["win_rate"] = wr
-
-    #built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
-    #since it always returns Null, it should be disabled for now
 
     # Build a dict using the stats.
     _t_d = {}
@@ -276,6 +274,8 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
                    "msg": "missing hero name"
                }, 400
 
+    hero_name = unidecode.unidecode(hero_name)
+
     if hero_name in hero_data_div_ids:
         requested_hero_div_id = hero_data_div_ids[hero_name]
     else:
@@ -336,69 +336,40 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     return built_dict
 
 
-@bp.route("/v1/u/(.*)/stats")
-@util.jsonify
-async def get_stats(ctx: HTTPRequestContext, battletag: str):
-    """
-    Gets the stats for a user.
-    """
-    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None))
-    if data == (None, None):
-        raise HTTPException(404)
-
-    parsed, region = data
-
-    # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}}
-
-    kills = 0
-    # Parse out the HTML.
-
-    # Load the level.
-    level = int(parsed.findall(".//div[@class='header-avatar']/span")[0].text)
-    built_dict["overall_stats"]["level"] = level
-
-    stats = parsed.xpath(".//div[contains(@class, 'stats-list-box')]")
-
-    for child in stats:
-        title, avg, count = child[::-1]
-
-        # Unfuck numbers
-        count = int(count.text.replace(",", ""))
-        avg = float(avg.text.replace(" AVG", "").replace(",", ""))
-
-        if title.text == "Eliminations":
-            # Set kills.
-            kills = int(count)
-        elif title.text == "Deaths":
-            # Add the KDA.
-            try:
-                built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": kills / int(count)})
-            except ZeroDivisionError:
-                built_dict["game_stats"].append({"name": "kpd", "avg": None, "value": float("inf")})
-
-        # Add it to the dict.
-        built_dict["game_stats"].append({"name": title.text.lower(), "avg": avg, "value": int(count)})
-
-    # Load up overall stats.
-    ov_stats = parsed.findall(".//div[@class='header-stat']/strong")
-    wins, losses = map(int, ov_stats[-2].text.replace(" ", "").replace("\t", "").split("/"))
-
-    built_dict["overall_stats"]["wins"] = wins
-    built_dict["overall_stats"]["losses"] = losses
-    # The less things we have to scrape, the better.
-    built_dict["overall_stats"]["games"] = wins + losses
-    built_dict["overall_stats"]["winrate"] = round(wins / (wins + losses) * 100, 2)
-
-    return built_dict
-
-
 @bp.route("/v2/u/(.*)/heroes")
 @util.jsonify
 async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes for the battletag specified.
     """
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  platform=ctx.request.values.get("platform", "pc"))
+
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    built_dict = {"region": region, "battletag": battletag, "heroes": {}}
+
+    _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
+    hero_info = _hero_info.findall(".//div[@class='bar-text']")
+
+    # Loop over each one, extracting the name and hours counted.
+    for child in hero_info:
+        name, played = child.getchildren()
+        name, played = name.text.lower(), played.text.lower()
+
+        name = unidecode.unidecode(name)
+        name = name.replace(".", "").replace(": ", "")  # d.va and soldier: 76 special cases
+
+        if played == "--":
+            time = 0
+        else:
+            time = util.try_extract(played)
+        built_dict["heroes"][name] = time
+
+    return built_dict
 
 
 @bp.route("/v1/u/(.*)/heroes")
