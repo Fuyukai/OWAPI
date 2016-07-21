@@ -16,7 +16,7 @@ $ http GET "https://owapi.net/api/v2/SunDwarf-21353/stats/general?region=us"
 
 Note that if they are not overriden, the API will automatically determine which region to use.
 
-This also applies to platforms - you can override the platform with `?platform=<pc|xbox|psn>`. This defaults to `pc`.
+This also applies to platforms - you can override the platform with `?platform=<pc|xbl|psn>`. This defaults to `pc`.
 
 ### `GET /api/v2/u/:battletag/stats`
 **Get the basic stats of a user.**
