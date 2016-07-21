@@ -78,6 +78,9 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, platform="pc", 
     if region is None:
         reg_l = ["/eu", "/us", "/cn", "/kr"]
     else:
+        if not region.startswith("/"):
+            # ugh
+            region = "/" + region
         reg_l = [region]
 
     for reg in reg_l:
