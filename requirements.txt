@@ -14,4 +14,4 @@ python-magic==0.4.12
 PyYAML==3.11
 redis==2.10.5
 typeguard==1.2.1
-unidecode
+unidecode==0.04.19
