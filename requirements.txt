@@ -1,5 +1,5 @@
 aiohttp==0.22.1
-aioredis==0.2.7
+aioredis==0.2.8
 asphalt==2.0.0
 asphalt-redis==1.0.0
 asyncio-extras==1.1.1
