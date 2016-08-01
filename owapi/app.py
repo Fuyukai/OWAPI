@@ -6,11 +6,11 @@ import logging
 
 from asphalt.core import ContainerComponent
 
-import kyokai
 from asphalt.redis.component import RedisComponent
-from kyokai.asphalt import KyoukaiComponent
-from kyokai.context import HTTPRequestContext
-from kyokai.response import redirect
+from kyoukai import Kyoukai
+from kyoukai.asphalt import KyoukaiComponent
+from kyoukai.context import HTTPRequestContext
+from kyoukai.response import Response
 
 from owapi import util, routes
 
@@ -42,16 +42,15 @@ class APIComponent(ContainerComponent):
         logger.info("Started OWAPI server.")
 
 
-app = kyokai.Kyokai("owapi")
+app = Kyoukai("owapi")
 
 
 @app.route("/")
 async def root(ctx: HTTPRequestContext):
-    return redirect("https://github.com/SunDwarf/OWAPI/blob/master/api.md")
+    return Response.redirect("https://github.com/SunDwarf/OWAPI/blob/master/api.md")
 
 
 @app.errorhandler(404)
-@util.jsonify
 async def e404(ctx: HTTPRequestContext):
     return {"error": 404}, 404
 

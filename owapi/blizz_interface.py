@@ -8,7 +8,7 @@ import asyncio
 from lxml import etree
 
 import aiohttp
-from kyokai.context import HTTPRequestContext
+from kyoukai.context import HTTPRequestContext
 
 from owapi import util
 
