@@ -234,6 +234,63 @@ async def redir_stats(ctx: HTTPRequestContext, battletag: str):
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
+@bp.route("/v2/u/(.*)/heroes/competitive")
+@util.jsonify
+async def get_heroes_competitive(ctx: HTTPRequestContext, battletag: str):
+    """
+    Returns the top 5 heroes and playtime for the battletag specified, in Competitive.
+    """
+
+    built_dict = await get_heroes("competitive", ctx, battletag)
+    return built_dict
+
+@bp.route("/v2/u/(.*)/heroes/general")
+@util.jsonify
+async def get_heroes_general(ctx: HTTPRequestContext, battletag: str):
+    """
+    Returns the top 5 heroes and playtime for the battletag specified, in Quickplay.
+    """
+
+    built_dict = await get_heroes("quickplay", ctx, battletag)
+    return built_dict
+
+async def get_heroes(mode, ctx, battletag):
+
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
+                                  platform=ctx.request.values.get("platform", "pc"))
+
+    if data == (None, None):
+        raise HTTPException(404)
+
+    parsed, region = data
+
+    built_dict = {"region": region, "battletag": battletag, "heroes": {}}
+
+    if mode == "competitive":
+        _hero_info = parsed.findall(".//div[@id='competitive-play']/section/div/div[@data-group-id='comparisons']")[0]
+    elif mode == "quickplay":
+        _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
+    else:
+        _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
+
+    hero_info = _hero_info.findall(".//div[@class='bar-text']")
+
+    # Loop over each one, extracting the name and hours counted.
+    for child in hero_info:
+        name, played = child.getchildren()
+        name, played = name.text.lower(), played.text.lower()
+
+        name = unidecode.unidecode(name)
+        name = name.replace(".", "").replace(": ", "")  # d.va and soldier: 76 special cases
+
+        if played == "--":
+            time = 0
+        else:
+            time = util.try_extract(played)
+        built_dict["heroes"][name] = time
+
+    return built_dict
+
 @bp.route("/v2/u/(.*)/heroes/(.*)")
 @util.jsonify
 async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
@@ -335,98 +392,8 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
 
     return built_dict
 
-
 @bp.route("/v2/u/(.*)/heroes")
 @util.jsonify
-async def get_heroes(ctx: HTTPRequestContext, battletag: str):
-    """
-    Returns the top 5 heroes for the battletag specified.
-    """
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
-                                  platform=ctx.request.values.get("platform", "pc"))
-
-    if data == (None, None):
-        raise HTTPException(404)
-
-    parsed, region = data
-
-    built_dict = {"region": region, "battletag": battletag, "heroes": {}}
-
-    _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
-    hero_info = _hero_info.findall(".//div[@class='bar-text']")
-
-    # Loop over each one, extracting the name and hours counted.
-    for child in hero_info:
-        name, played = child.getchildren()
-        name, played = name.text.lower(), played.text.lower()
-
-        name = unidecode.unidecode(name)
-        name = name.replace(".", "").replace(": ", "")  # d.va and soldier: 76 special cases
-
-        if played == "--":
-            time = 0
-        else:
-            time = util.try_extract(played)
-        built_dict["heroes"][name] = time
-
-    return built_dict
-
-
-@bp.route("/v1/u/(.*)/heroes")
-@util.jsonify
-async def mo_get_heroes(ctx: HTTPRequestContext, battletag: str):
-    """
-    Returns the top 5 heroes for the battletag specified.
-    """
-    data = await mo.region_helper(ctx, battletag, region=ctx.request.values.get("region", None), extra="/heroes")
-    if data == (None, None):
-        raise HTTPException(404)
-
-    parsed, region = data
-
-    # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "heroes": []}
-
-    # Get the hero data and deconstruct it.
-    hero_info = parsed.findall(".//div[@class='heroes-list']")[0]
-    # Get the time info, and zip it together with the hero_info.
-    times = parsed.findall(".//div[@class='heroes-stats-time']")
-    for child, time in zip(hero_info, times):
-        assert isinstance(child, etree._Element)
-        # Don't check `heroes-columns`.
-        kls = child.values()
-        if any('heroes-columns' in x for x in kls):
-            continue
-        # The `see more` tag at the bottom.
-        if child.tag != "div":
-            continue
-
-        # Parse the time into hours.
-        hours = util.parse_time(time.text)
-
-        # Split out the last part of the `data-href` so we can provide a link to extended hero data.
-        url = child.xpath(".//a[@class='heroes-row-link']")[0].values()[1]
-        id = int(url.split("/")[-1])
-
-        built_url = "/api/v1/u/{}/heroes/{}".format(battletag, id)
-
-        # Load the hero name.
-        name = child.xpath(".//div[contains(@class, 'heroes-icon')]/strong/span")[0].text.lower()
-        # Load the stats KPD.
-        kpd = float(child.xpath(".//div[contains(@class, 'heroes-stats-kda')]/strong")[0].text)
-        # Load the winrate.
-        win_stats = child.xpath(".//span[contains(@class, 'heroes-stats-winrate')]/..")[0]
-        # Get the win rate and the games played.
-        winrate_raw = win_stats.xpath(".//span[@data-column = 'winrate']")[0].text
-        winrate = float(winrate_raw[:-1])
-
-        wins = win_stats.xpath(".//small[@class='bar-left']")[0].text[:-1]
-        losses = win_stats.xpath(".//small[@class='bar-right']")[0].text[:-1]
-        wins, losses = int(wins), int(losses)
-        games = wins + losses
-
-        # Create the dict.
-        built_dict["heroes"].append({"name": name, "kpd": kpd, "winrate": winrate, "games": games,
-                                     "extended_url": built_url, "hours": hours, "wins": wins, "losses": losses})
-
-    return built_dict
+async def redir_heroes(ctx: HTTPRequestContext, battletag: str):
+    built = "/api/v2/u/{}/heroes/general".format(battletag)
+    return {"error": 301, "loc": built}, 301, {"Location": built}
