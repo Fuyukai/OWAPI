@@ -1,6 +1,6 @@
 Kyoukai==1.5.2
 aioredis==0.2.8
-aiohttp==0.21.6
+aiohttp==0.22.5
 asphalt==2.0.0
 asphalt-redis==1.0.0
 asyncio-extras==1.1.1
@@ -9,7 +9,7 @@ click==6.6
 hiredis==0.2.0
 http-parser==0.8.3
 libmagic==1.0
-lxml==3.6.0
+lxml==3.6.1
 python-magic==0.4.12
 PyYAML==3.11
 redis==2.10.5
