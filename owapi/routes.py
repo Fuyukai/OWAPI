@@ -61,103 +61,19 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
     """
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
-                                  platform=ctx.request.values.get("platform", "pc"))
-    if data == (None, None):
-        raise HTTPException(404)
-
-    parsed, region = data
-
-    # Start the dict.
-    built_dict = {"region": region, "battletag": battletag, "game_stats": [], "overall_stats": {}, "average_stats": []}
-
-    # Get the prestige.
-    prestige = parsed.xpath(".//div[@class='player-level']")[0]
-    # Extract the background-image from the styles.
-    try:
-        bg_image = [x for x in prestige.values() if 'background-image' in x][0]
-    except IndexError:
-        # Cannot find background-image.
-        # Yikes!
-        # Don't set a prestige.
-        built_dict["overall_stats"]["prestige"] = 0
-    else:
-        for key, val in PRESTIGE.items():
-            if key in bg_image:
-                prestige_num = val
-                break
-        else:
-            # Unknown.
-            prestige_num = None
-        built_dict["overall_stats"]["prestige"] = prestige_num
-
-    # Parse out the HTML.
-    level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
-    built_dict["overall_stats"]["level"] = level
-
-    hasrank = parsed.findall(".//div[@class='competitive-rank']/div")
-    if hasrank:
-        comprank = int(hasrank[0].text)
-    else:
-        comprank = None
-    built_dict["overall_stats"]["comprank"] = comprank
-
-    # Fetch Avatar
-    built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
-
-    hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
-    if len(hascompstats) != 2:
-        return {"error": 404, "msg": "competitive stats not found", "region": region}, 404
-    stat_groups = hascompstats[1]
-
-    # Highlight specific stat groups.
-    death_box = stat_groups[4]
-    game_box = stat_groups[6]
-
-    # Calculate the wins, losses, and win rate.
-    wins = int(game_box.xpath(".//text()[. = 'Games Won']/../..")[0][1].text.replace(",", ""))
-    g = game_box.xpath(".//text()[. = 'Games Played']/../..")
-    games = int(g[0][1].text.replace(",", ""))
-    losses = games - wins
-    wr = floor((wins / games) * 100)
-
-    # Update the dictionary.
-    built_dict["overall_stats"]["games"] = games
-    built_dict["overall_stats"]["losses"] = losses
-    built_dict["overall_stats"]["wins"] = wins
-    built_dict["overall_stats"]["win_rate"] = wr
-
-    # built_dict["overall_stats"]["rank"] = None  # We don't have a rank in Blizz data.
-    # since it always returns Null, this should be disabled for now
-
-    # Build a dict using the stats.
-    _t_d = {}
-    _a_d = {}
-    for subbox in stat_groups:
-        trs = subbox.findall(".//tbody/tr")
-        # Update the dict with [0]: [1]
-        for subval in trs:
-            name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
-            nvl = util.try_extract(value)
-            if 'average' in name.lower():
-                _a_d[name.replace("_average", "_avg")] = nvl
-            else:
-                _t_d[name] = nvl
-
-    # Manually add the KPD.
-    _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
-
-    built_dict["game_stats"] = _t_d
-    built_dict["average_stats"] = _a_d
-
+    built_dict = await bl_get_stats("competitive", ctx, battletag)
     return built_dict
 
 
 @bp.route("/v2/u/(.*)/stats/general")
-async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
+async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
     """
+    built_dict = await bl_get_stats("quickplay", ctx, battletag)
+    return built_dict
+
+async def bl_get_stats(mode, ctx, battletag):
     data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
                                   platform=ctx.request.values.get("platform", "pc"))
     if data == (None, None):
@@ -202,7 +118,17 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
 
-    stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+    if mode == "competitive":
+        hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
+        if len(hascompstats) != 2:
+            return {"error": 404, "msg": "competitive stats not found", "region": region}, 404
+        stat_groups = hascompstats[1]
+    elif mode == "quickplay":
+        stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+    else:
+        #how else to handle fallthrough case?
+        stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+
     # Highlight specific stat groups.
     death_box = stat_groups[4]
     game_box = stat_groups[6]
@@ -243,7 +169,6 @@ async def bl_get_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict["average_stats"] = _a_d
 
     return built_dict
-
 
 @bp.route("/v2/u/(.*)/stats")
 async def redir_stats(ctx: HTTPRequestContext, battletag: str):
