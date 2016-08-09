@@ -11,7 +11,7 @@ Regions and platforms can be overriden with URL parameters.
 For example, if you wanted to force fetching of US stats:
 
 ```
-$ http GET "https://owapi.net/api/v2/SunDwarf-21353/stats/general?region=us"
+$ http GET "https://owapi.net/api/v2/u/SunDwarf-21353/stats/general?region=us"
 ```
 
 Note that if they are not overriden, the API will automatically determine which region to use.
