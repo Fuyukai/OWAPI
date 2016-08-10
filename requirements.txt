@@ -1,4 +1,4 @@
-Kyoukai==1.5.3
+Kyoukai==1.5.5
 aioredis==0.2.8
 aiohttp==0.22.5
 asphalt==2.0.0
