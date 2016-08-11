@@ -73,6 +73,7 @@ async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
     built_dict = await bl_get_stats("quickplay", ctx, battletag)
     return built_dict
 
+
 async def bl_get_stats(mode, ctx, battletag):
     data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
                                   platform=ctx.request.values.get("platform", "pc"))
@@ -126,7 +127,7 @@ async def bl_get_stats(mode, ctx, battletag):
     elif mode == "quickplay":
         stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
     else:
-        #how else to handle fallthrough case?
+        # how else to handle fallthrough case?
         stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
 
     # Highlight specific stat groups.
@@ -169,6 +170,7 @@ async def bl_get_stats(mode, ctx, battletag):
     built_dict["average_stats"] = _a_d
 
     return built_dict
+
 
 @bp.route("/v2/u/(.*)/stats")
 async def redir_stats(ctx: HTTPRequestContext, battletag: str):

@@ -205,13 +205,13 @@ Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
 
 ```
 
-### `GET /api/v2/u/:battletag/heroes`
+### `GET /api/v2/u/:battletag/heroes/general`
 
-**Get the list of heroes that a person has played as, and the time.**
+**Get the list of heroes that a person has played as, and the time, in quickplay.**
 
 *Example*:
 ```
-$ http GET https://owapi.net/api/v2/u/SunDwarf-21353/heroes
+$ http GET https://owapi.net/api/v2/u/SunDwarf-21353/heroes/general
 ```
 
 *Result*:
@@ -226,7 +226,7 @@ Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
 {
     "_request": {
         "api_ver": 1,
-        "route": "/api/v2/u/SunDwarf-21353/heroes"
+        "route": "/api/v2/u/SunDwarf-21353/heroes/general"
     },
     "battletag": "SunDwarf-21353",
     "heroes": {
@@ -255,6 +255,62 @@ Server: Kyoukai/1.3.6 (see https://github.com/SunDwarf/Kyoukai)
     },
     "region": "eu"
 }
+```
+
+### `GET /api/v2/u/:battletag/heroes/competitive`
+
+**Get the list of heroes that a person has played as, and the time, in competitive.**
+
+*Example*:
+```
+$ http GET https://owapi.net/api/v2/u/SunDwarf-21353/heroes/competitive
+```
+
+*Result*:
+
+```
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 570
+Content-Type: application/json
+Date: Thu, 11 Aug 2016 10:57:37 GMT
+Server: nginx/1.10.0 (Ubuntu)
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Powered-By: Kyoukai
+
+{
+    "_request": {
+        "api_ver": 2,
+        "route": "/api/v2/u/SunDwarf-21353/heroes/competitive"
+    },
+    "battletag": "SunDwarf-21353",
+    "heroes": {
+        "ana": 0,
+        "bastion": 0,
+        "dva": 0,
+        "genji": 0.11666666666666667,
+        "hanzo": 0,
+        "junkrat": 0.03333333333333333,
+        "lucio": 0,
+        "mccree": 0.35,
+        "mei": 0,
+        "mercy": 0,
+        "pharah": 0.2,
+        "reaper": 0.23333333333333334,
+        "reinhardt": 0.9166666666666666,
+        "roadhog": 0.18333333333333332,
+        "soldier76": 0.21666666666666667,
+        "symmetra": 0,
+        "torbjorn": 0,
+        "tracer": 0.03333333333333333,
+        "widowmaker": 0.15,
+        "winston": 0,
+        "zarya": 0,
+        "zenyatta": 0
+    },
+    "region": "eu"
+}
+
 ```
 
 ### `GET /api/v2/u/:battletag/heroes/:heroname`
