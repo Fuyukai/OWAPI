@@ -132,10 +132,17 @@ async def bl_get_stats(mode, ctx, battletag):
 
     # Highlight specific stat groups.
     death_box = stat_groups[4]
-    game_box = stat_groups[6]
+    try:
+        game_box = stat_groups[6]
+    except IndexError:
+        game_box = stat_groups[5]
 
     # Calculate the wins, losses, and win rate.
-    wins = int(game_box.xpath(".//text()[. = 'Games Won']/../..")[0][1].text.replace(",", ""))
+    try:
+        wins = int(game_box.xpath(".//text()[. = 'Games Won']/../..")[0][1].text.replace(",", ""))
+    except IndexError:
+        # weird edge case
+        wins = 0
     g = game_box.xpath(".//text()[. = 'Games Played']/../..")
     games = int(g[0][1].text.replace(",", ""))
     losses = games - wins
