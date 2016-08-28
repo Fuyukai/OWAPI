@@ -18,13 +18,16 @@ bp = Blueprint("routes", url_prefix="/api")
 
 
 @bp.errorhandler(404)
-async def a404(ctx: HTTPRequestContext):
+async def a404(ctx: HTTPRequestContext, exception: HTTPException):
     """
     Return a 404 message, probably because the battletag was not found.
     """
     assert isinstance(ctx.request, Request)
     region = ctx.request.values.get("region", None)
-    return {"error": 404, "msg": "profile not found", "region": region}, 404, {"Retry-After": 5}
+    return json.dumps({"error": 404, "msg": "profile not found", "region": region}), \
+           404, \
+           {"Retry-After": 5,
+            "Content-Type": "application/json"}
 
 
 @bp.after_request
