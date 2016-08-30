@@ -76,7 +76,7 @@ async def region_helper(ctx: HTTPRequestContext, battletag: str, platform="pc", 
     This will return either (etree._Element, region) or (None, None).
     """
     if region is None:
-        reg_l = ["/eu", "/us", "/cn", "/kr"]
+        reg_l = ["/eu", "/us", "/kr"]
     else:
         if not region.startswith("/"):
             # ugh
