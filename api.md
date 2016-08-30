@@ -313,16 +313,16 @@ X-Powered-By: Kyoukai
 
 ```
 
-### `GET /api/v2/u/:battletag/heroes/:heroname`
+### `GET /api/v2/u/:battletag/heroes/:heroname/general`
 
-**Get detailed information about a player's performance as a hero.**
+**Get detailed information about a player's performance as a hero, in quickplay.**
 
 Note that hero names do not have special characters (lucio not lúcio) and
 are lowercase. Use `d.va` or `dva` for D.va and `s76` or `soldier76` for S76.
 
 *Example*:
 ```
-$ http GET "https://owapi.net/api/v2/u/Aurelius-1648/heroes/reinhardt"
+$ http GET "https://owapi.net/api/v2/u/Aurelius-1648/heroes/reinhardt/general"
 ```
 
 *Result*:
@@ -380,3 +380,72 @@ $ http GET "https://owapi.net/api/v2/u/Aurelius-1648/heroes/reinhardt"
     "region": "us"
 }
 ```
+
+### `GET /api/v2/u/:battletag/heroes/:heroname/competitive`
+
+**Get detailed information about a player's performance as a hero, in competitive.**
+
+Note that hero names do not have special characters (lucio not lúcio) and
+are lowercase. Use `d.va` or `dva` for D.va and `s76` or `soldier76` for S76.
+
+*Example*:
+```
+$ http GET "https://owapi.net/api/v2/u/SunDwarf-21353/heroes/reinhardt/competitive"
+```
+
+*Result*:
+
+
+```
+{
+  "battletag": "SunDwarf-21353",
+  "region": "eu",
+  "_request": {
+    "route": "/api/v2/u/SunDwarf-21353/heroes/reinhardt/general",
+    "api_ver": 2
+  },
+  "hero_stats": {
+    "charge_kills": 63,
+    "earthshatter_kills": 55,
+    "damage_blocked": 360541,
+    "damage_blocked_most_in_game": 21119,
+    "fire_strike_kills_most_in_game": 8,
+    "earthshatter_kills_most_in_game": 6,
+    "fire_strike_kills": 109,
+    "charge_kills_most_in_game": 5
+  },
+  "general_stats": {
+    "damage_done_most_in_life": 3199,
+    "final_blows": 190,
+    "objective_kills": 121,
+    "eliminations_most_in_life": 10,
+    "medals_silver": 25,
+    "environmental_kills": 3,
+    "time_played": "4 hours",
+    "medals_bronze": 24,
+    "games_played": 35,
+    "objective_kills_most_in_game": 11,
+    "final_blows_most_in_game": 14,
+    "objective_time": "23:49",
+    "medals_gold": 20,
+    "games_won": 18,
+    "eliminations": 308,
+    "objective_time_most_in_game": "01:58",
+    "environmental_deaths": 13,
+    "multikill_best": 3,
+    "medals": 70,
+    "cards": 15,
+    "win_percentage": "52%",
+    "eliminations_per_life": 1.61,
+    "deaths": 191,
+    "damage_done_most_in_game": 6940,
+    "solo_kills_most_in_game": 4,
+    "multikills": 2,
+    "kill_streak_best": 10,
+    "solo_kills": 52,
+    "damage_done": 114410,
+    "time_spent_on_fire": "08:06",
+    "eliminations_most_in_game": 18
+  },
+  "competitive": false
+}```
