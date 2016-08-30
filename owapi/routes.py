@@ -16,6 +16,33 @@ from owapi.prestige import PRESTIGE
 
 bp = Blueprint("routes", url_prefix="/api")
 
+hero_data_div_ids = {
+    "reaper": "0x02E0000000000002",
+    "tracer": "0x02E0000000000003",
+    "mercy": "0x02E0000000000004",
+    "hanzo": "0x02E0000000000005",
+    "torbjorn": "0x02E0000000000006",
+    "reinhardt": "0x02E0000000000007",
+    "pharah": "0x02E0000000000008",
+    "winston": "0x02E0000000000009",
+    "widowmaker": "0x02E000000000000A",
+    "bastion": "0x02E0000000000015",
+    "symmetra": "0x02E0000000000016",
+    "zenyatta": "0x02E0000000000020",
+    "genji": "0x02E0000000000029",
+    "roadhog": "0x02E0000000000040",
+    "mccree": "0x02E0000000000042",
+    "junkrat": "0x02E0000000000065",
+    "zarya": "0x02E0000000000068",
+    "s76": "0x02E000000000006E",
+    "soldier76": "0x02E000000000006E",
+    "lucio": "0x02E0000000000079",
+    "d.va": "0x02E000000000007A",
+    "dva": "0x02E000000000007A",
+    "mei": "0x02E00000000000DD",
+    "ana": "0x02E000000000013B"
+}
+
 
 @bp.errorhandler(404)
 async def a404(ctx: HTTPRequestContext, exception: HTTPException):
@@ -178,6 +205,7 @@ async def bl_get_stats(mode, ctx, battletag):
 
     built_dict["game_stats"] = _t_d
     built_dict["average_stats"] = _a_d
+    built_dict["competitive"] = mode == "competitive"
 
     return built_dict
 
@@ -245,39 +273,7 @@ async def get_heroes(mode, ctx, battletag):
     return built_dict
 
 
-@bp.route("/v2/u/(.*)/heroes/(.*)")
-async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
-    """
-    Gets extended information about a hero on a player.
-    """
-
-    hero_data_div_ids = {
-        "reaper": "0x02E0000000000002",
-        "tracer": "0x02E0000000000003",
-        "mercy": "0x02E0000000000004",
-        "hanzo": "0x02E0000000000005",
-        "torbjorn": "0x02E0000000000006",
-        "reinhardt": "0x02E0000000000007",
-        "pharah": "0x02E0000000000008",
-        "winston": "0x02E0000000000009",
-        "widowmaker": "0x02E000000000000A",
-        "bastion": "0x02E0000000000015",
-        "symmetra": "0x02E0000000000016",
-        "zenyatta": "0x02E0000000000020",
-        "genji": "0x02E0000000000029",
-        "roadhog": "0x02E0000000000040",
-        "mccree": "0x02E0000000000042",
-        "junkrat": "0x02E0000000000065",
-        "zarya": "0x02E0000000000068",
-        "s76": "0x02E000000000006E",
-        "soldier76": "0x02E000000000006E",
-        "lucio": "0x02E0000000000079",
-        "d.va": "0x02E000000000007A",
-        "dva": "0x02E000000000007A",
-        "mei": "0x02E00000000000DD",
-        "ana": "0x02E000000000013B"
-    }
-
+async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
     if not hero_name:
         return {
                    "error": 400,
@@ -305,7 +301,11 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     # Start the dict.
     built_dict = {"region": region, "battletag": battletag}
 
-    _stat_groups = parsed.xpath(
+    _root = parsed.xpath(
+        ".//div[@id='{}']".format("competitive-play" if competitive else "quick-play")
+    )[0]
+
+    _stat_groups = _root.xpath(
         ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
     )
     if len(_stat_groups) == 0:
@@ -342,8 +342,28 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
             _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
 
     built_dict["general_stats"] = _t_d
+    built_dict["competitive"] = competitive
 
     return built_dict
+
+
+@bp.route("/v2/u/(.*)/heroes/(.*)/competitive")
+async def get_extended_data_comp(ctx: HTTPRequestContext, battletag: str, hero_name: str):
+    return await _get_extended_data(ctx, battletag, hero_name, competitive=True)
+
+
+@bp.route("/v2/u/(.*)/heroes/(.*)/general")
+async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
+    """
+    Gets extended information about a hero on a player.
+    """
+    return await _get_extended_data(ctx, battletag, hero_name, competitive=False)
+
+
+@bp.route("/v2/u/(.*)/heroes/(.*)")
+async def redir_extended_data(ctx: HTTPRequestContext, _, __):
+    built = "/api/v2/u/{}/heroes/{}/general".format(_, __)
+    return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
 @bp.route("/v2/u/(.*)/heroes")
