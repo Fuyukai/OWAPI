@@ -174,9 +174,14 @@ async def bl_get_stats(mode, ctx, battletag):
         # weird edge case
         wins = 0
     g = game_box.xpath(".//text()[. = 'Games Played']/../..")
-    games = int(g[0][1].text.replace(",", ""))
-    losses = games - wins
-    wr = floor((wins / games) * 100)
+    if len(g) < 1:
+        # Blizzard fucked up, temporary quick fix for #70
+        games, losses = 0, 0
+        wr = 0
+    else:
+        games = int(g[0][1].text.replace(",", ""))
+        losses = games - wins
+        wr = floor((wins / games) * 100)
 
     # Update the dictionary.
     built_dict["overall_stats"]["games"] = games
