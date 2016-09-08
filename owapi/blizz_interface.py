@@ -48,7 +48,7 @@ def _parse_page(content: str) -> etree._Element:
     """
     Internal function to parse a page and return the data.
     """
-    if content:
+    if content and content.lower() != 'none':
         data = etree.HTML(content)
         return data
 
