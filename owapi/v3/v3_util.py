@@ -45,7 +45,7 @@ def check_default_useragents(useragent: str):
     return DISALLOW_AGENTS.match(useragent)
 
 
-def with_ratelimit(bucket: str):
+def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
     """
     Defines a function to rate limit for.
 
@@ -84,15 +84,15 @@ def with_ratelimit(bucket: str):
                 # UH OH
                 raise RuntimeError("Failed to match User-Agent - did you wipe rates.yml?")
 
-            timelimit = rates.get("time", 1)
-            max_reqs = rates.get("max_reqs", 1)
+            _timelimit = timelimit or rates.get("time", 1)
+            _max_reqs = max_reqs or rates.get("max_reqs", 1)
 
             # Redis-based ratelimiting.
             # First, check if the key even exists.
             if not (await ctx.redis.exists(built)):
                 # LPUSH, and EXPIRE it.
-                await ctx.redis.lpush(built, max_reqs)
-                await ctx.redis.expire(built, timelimit)
+                await ctx.redis.lpush(built, _max_reqs)
+                await ctx.redis.expire(built, _timelimit)
             else:
                 # LLEN it.
                 tries = await ctx.redis.llen(built)

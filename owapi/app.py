@@ -18,6 +18,7 @@ from owapi.v2 import routes
 
 # Fuck your logging config.
 from owapi.v2.routes import api_v2
+from owapi.v3 import api_v3
 
 logging.basicConfig(filename='/dev/null', level=logging.INFO)
 
@@ -70,8 +71,26 @@ async def e404(ctx: HTTPRequestContext, exc: HTTPException):
     return json.dumps({"error": 404}), 404, {"Content-Type": "application/json"}
 
 
-# Create the api blueprint.
+# Create the api blueprint and add children
 api_bp = Blueprint("api", url_prefix="/api")
+
+
+@api_bp.after_request
+async def jsonify(ctx, response: Response):
+    """
+    JSONify the response.
+    """
+    if isinstance(response.body, str):
+        return response
+
+    # json.dump the body.
+    d = json.dumps(response.body)
+    response.body = d
+    response.headers["Content-Type"] = "application/json"
+    return response
+
+
 api_bp.add_child(api_v2)
+api_bp.add_child(api_v3)
 
 app.register_blueprint(api_bp)

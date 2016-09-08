@@ -42,6 +42,19 @@ hero_data_div_ids = {
 }
 
 
+@api_v2.after_request
+async def add__request(ctx: HTTPRequestContext, r: Response):
+    # Edit the body, and add a _request.
+    if isinstance(r.body, dict):
+        # Add a _request var to the body.
+        r.body["_request"] = {
+            "api_ver": 2,
+            "route": ctx.request.path
+        }
+
+    return r
+
+
 @api_v2.errorhandler(404)
 async def a404(ctx: HTTPRequestContext, exception: HTTPException):
     """
@@ -53,27 +66,6 @@ async def a404(ctx: HTTPRequestContext, exception: HTTPException):
            404, \
            {"Retry-After": 5,
             "Content-Type": "application/json"}
-
-
-@api_v2.after_request
-async def jsonify(ctx, response: Response):
-    """
-    JSONify the response.
-    """
-    if isinstance(response.body, str):
-        return response
-
-    # Add a _request var to the body.
-    response.body["_request"] = {
-        "api_ver": 2,
-        "route": ctx.request.path
-    }
-
-    # json.dump the body.
-    d = json.dumps(response.body)
-    response.body = d
-    response.headers["Content-Type"] = "application/json"
-    return response
 
 
 @api_v2.route("/")
