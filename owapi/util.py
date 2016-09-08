@@ -24,7 +24,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
     # Check for the key.
     # Uses a simple func name + repr(args) as the key to use.
     got = await ctx.redis.get(built)
-    if got:
+    if got and got != "None":
         logger.info("Cache hit for `{}`".format(built))
         return got.decode()
 

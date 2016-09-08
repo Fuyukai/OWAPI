@@ -15,6 +15,9 @@ from owapi import util
 B_BASE_URL = "https://playoverwatch.com/en-us/"
 B_PAGE_URL = B_BASE_URL + "career/{platform}{region}/{btag}"
 
+# The currently available specific regions.
+AVAILABLE_REGIONS = ["eu", "us", "kr"]
+
 logger = logging.getLogger("OWAPI")
 
 
@@ -47,7 +50,7 @@ def _parse_page(content: str) -> etree._Element:
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str="pc", region: str = "us", extra="",
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc", region: str = "us", extra="",
                         cache_time=300) -> etree._Element:
     """
     Downloads the BZ page for a user, and parses it.
@@ -67,6 +70,32 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str="
     parsed = await loop.run_in_executor(None, parse_partial)
 
     return parsed
+
+
+async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
+                               platform="pc"):
+    """
+    Fetches all user pages for a specified user.
+
+    Returns a dictionary in the format of `{region: etree._Element | None}`.
+    """
+    futures = []
+    for region in AVAILABLE_REGIONS:
+        # Add the get_user_page coroutine.
+        coro = get_user_page(ctx, battletag, region=region, platform=platform)
+        futures.append(coro)
+
+    # Gather all the futures to download paralellely.
+    results = await asyncio.gather(futures, return_exceptions=True)
+    d = {}
+    for region, result in zip(AVAILABLE_REGIONS, results):
+        # Make sure it's either a None or an element.
+        if isinstance(result, etree._Element):
+            d[region] = result
+        else:
+            d[region] = None
+
+    return d
 
 
 async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""):
