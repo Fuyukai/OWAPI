@@ -13,7 +13,7 @@ HOUR_REGEX = re.compile(r"([0-9]*) hours?")
 MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
 SECOND_REGEX = re.compile(r"([0-9]*) seconds?")
 
-async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
+async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_404=False):
     """
     Run a coroutine with cache.
 
@@ -32,7 +32,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300):
 
     # Call the function.
     result = await func(ctx, *args)
-    if result is None:
+    if result is None and not cache_404:
         # return None, no caching for 404s.
         return None
 
