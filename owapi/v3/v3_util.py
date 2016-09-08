@@ -18,9 +18,9 @@ DISALLOW_AGENTS = re.compile(r"(?:.*aiohttp/.*|.*python-requests/.*)")
 
 # Bad useragent response text.
 BAD_USERAGENT = {
-                    "error": 429,
+                    "error": 400,
                     "msg": "Hi! To prevent abuse of this service, it is required that you customize your user agent."
-                }, 429, {"Content-Type": "application/json", "Retry-After": 3600 * 24 * 30 * 365}
+                }, 400, {"Content-Type": "application/json"}
 
 if not os.path.exists(RATES_PATH):
     shutil.copy(os.path.join(os.getcwd(), "rates.default.yml"), RATES_PATH)
