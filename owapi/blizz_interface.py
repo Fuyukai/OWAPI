@@ -23,7 +23,7 @@ AVAILABLE_REGIONS = ["/eu", "/us", "/kr"]
 logger = logging.getLogger("OWAPI")
 
 
-async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> str:
+async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache_404=False) -> str:
     """
     Downloads page body from MasterOverwatch and caches it.
     """
@@ -39,7 +39,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> st
                 return None
             return (await req.read()).decode()
 
-    result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time)
+    result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time, cache_404=cache_404)
     session.close()
     return result
 
@@ -53,16 +53,16 @@ def _parse_page(content: str) -> etree._Element:
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc", region: str = "us", extra="",
-                        cache_time=300) -> etree._Element:
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc", region: str = "us",
+                        cache_time=300, cache_404=False) -> etree._Element:
     """
     Downloads the BZ page for a user, and parses it.
     """
     if platform != "pc":
         region = ""
     built_url = B_PAGE_URL.format(
-        region=region, btag=battletag.replace("#", "-"), platform=platform) + "{}".format(extra)
-    page_body = await get_page_body(ctx, built_url, cache_time=cache_time)
+        region=region, btag=battletag.replace("#", "-"), platform=platform)
+    page_body = await get_page_body(ctx, built_url, cache_time=cache_time, cache_404=cache_404)
 
     if not page_body:
         return None
@@ -85,7 +85,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
     futures = []
     for region in AVAILABLE_REGIONS:
         # Add the get_user_page coroutine.
-        coro = get_user_page(ctx, battletag, region=region, platform=platform)
+        coro = get_user_page(ctx, battletag, region=region, platform=platform, cache_404=True)
         futures.append(coro)
 
     # Gather all the futures to download paralellely.
