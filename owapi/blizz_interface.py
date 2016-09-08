@@ -22,7 +22,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> st
     """
     Downloads page body from MasterOverwatch and caches it.
     """
-    session = aiohttp.ClientSession(headers={"User-Agent": "OWAPI Scraper/1.0.0"})
+    session = aiohttp.ClientSession(headers={"User-Agent": "OWAPI Scraper/1.0.1"})
 
     async def _real_get_body(_, url: str):
         # Real function.
@@ -69,7 +69,7 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str="
     return parsed
 
 
-async def region_helper(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""):
+async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""):
     """
     Downloads the correct page for a user in the right region.
 

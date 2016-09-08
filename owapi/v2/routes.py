@@ -105,8 +105,8 @@ async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
 
 
 async def bl_get_stats(mode, ctx, battletag):
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.args.get("region", None),
-                                  platform=ctx.request.args.get("platform", "pc"))
+    data = await bz.region_helper_v2(ctx, battletag, region=ctx.request.args.get("region", None),
+                                     platform=ctx.request.args.get("platform", "pc"))
     if data == (None, None):
         raise HTTPException(404)
 
@@ -242,8 +242,8 @@ async def get_heroes_general(ctx: HTTPRequestContext, battletag: str):
 
 
 async def get_heroes(mode, ctx, battletag):
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.args.get("region", None),
-                                  platform=ctx.request.args.get("platform", "pc"))
+    data = await bz.region_helper_v2(ctx, battletag, region=ctx.request.args.get("region", None),
+                                     platform=ctx.request.args.get("platform", "pc"))
 
     if data == (None, None):
         raise HTTPException(404)
@@ -295,8 +295,8 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
                    "msg": "bad hero name"
                }, 404
 
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.args.get("region", None),
-                                  platform=ctx.request.args.get("platform", "pc"))
+    data = await bz.region_helper_v2(ctx, battletag, region=ctx.request.args.get("region", None),
+                                     platform=ctx.request.args.get("platform", "pc"))
 
     if data == (None, None):
         raise HTTPException(404)
