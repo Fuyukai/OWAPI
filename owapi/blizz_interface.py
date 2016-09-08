@@ -5,6 +5,8 @@ import functools
 import logging
 
 import asyncio
+import traceback
+
 from lxml import etree
 
 import aiohttp
@@ -16,7 +18,7 @@ B_BASE_URL = "https://playoverwatch.com/en-us/"
 B_PAGE_URL = B_BASE_URL + "career/{platform}{region}/{btag}"
 
 # The currently available specific regions.
-AVAILABLE_REGIONS = ["eu", "us", "kr"]
+AVAILABLE_REGIONS = ["/eu", "/us", "/kr"]
 
 logger = logging.getLogger("OWAPI")
 
@@ -32,6 +34,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300) -> st
         logger.info("GET => {}".format(url))
         async with session.get(url) as req:
             assert isinstance(req, aiohttp.ClientResponse)
+            logger.info("GET => {} => {}".format(url, req.status))
             if req.status != 200:
                 return None
             return (await req.read()).decode()
@@ -86,12 +89,16 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
         futures.append(coro)
 
     # Gather all the futures to download paralellely.
-    results = await asyncio.gather(futures, return_exceptions=True)
+    results = await asyncio.gather(*futures, return_exceptions=True)
     d = {}
     for region, result in zip(AVAILABLE_REGIONS, results):
         # Make sure it's either a None or an element.
         if isinstance(result, etree._Element):
             d[region] = result
+        elif isinstance(result, Exception):
+            logger.error("Failed to fetch user page!\n{}".format(
+                traceback.format_exception(type(result), result, result.__traceback__)
+            ))
         else:
             d[region] = None
 
