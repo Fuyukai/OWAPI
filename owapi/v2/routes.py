@@ -3,8 +3,6 @@ from math import floor
 
 import unidecode
 from kyoukai import Response
-from lxml import etree
-
 from kyoukai import Request
 from kyoukai.blueprints import Blueprint
 from kyoukai.context import HTTPRequestContext
@@ -14,7 +12,7 @@ from owapi import util
 from owapi import blizz_interface as bz
 from owapi.prestige import PRESTIGE
 
-bp = Blueprint("routes", url_prefix="/api")
+api_v2 = Blueprint("api_v2", url_prefix="/v2")
 
 hero_data_div_ids = {
     "reaper": "0x02E0000000000002",
@@ -44,7 +42,7 @@ hero_data_div_ids = {
 }
 
 
-@bp.errorhandler(404)
+@api_v2.errorhandler(404)
 async def a404(ctx: HTTPRequestContext, exception: HTTPException):
     """
     Return a 404 message, probably because the battletag was not found.
@@ -57,7 +55,7 @@ async def a404(ctx: HTTPRequestContext, exception: HTTPException):
             "Content-Type": "application/json"}
 
 
-@bp.after_request
+@api_v2.after_request
 async def jsonify(ctx, response: Response):
     """
     JSONify the response.
@@ -78,15 +76,17 @@ async def jsonify(ctx, response: Response):
     return response
 
 
-@bp.route("/")
+@api_v2.route("/")
 async def root(ctx: HTTPRequestContext):
     """
     Return the root message.
     """
-    return {}
+    return {
+        "message": "API v2 is deprecated! It is recommended to use API v3 instead."
+    }
 
 
-@bp.route("/v2/u/(.*)/stats/competitive")
+@api_v2.route("/u/(.*)/stats/competitive")
 async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
@@ -95,7 +95,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@bp.route("/v2/u/(.*)/stats/general")
+@api_v2.route("/u/(.*)/stats/general")
 async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
@@ -215,13 +215,13 @@ async def bl_get_stats(mode, ctx, battletag):
     return built_dict
 
 
-@bp.route("/v2/u/(.*)/stats")
+@api_v2.route("/u/(.*)/stats")
 async def redir_stats(ctx: HTTPRequestContext, battletag: str):
     built = "/api/v2/u/{}/stats/general".format(battletag)
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
-@bp.route("/v2/u/(.*)/heroes/competitive")
+@api_v2.route("/u/(.*)/heroes/competitive")
 async def get_heroes_competitive(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes and playtime for the battletag specified, in Competitive.
@@ -231,7 +231,7 @@ async def get_heroes_competitive(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@bp.route("/v2/u/(.*)/heroes/general")
+@api_v2.route("/u/(.*)/heroes/general")
 async def get_heroes_general(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes and playtime for the battletag specified, in Quickplay.
@@ -352,12 +352,12 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
     return built_dict
 
 
-@bp.route("/v2/u/(.*)/heroes/(.*)/competitive")
+@api_v2.route("/u/(.*)/heroes/(.*)/competitive")
 async def get_extended_data_comp(ctx: HTTPRequestContext, battletag: str, hero_name: str):
     return await _get_extended_data(ctx, battletag, hero_name, competitive=True)
 
 
-@bp.route("/v2/u/(.*)/heroes/(.*)/general")
+@api_v2.route("/u/(.*)/heroes/(.*)/general")
 async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
     """
     Gets extended information about a hero on a player.
@@ -365,13 +365,13 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     return await _get_extended_data(ctx, battletag, hero_name, competitive=False)
 
 
-@bp.route("/v2/u/(.*)/heroes/(.*)")
+@api_v2.route("/u/(.*)/heroes/(.*)")
 async def redir_extended_data(ctx: HTTPRequestContext, _, __):
     built = "/api/v2/u/{}/heroes/{}/general".format(_, __)
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
-@bp.route("/v2/u/(.*)/heroes")
+@api_v2.route("/u/(.*)/heroes")
 async def redir_heroes(ctx: HTTPRequestContext, battletag: str):
     built = "/api/v2/u/{}/heroes/general".format(battletag)
     return {"error": 301, "loc": built}, 301, {"Location": built}

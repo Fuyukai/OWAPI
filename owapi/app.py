@@ -6,17 +6,18 @@ import logging
 import traceback
 
 from asphalt.core import ContainerComponent
-
 from asphalt.redis.component import RedisComponent
+from kyoukai import Blueprint
 from kyoukai import HTTPException
 from kyoukai import Kyoukai
 from kyoukai.asphalt import KyoukaiComponent
 from kyoukai.context import HTTPRequestContext
 from kyoukai.response import Response
 
-from owapi import util, routes
+from owapi.v2 import routes
 
 # Fuck your logging config.
+from owapi.v2.routes import api_v2
 
 logging.basicConfig(filename='/dev/null', level=logging.INFO)
 
@@ -69,4 +70,8 @@ async def e404(ctx: HTTPRequestContext, exc: HTTPException):
     return json.dumps({"error": 404}), 404, {"Content-Type": "application/json"}
 
 
-app.register_blueprint(routes.bp)
+# Create the api blueprint.
+api_bp = Blueprint("api", url_prefix="/api")
+api_bp.add_child(api_v2)
+
+app.register_blueprint(api_bp)
