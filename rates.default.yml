@@ -1,0 +1,6 @@
+## Default ratelimits file.
+## This specifies a 1/1 ratelimit for all users.
+rates:
+  ".*":
+    time: 1
+    max_reqs: 1
