@@ -50,7 +50,7 @@ async def a404(ctx: HTTPRequestContext, exception: HTTPException):
     Return a 404 message, probably because the battletag was not found.
     """
     assert isinstance(ctx.request, Request)
-    region = ctx.request.values.get("region", None)
+    region = ctx.request.args.get("region", None)
     return json.dumps({"error": 404, "msg": "profile not found", "region": region}), \
            404, \
            {"Retry-After": 5,
@@ -295,8 +295,8 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
                    "msg": "bad hero name"
                }, 404
 
-    data = await bz.region_helper(ctx, battletag, region=ctx.request.values.get("region", None),
-                                  platform=ctx.request.values.get("platform", "pc"))
+    data = await bz.region_helper(ctx, battletag, region=ctx.args.get("region", None),
+                                  platform=ctx.request.args.get("platform", "pc"))
 
     if data == (None, None):
         raise HTTPException(404)
