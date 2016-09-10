@@ -295,7 +295,7 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
                    "msg": "bad hero name"
                }, 404
 
-    data = await bz.region_helper(ctx, battletag, region=ctx.args.get("region", None),
+    data = await bz.region_helper(ctx, battletag, region=ctx.request.args.get("region", None),
                                   platform=ctx.request.args.get("platform", "pc"))
 
     if data == (None, None):
