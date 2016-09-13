@@ -40,7 +40,10 @@ OWAPI has a few requirements:
      `sudo systemctl enable redis-server && sudo systemctl start redis-server`.
      
  4. **Install the requirements.**
- 
+
+     For debian-based systems:
+        `sudo apt install libxslt-dev python3-dev build-essential`
+
      `source ./venv/activate && pip install -r requirements.txt`
      
  5. **Start the OWAPI server.**
