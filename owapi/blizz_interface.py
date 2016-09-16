@@ -86,10 +86,10 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
         coro = get_user_page(ctx, battletag, region="", platform=platform, cache_404=True)
         result = await coro
         if isinstance(result, etree._Element):
-            return {"all": result,
+            return {"any": result,
                     "eu": None, "us": None, "kr": None}
         else:
-            return {"all": None,
+            return {"any": None,
                     "eu": None, "us": None, "kr": None}
 
     futures = []
@@ -100,7 +100,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
 
     # Gather all the futures to download paralellely.
     results = await asyncio.gather(*futures, return_exceptions=True)
-    d = {}
+    d = {"any": None}
     for region, result in zip(AVAILABLE_REGIONS, results):
         # Remove the `/` from the front of the region.
         # This is used internally to make building the URL to get simpler.
