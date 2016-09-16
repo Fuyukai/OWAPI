@@ -7,6 +7,8 @@ import aioredis
 import shutil
 
 import re
+
+import functools
 import yaml
 from kyoukai import HTTPRequestContext
 
@@ -54,6 +56,7 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
 
     # Compile regular expressions
     def _rl_inner1(func):
+        @functools.wraps(func)
         async def _rl_inner2(ctx: HTTPRequestContext, *args, **kwargs):
             """
             Inner ratelimit function.
