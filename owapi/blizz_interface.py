@@ -82,6 +82,16 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
 
     Returns a dictionary in the format of `{region: etree._Element | None}`.
     """
+    if platform != "pc":
+        coro = get_user_page(ctx, battletag, region="", platform=platform, cache_404=True)
+        result = await coro
+        if isinstance(result, etree._Element):
+            return {"all": result,
+                    "eu": None, "us": None, "kr": None}
+        else:
+            return {"all": None,
+                    "eu": None, "us": None, "kr": None}
+
     futures = []
     for region in AVAILABLE_REGIONS:
         # Add the get_user_page coroutine.
@@ -92,6 +102,9 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
     results = await asyncio.gather(*futures, return_exceptions=True)
     d = {}
     for region, result in zip(AVAILABLE_REGIONS, results):
+        # Remove the `/` from the front of the region.
+        # This is used internally to make building the URL to get simpler.
+        region = region[1:]
         # Make sure it's either a None or an element.
         if isinstance(result, etree._Element):
             d[region] = result
@@ -99,6 +112,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
             logger.error("Failed to fetch user page!\n{}".format(
                 traceback.format_exception(type(result), result, result.__traceback__)
             ))
+            d[region] = None
         else:
             d[region] = None
 
