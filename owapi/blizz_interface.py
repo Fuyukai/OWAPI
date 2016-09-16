@@ -25,7 +25,7 @@ logger = logging.getLogger("OWAPI")
 
 async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache_404=False) -> str:
     """
-    Downloads page body from MasterOverwatch and caches it.
+    Downloads page body from PlayOverwatch and caches it.
     """
     session = aiohttp.ClientSession(headers={"User-Agent": "OWAPI Scraper/1.0.1"})
 
