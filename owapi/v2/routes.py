@@ -12,7 +12,7 @@ from owapi import util
 from owapi import blizz_interface as bz
 from owapi.prestige import PRESTIGE
 
-api_v2 = Blueprint("api_v2", url_prefix="/v2")
+api_v2 = Blueprint("api_v2", url_prefix="/v2", reverse_hooks=True)
 
 hero_data_div_ids = {
     "reaper": "0x02E0000000000002",

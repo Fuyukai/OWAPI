@@ -9,7 +9,7 @@ from owapi.blizz_interface import fetch_all_user_pages
 from owapi.v3.v3_util import with_ratelimit
 from owapi.v3 import parsing
 
-api_v3 = Blueprint("api_v3", url_prefix="/v3")
+api_v3 = Blueprint("api_v3", url_prefix="/v3", reverse_hooks=True)
 
 
 @api_v3.after_request
