@@ -31,7 +31,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
     """
     Returns a giant blob of data.
     """
-    pages = await fetch_all_user_pages(ctx, battletag)
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -65,7 +65,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches stats about the user.
     """
-    pages = await fetch_all_user_pages(ctx, battletag)
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -94,7 +94,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, for quick-play.
     """
-    pages = await fetch_all_user_pages(ctx, battletag)
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -122,7 +122,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, in one big blob.
     """
-    pages = await fetch_all_user_pages(ctx, battletag)
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -154,7 +154,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, for quick-play.
     """
-    pages = await fetch_all_user_pages(ctx, battletag)
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
     built_dict = {}
     for region, result in pages.items():
