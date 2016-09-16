@@ -90,35 +90,7 @@ get_stats.should_convert = False
 
 @api_v3.route("/u/(.*)/heroes")
 @with_ratelimit("stats")
-async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
-    """
-    Fetches hero stats, for quick-play.
-    """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
-
-    built_dict = {}
-    for region, result in pages.items():
-        if result is None:
-            built_dict[region] = None
-            continue
-        d = {
-            "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
-        }
-
-        d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
-
-        d["heroes"]["playtime"]["quickplay"] = parsing.bl_parse_all_heroes(result)
-
-        built_dict[region] = d
-
-    return built_dict
-
-
-# Separate routes.
-@api_v3.route("/u/(.*)/heroes/quickplay")
-@with_ratelimit("stats")
-async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
+async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, in one big blob.
     """
@@ -145,6 +117,34 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
+# Separate routes.
+@api_v3.route("/u/(.*)/heroes/quickplay")
+@with_ratelimit("stats")
+async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
+    """
+    Fetches hero stats, for quick-play.
+    """
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+
+    built_dict = {}
+    for region, result in pages.items():
+        if result is None:
+            built_dict[region] = None
+            continue
+        d = {
+            "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
+            "stats": {}
+        }
+
+        d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
+
+        d["heroes"]["playtime"]["quickplay"] = parsing.bl_parse_all_heroes(result)
+
+        built_dict[region] = d
+
+    return built_dict
+
+
 get_heroes_qp.should_convert = False
 
 
@@ -152,7 +152,7 @@ get_heroes_qp.should_convert = False
 @with_ratelimit("stats")
 async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     """
-    Fetches hero stats, for quick-play.
+    Fetches hero stats, for competitive.
     """
     pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
 
