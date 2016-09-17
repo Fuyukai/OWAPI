@@ -31,7 +31,6 @@ root.addHandler(consoleHandler)
 
 logger = logging.getLogger("OWAPI")
 
-
 class APIComponent(ContainerComponent):
     """
     Container for other components. I think.

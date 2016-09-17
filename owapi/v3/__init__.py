@@ -11,7 +11,6 @@ from owapi.v3 import parsing
 
 api_v3 = Blueprint("api_v3", url_prefix="/v3", reverse_hooks=True)
 
-
 @api_v3.after_request
 async def add__request(ctx: HTTPRequestContext, r: Response):
     # Edit the body, and add a _request.
@@ -31,7 +30,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
     """
     Returns a giant blob of data.
     """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -65,7 +64,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches stats about the user.
     """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -94,7 +93,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, in one big blob.
     """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -124,7 +123,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, for quick-play.
     """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
 
     built_dict = {}
     for region, result in pages.items():
@@ -154,7 +153,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     """
     Fetches hero stats, for competitive.
     """
-    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform"))
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
 
     built_dict = {}
     for region, result in pages.items():
