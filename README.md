@@ -42,13 +42,15 @@ OWAPI has a few requirements:
  4. **Install the requirements.**
 
      For debian-based systems:
-        `sudo apt install libxslt-dev python3-dev build-essential`
+        `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev`
 
-     `source ./venv/activate && pip install -r requirements.txt`
+     `source ./venv/bin/activate && pip install wheel && pip install -r requirements.txt`
      
  5. **Start the OWAPI server.**
  
      `PYTHONPATH=. asphalt run config.yml`
+     
+     The server is now running on http://localhost:4444/
           
      Note: If you want the full speedups from Kyoukai you must run with uvloop enabled:
      `PYTHONPATH=. asphalt run -l uvloop config.yml`
