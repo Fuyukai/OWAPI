@@ -89,7 +89,13 @@ def bl_parse_stats(parsed, mode="quickplay"):
     try:
         game_box = stat_groups[6]
     except IndexError:
-        game_box = stat_groups[5]
+        try:
+            game_box = stat_groups[5]
+        except IndexError:
+            # edge cases...
+            # we can't really extract any more stats
+            # so we do an early return
+            return {}
 
     # Calculate the wins, losses, and win rate.
     try:
