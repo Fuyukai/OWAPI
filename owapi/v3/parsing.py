@@ -5,6 +5,7 @@ from lxml import etree
 from math import floor
 
 import unidecode
+import re
 
 from owapi import util
 from owapi.prestige import PRESTIGE
@@ -217,5 +218,37 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         n_dict["general_stats"] = _t_d
 
         built_dict[hero_name] = n_dict
+
+    return built_dict
+
+def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
+    # Start the dict.
+    built_dict = {}
+
+    _root = parsed.xpath(
+        ".//section[@id='achievements-section']"
+    )
+    if not _root:
+        return
+    _root = _root[0]
+
+    _category_selects = _root.xpath(".//select[@data-group-id='achievements']")[0].xpath(".//option")
+
+    for _category_select in _category_selects:
+        category_name = _category_select.text
+        category_id = _category_select.get("value")
+
+        _achievement_boxes = _root.xpath(".//div[@data-group-id='achievements' and @data-category-id='{0}']/ul/div/div[@data-tooltip]".format(category_id))
+        n_dict = {}
+
+        for _achievement_box in _achievement_boxes:
+            achievement_name = _achievement_box.xpath("./div/div")[0].text
+            if achievement_name == '?':
+                #Sombra ARG clue, not a real achievement
+                continue
+
+            n_dict[util.sanitize_string(achievement_name)] = "m-disabled" not in _achievement_box.get("class")
+
+        built_dict[category_name.lower()] = n_dict
 
     return built_dict

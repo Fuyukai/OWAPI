@@ -4,6 +4,8 @@ Useful utilities.
 import logging
 import re
 
+import unidecode
+
 import aioredis
 from kyoukai.context import HTTPRequestContext
 
@@ -124,3 +126,11 @@ def try_extract(value):
     else:
         # Just return the value.
         return value
+
+def sanitize_string(string):
+    """
+    Convert an arbitrary string into the format used for our json keys
+    """
+    space_converted = re.sub(r'[-\s]', '_', unidecode.unidecode(string).lower())
+    removed_nonalphanumeric = re.sub(r'\W', '', space_converted)
+    return re.sub(r'_{2,}', '_', removed_nonalphanumeric)

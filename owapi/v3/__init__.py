@@ -39,7 +39,8 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
+            "stats": {},
+            "achievements": {}
         }
 
         d["stats"]["quickplay"] = parsing.bl_parse_stats(result)
@@ -50,6 +51,8 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
 
         d["heroes"]["stats"]["competitive"] = parsing.bl_parse_hero_data(result, mode="competitive")
         d["heroes"]["playtime"]["competitive"] = parsing.bl_parse_all_heroes(result, mode="competitive")
+
+        d["achievements"] = parsing.bl_parse_achievement_data(result)
 
         built_dict[region] = d
 
@@ -73,7 +76,8 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
+            "stats": {},
+            "achievements": {}
         }
 
         d["stats"]["quickplay"] = parsing.bl_parse_stats(result)
@@ -102,7 +106,8 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
+            "stats": {},
+            "achievements": {}
         }
 
         d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
@@ -132,7 +137,8 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
+            "stats": {},
+            "achievements": {}
         }
 
         d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
@@ -162,7 +168,8 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {}
+            "stats": {},
+            "achievements": {}
         }
 
         d["heroes"]["stats"]["competitive"] = parsing.bl_parse_hero_data(result, mode="competitive")
@@ -175,3 +182,30 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
 
 
 get_heroes_comp.should_convert = False
+
+@api_v3.route("/u/(.*)/achievements")
+@with_ratelimit("stats")
+async def get_achievements(ctx: HTTPRequestContext, battletag: str):
+    """
+    Fetches hero stats, for competitive.
+    """
+    pages = await fetch_all_user_pages(ctx, battletag, platform=ctx.request.args.get("platform", "pc"))
+
+    built_dict = {}
+    for region, result in pages.items():
+        if result is None:
+            built_dict[region] = None
+            continue
+        d = {
+            "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
+            "stats": {},
+            "achievements": {}
+        }
+
+        d["achievements"] = parsing.bl_parse_achievement_data(result)
+
+        built_dict[region] = d
+
+    return built_dict
+
+get_achievements.should_convert = False
