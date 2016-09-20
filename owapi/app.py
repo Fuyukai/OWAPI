@@ -86,7 +86,10 @@ async def jsonify(ctx, response: Response):
     status_code = response.code
     if not any(response.body.values()):
         status_code = 404
-    d = json.dumps(response.body)
+    if ctx.request.args.get("format", "json") == "json_pretty":
+        d = json.dumps(response.body, sort_keys=True, indent=4, separators=(',', ': '))
+    else:
+        d = json.dumps(response.body)
     response.body = d
     response.headers["Content-Type"] = "application/json"
     response.code = status_code
