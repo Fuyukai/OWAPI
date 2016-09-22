@@ -340,12 +340,12 @@ See below for detailed response on `stats`, `heroes`, and `achievements`.
 }
 ```
 
-### `GET /api/v3/u/:battletag/achievements`
-**Get user achievements status**
+### `GET /api/v3/u/:battletag/heroes`
+**Get user hero stats**
 
 *Example:*
 
-`https://owapi.net/api/v3/u/Dad-12262/achievements`
+`https://owapi.net/api/v3/u/Dad-12262/heroes`
 
 *Result:*
 
