@@ -11,6 +11,7 @@ from owapi.v3 import parsing
 
 api_v3 = Blueprint("api_v3", url_prefix="/v3", reverse_hooks=True)
 
+
 @api_v3.after_request
 async def add__request(ctx: HTTPRequestContext, r: Response):
     # Edit the body, and add a _request.
@@ -57,6 +58,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
         built_dict[region] = d
 
     return built_dict
+
 
 get_blob.should_convert = False
 
@@ -183,6 +185,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
 
 get_heroes_comp.should_convert = False
 
+
 @api_v3.route("/u/(.*)/achievements")
 @with_ratelimit("stats")
 async def get_achievements(ctx: HTTPRequestContext, battletag: str):
@@ -207,5 +210,6 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
         built_dict[region] = d
 
     return built_dict
+
 
 get_achievements.should_convert = False

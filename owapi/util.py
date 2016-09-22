@@ -40,6 +40,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
 
     # Store the result as cached.
     to_set = result if result else "None"
+    logger.info("Storing {} with expiration {}".format(built, expires))
     await ctx.redis.set(built, to_set, expire=expires)
     if to_set == "None":
         return None

@@ -135,7 +135,7 @@ async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc
 
     for reg in reg_l:
         # Get the user page.
-        page = await get_user_page(ctx, battletag, platform, reg, extra)
+        page = await get_user_page(ctx, battletag, platform=platform, region=reg)
         # Check if the page was returned successfully.
         # If it was, return it.
         if page is not None:
