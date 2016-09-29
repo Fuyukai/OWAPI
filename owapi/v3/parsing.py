@@ -126,7 +126,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
         for subval in trs:
-            name, value = subval[0].text.lower().replace(" ", "_").replace("_-_", "_"), subval[1].text
+            name, value = util.sanitize_string(subval[0].text), subval[1].text
             # Try and parse out the value. It might be a time!
             # If so, try and extract the time.
             nvl = util.try_extract(value)
@@ -160,10 +160,7 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     # Loop over each one, extracting the name and hours counted.
     for child in hero_info:
         name, played = child.getchildren()
-        name, played = name.text.lower(), played.text.lower()
-
-        name = unidecode.unidecode(name)
-        name = name.replace(".", "").replace(": ", "")  # d.va and soldier: 76 special cases
+        name, played = util.sanitize_string(name.text), played.text.lower()
 
         if played == "--":
             time = 0
@@ -200,12 +197,12 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         trs = hero_specific_box.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
         for subval in trs:
-            name, value = subval[0].text, subval[1].text
+            name, value = util.sanitize_string(subval[0].text), subval[1].text
             if 'average' in name.lower():
                 # No averages, ty
                 continue
             nvl = util.try_extract(value)
-            _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+            _t_d[name] = nvl
 
         n_dict["hero_stats"] = _t_d
 
@@ -214,12 +211,12 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
             for subval in trs:
-                name, value = subval[0].text, subval[1].text
+                name, value = util.sanitize_string(subval[0].text), subval[1].text
                 if 'average' in name.lower():
                     # No averages, ty
                     continue
                 nvl = util.int_or_string(value)
-                _t_d[name.lower().replace(" ", "_").replace("_-_", "_")] = nvl
+                _t_d[name] = nvl
 
         n_dict["general_stats"] = _t_d
 

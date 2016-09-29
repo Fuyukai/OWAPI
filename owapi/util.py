@@ -134,4 +134,5 @@ def sanitize_string(string):
     """
     space_converted = re.sub(r'[-\s]', '_', unidecode.unidecode(string).lower())
     removed_nonalphanumeric = re.sub(r'\W', '', space_converted)
-    return re.sub(r'_{2,}', '_', removed_nonalphanumeric)
+    underscore_normalized = re.sub(r'_{2,}', '_', removed_nonalphanumeric)
+    return underscore_normalized.replace("soldier_76", "soldier76") #backwards compatability
