@@ -215,7 +215,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                 if 'average' in name.lower():
                     # No averages, ty
                     continue
-                nvl = util.int_or_string(value)
+                nvl = util.try_extract(value)
                 _t_d[name] = nvl
 
         n_dict["general_stats"] = _t_d
