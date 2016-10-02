@@ -63,7 +63,7 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
 
             # only ratelimit if we have redis. Can't make this decision in
             # outer functions because they are called before globalsettings are set
-            if ctx._app.config["owapi_use_redis"]:
+            if ctx.app.config["owapi_use_redis"]:
                 import aioredis
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.

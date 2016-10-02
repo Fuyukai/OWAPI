@@ -23,7 +23,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
     Unless we don have redis.
     """
 
-    if not ctx._app.config["owapi_use_redis"]:
+    if not ctx.app.config["owapi_use_redis"]:
         #no caching without redis, just call the function
         logger.info("Loading `{}` with disabled cache".format(repr(args)))
         result = await func(ctx, *args)
