@@ -6,7 +6,6 @@ import logging
 import traceback
 
 from asphalt.core import ContainerComponent
-from asphalt.redis.component import RedisComponent
 from kyoukai import Blueprint
 from kyoukai import HTTPException
 from kyoukai import Kyoukai
@@ -35,11 +34,18 @@ class APIComponent(ContainerComponent):
     """
     Container for other components. I think.
     """
+    def __init__(self, components, use_redis = True):
+        super().__init__(components)
+        app.config["owapi_use_redis"] = use_redis
 
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
                            app="app:app", template_renderer=None)
-        self.add_component('redis', RedisComponent)
+        if app.config["owapi_use_redis"]:
+            from asphalt.redis.component import RedisComponent
+            self.add_component('redis', RedisComponent)
+        else:
+            logger.warn('redis is disabled by config, rate limiting and caching not available')
         await super().start(ctx)
 
         logger.info("Started OWAPI server.")

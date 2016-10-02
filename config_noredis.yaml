@@ -1,0 +1,8 @@
+---
+component:
+  type: owapi.app:APIComponent
+  use_redis: False
+  components:
+    kyoukai:
+      app: owapi.app:app
+      debug: True

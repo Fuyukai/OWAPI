@@ -3,7 +3,6 @@ v3-specific utilities.
 """
 import os
 
-import aioredis
 import shutil
 
 import re
@@ -61,52 +60,57 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
             """
             Inner ratelimit function.
             """
-            assert isinstance(ctx.redis, aioredis.Redis)
-            # Get the IP.
-            ip = ctx.request.ip
-            if ip == "127.0.0.1":
-                # We don't want to rate limit localhost.
-                ip = ctx.request.headers.get("X-Real-IP")
 
-            # Build the ratelimit string.
-            built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
+            # only ratelimit if we have redis. Can't make this decision in
+            # outer functions because they are called before globalsettings are set
+            if ctx._app.config["owapi_use_redis"]:
+                import aioredis
+                assert isinstance(ctx.redis, aioredis.Redis)
+                # Get the IP.
+                ip = ctx.request.ip
+                if ip == "127.0.0.1":
+                    # We don't want to rate limit localhost.
+                    ip = ctx.request.headers.get("X-Real-IP")
 
-            # Check the user agent before.
-            user_agent = ctx.request.headers.get("User-Agent")
-            if user_agent is None:
-                return BAD_USERAGENT
+                # Build the ratelimit string.
+                built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
 
-            if check_default_useragents(user_agent):
-                return BAD_USERAGENT
+                # Check the user agent before.
+                user_agent = ctx.request.headers.get("User-Agent")
+                if user_agent is None:
+                    return BAD_USERAGENT
 
-            # Load the rate limit based on the regular expression provided.
-            for regex, rates in compiled:
-                if regex.match(user_agent):
-                    break
-            else:
-                # UH OH
-                raise RuntimeError("Failed to match User-Agent - did you wipe rates.yml?")
+                if check_default_useragents(user_agent):
+                    return BAD_USERAGENT
 
-            _timelimit = timelimit or rates.get("time", 1)
-            _max_reqs = max_reqs or rates.get("max_reqs", 1)
+                # Load the rate limit based on the regular expression provided.
+                for regex, rates in compiled:
+                    if regex.match(user_agent):
+                        break
+                else:
+                    # UH OH
+                    raise RuntimeError("Failed to match User-Agent - did you wipe rates.yml?")
 
-            # Redis-based ratelimiting.
-            # First, check if the key even exists.
-            if not (await ctx.redis.exists(built)):
-                # LPUSH, and EXPIRE it.
-                await ctx.redis.lpush(built, _max_reqs)
-                await ctx.redis.expire(built, _timelimit)
-            else:
-                # LLEN it.
-                tries = await ctx.redis.llen(built)
-                if tries >= max_reqs:
-                    # 429 You Are Being Ratelimited.
-                    ttl = await ctx.redis.ttl(built)
-                    return {"error": 429, "msg": "you are being ratelimited"}, 429, {"Retry-After": ttl}
+                _timelimit = timelimit or rates.get("time", 1)
+                _max_reqs = max_reqs or rates.get("max_reqs", 1)
 
-                # LPUSH a `1` or something onto the edge of the list.
-                # The actual value doesn't matter.
-                await ctx.redis.lpush(built, 1)
+                # Redis-based ratelimiting.
+                # First, check if the key even exists.
+                if not (await ctx.redis.exists(built)):
+                    # LPUSH, and EXPIRE it.
+                    await ctx.redis.lpush(built, _max_reqs)
+                    await ctx.redis.expire(built, _timelimit)
+                else:
+                    # LLEN it.
+                    tries = await ctx.redis.llen(built)
+                    if tries >= max_reqs:
+                        # 429 You Are Being Ratelimited.
+                        ttl = await ctx.redis.ttl(built)
+                        return {"error": 429, "msg": "you are being ratelimited"}, 429, {"Retry-After": ttl}
+
+                    # LPUSH a `1` or something onto the edge of the list.
+                    # The actual value doesn't matter.
+                    await ctx.redis.lpush(built, 1)
 
             # Now, await the underlying function.
             return await func(ctx, *args, **kwargs)

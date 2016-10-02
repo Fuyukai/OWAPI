@@ -6,7 +6,6 @@ import re
 
 import unidecode
 
-import aioredis
 from kyoukai.context import HTTPRequestContext
 
 logger = logging.getLogger("OWAPI")
@@ -20,31 +19,41 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
     Run a coroutine with cache.
 
     Stores the result in redis.
+
+    Unless we don have redis.
     """
-    assert isinstance(ctx.redis, aioredis.Redis)
-    built = func.__name__ + repr(args)
-    # Check for the key.
-    # Uses a simple func name + repr(args) as the key to use.
-    got = await ctx.redis.get(built)
-    if got and got != "None":
-        logger.info("Cache hit for `{}`".format(built))
-        return got.decode()
 
-    logger.info("Cache miss for `{}`".format(built))
+    if not ctx._app.config["owapi_use_redis"]:
+        #no caching without redis, just call the function
+        logger.info("Loading `{}` with disabled cache".format(repr(args)))
+        result = await func(ctx, *args)
+        return result
+    else:
+        import aioredis
+        assert isinstance(ctx.redis, aioredis.Redis)
+        built = func.__name__ + repr(args)
+        # Check for the key.
+        # Uses a simple func name + repr(args) as the key to use.
+        got = await ctx.redis.get(built)
+        if got and got != "None":
+            logger.info("Cache hit for `{}`".format(built))
+            return got.decode()
 
-    # Call the function.
-    result = await func(ctx, *args)
-    if result is None and not cache_404:
-        # return None, no caching for 404s.
-        return None
+        logger.info("Cache miss for `{}`".format(built))
 
-    # Store the result as cached.
-    to_set = result if result else "None"
-    logger.info("Storing {} with expiration {}".format(built, expires))
-    await ctx.redis.set(built, to_set, expire=expires)
-    if to_set == "None":
-        return None
-    return result
+        # Call the function.
+        result = await func(ctx, *args)
+        if result is None and not cache_404:
+            # return None, no caching for 404s.
+            return None
+
+        # Store the result as cached.
+        to_set = result if result else "None"
+        logger.info("Storing {} with expiration {}".format(built, expires))
+        await ctx.redis.set(built, to_set, expire=expires)
+        if to_set == "None":
+            return None
+        return result
 
 
 def int_or_string(val: str):
