@@ -1,5 +1,6 @@
 import json
 from math import floor
+import logging
 
 import unidecode
 from kyoukai import Response
@@ -174,14 +175,21 @@ async def bl_get_stats(mode, ctx, battletag):
         wr = 0
     else:
         games = int(g[0][1].text.replace(",", ""))
-        losses = games - wins
-        wr = floor((wins / games) * 100)
+
+    if mode == "competitive":
+        misc_box = stat_groups[7]
+        losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
+        ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+
+        wr = floor((wins / (games - ties))*100)
+
+        built_dict["overall_stats"]["ties"] = ties
+        built_dict["overall_stats"]["games"] = games
+        built_dict["overall_stats"]["losses"] = losses
+        built_dict["overall_stats"]["win_rate"] = wr
 
     # Update the dictionary.
-    built_dict["overall_stats"]["games"] = games
-    built_dict["overall_stats"]["losses"] = losses
     built_dict["overall_stats"]["wins"] = wins
-    built_dict["overall_stats"]["win_rate"] = wr
 
     # Build a dict using the stats.
     _t_d = {}
