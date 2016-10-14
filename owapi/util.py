@@ -13,6 +13,7 @@ logger = logging.getLogger("OWAPI")
 HOUR_REGEX = re.compile(r"([0-9]*) hours?")
 MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
 SECOND_REGEX = re.compile(r"([0-9]*) seconds?")
+PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?\%")
 
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_404=False):
     """
@@ -112,6 +113,14 @@ def try_extract(value):
         val = matched.groups()[0]
         val = float(val)
         val = (val / 60 / 60)
+
+        return val
+
+    matched = PERCENT_REGEX.match(value)
+    if matched:
+        val = matched.groups()[0]
+        val = float(val)
+        val = (val / 100)
 
         return val
 
