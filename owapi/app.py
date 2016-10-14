@@ -4,6 +4,10 @@ Main OWAPI App.
 import json
 import logging
 import traceback
+import cProfile
+import pstats
+import io
+import os
 
 from asphalt.core import ContainerComponent
 from kyoukai import Blueprint
@@ -34,9 +38,10 @@ class APIComponent(ContainerComponent):
     """
     Container for other components. I think.
     """
-    def __init__(self, components, use_redis = True):
+    def __init__(self, components, use_redis = True, do_profiling = False):
         super().__init__(components)
         app.config["owapi_use_redis"] = use_redis
+        app.config["owapi_do_profiling"] = do_profiling
 
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
@@ -75,6 +80,26 @@ async def e500(ctx: HTTPRequestContext, exc: HTTPException):
 async def e404(ctx: HTTPRequestContext, exc: HTTPException):
     return json.dumps({"error": 404}), 404, {"Content-Type": "application/json"}
 
+@app.root.before_request
+async def start_profiling(ctx: HTTPRequestContext):
+    if ctx.app.config["owapi_do_profiling"]:
+        pr = cProfile.Profile()
+        ctx.cfg['owapi_profiling_obj'] = pr
+        pr.enable()
+    return ctx
+
+@app.root.after_request
+async def stop_profiling(ctx: HTTPRequestContext, response: Response):
+    if ctx.app.config["owapi_do_profiling"]:
+        pr = ctx.cfg['owapi_profiling_obj']
+        pr.disable()
+        s = io.StringIO()
+        ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+        #print into s, with regex filter
+        ps.print_stats("owapi")
+        #strip useless part of path infos and print with logger
+        logger.info(s.getvalue().replace(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0] + "/",""))
+    return response
 
 # Create the api blueprint and add children
 api_bp = Blueprint("api", url_prefix="/api")
