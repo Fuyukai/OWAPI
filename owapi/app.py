@@ -34,11 +34,13 @@ root.addHandler(consoleHandler)
 
 logger = logging.getLogger("OWAPI")
 
+
 class APIComponent(ContainerComponent):
     """
     Container for other components. I think.
     """
-    def __init__(self, components, use_redis = True, do_profiling = False):
+
+    def __init__(self, components, use_redis=True, do_profiling=False):
         super().__init__(components)
         app.config["owapi_use_redis"] = use_redis
         app.config["owapi_do_profiling"] = do_profiling
@@ -80,6 +82,7 @@ async def e500(ctx: HTTPRequestContext, exc: HTTPException):
 async def e404(ctx: HTTPRequestContext, exc: HTTPException):
     return json.dumps({"error": 404}), 404, {"Content-Type": "application/json"}
 
+
 @app.root.before_request
 async def start_profiling(ctx: HTTPRequestContext):
     if ctx.app.config["owapi_do_profiling"]:
@@ -88,6 +91,7 @@ async def start_profiling(ctx: HTTPRequestContext):
         pr.enable()
     return ctx
 
+
 @app.root.after_request
 async def stop_profiling(ctx: HTTPRequestContext, response: Response):
     if ctx.app.config["owapi_do_profiling"]:
@@ -95,11 +99,12 @@ async def stop_profiling(ctx: HTTPRequestContext, response: Response):
         pr.disable()
         s = io.StringIO()
         ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-        #print into s, with regex filter
+        # print into s, with regex filter
         ps.print_stats("owapi")
-        #strip useless part of path infos and print with logger
-        logger.info(s.getvalue().replace(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0] + "/",""))
+        # strip useless part of path infos and print with logger
+        logger.info(s.getvalue().replace(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0] + "/", ""))
     return response
+
 
 # Create the api blueprint and add children
 api_bp = Blueprint("api", url_prefix="/api")
