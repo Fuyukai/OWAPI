@@ -114,8 +114,8 @@ def bl_parse_stats(parsed, mode="quickplay"):
         #wr = floor((wins / games) * 100)
 
     if mode == "competitive":
-        misc_box = stat_groups[7]
         try:
+            misc_box = stat_groups[7]
             losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
             ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
         except IndexError:
@@ -123,9 +123,17 @@ def bl_parse_stats(parsed, mode="quickplay"):
             # I'm not 100% as to what causes this, but it might be because there are no ties.
             # In this case, just set ties to 0, and calculate losses manually.
             ties = 0
-            losses = games - wins
+            if games is None:
+                losses = 0
+                games = 0
+                wins = 0
+            else:
+                losses = games - wins
 
-        wr = floor((wins / (games - ties))*100)
+        if games == 0:
+            wr = 0
+        else:
+            wr = floor((wins / (games - ties))*100)
 
         built_dict["overall_stats"]["ties"] = ties
         built_dict["overall_stats"]["games"] = games
