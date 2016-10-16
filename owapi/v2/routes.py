@@ -171,6 +171,7 @@ async def bl_get_stats(mode, ctx, battletag):
     g = game_box.xpath(".//text()[. = 'Games Played']/../..")
     if len(g) < 1:
         # Blizzard fucked up, temporary quick fix for #70
+        # This is still temporary as of mid october.
         games, losses = 0, 0
         wr = 0
     else:
@@ -178,8 +179,12 @@ async def bl_get_stats(mode, ctx, battletag):
 
     if mode == "competitive":
         misc_box = stat_groups[7]
-        losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
-        ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+        try:
+            losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
+            ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+        except IndexError:
+            losses = games - wins
+            ties = 0
 
         wr = floor((wins / (games - ties))*100)
 
