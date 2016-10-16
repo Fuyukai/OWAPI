@@ -115,8 +115,15 @@ def bl_parse_stats(parsed, mode="quickplay"):
 
     if mode == "competitive":
         misc_box = stat_groups[7]
-        losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
-        ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+        try:
+            losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
+            ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+        except IndexError:
+            # Sometimes the losses and ties don't exist.
+            # I'm not 100% as to what causes this, but it might be because there are no ties.
+            # In this case, just set ties to 0, and calculate losses manually.
+            ties = 0
+            losses = games - wins
 
         wr = floor((wins / (games - ties))*100)
 
