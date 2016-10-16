@@ -60,6 +60,9 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
             """
             Inner ratelimit function.
             """
+            if ctx.app.config["owapi_disable_ratelimits"]:
+                # Don't bother with ratelimits.
+                return await func(ctx, *args, **kwargs)
 
             # only ratelimit if we have redis. Can't make this decision in
             # outer functions because they are called before globalsettings are set
