@@ -1,9 +1,11 @@
 """
 api_v3 routes.
 """
+import json
+
 from kyoukai import HTTPRequestContext
 from kyoukai import Response
-from kyoukai.blueprints import Blueprint
+from kyoukai import Blueprint
 
 from owapi.blizz_interface import fetch_all_user_pages
 from owapi.v3.v3_util import with_ratelimit
@@ -23,6 +25,14 @@ async def add__request(ctx: HTTPRequestContext, r: Response):
         }
 
     return r
+
+
+@api_v3.errorhandler(404)
+async def e404(ctx: HTTPRequestContext, exc):
+    return json.dumps({"error": 404, "msg": "profile not found"}), \
+           404, \
+           {"Retry-After": 5,
+            "Content-Type": "application/json"}
 
 
 @api_v3.route("/u/(.*)/blob")

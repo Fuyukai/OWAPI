@@ -7,6 +7,7 @@ import logging
 import asyncio
 import traceback
 
+from kyoukai import HTTPException
 from lxml import etree
 
 import aiohttp
@@ -89,8 +90,8 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
             return {"any": result,
                     "eu": None, "us": None, "kr": None}
         else:
-            return {"any": None,
-                    "eu": None, "us": None, "kr": None}
+            # Raise a 404.
+            raise HTTPException(404)
 
     futures = []
     for region in AVAILABLE_REGIONS:
@@ -115,6 +116,10 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
             d[region] = None
         else:
             d[region] = None
+
+    # Check if we should raise or return.
+    if not any(d[i[1:]] is not None for i in AVAILABLE_REGIONS):
+        raise HTTPException(404)
 
     return d
 
