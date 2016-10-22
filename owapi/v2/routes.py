@@ -173,7 +173,6 @@ async def bl_get_stats(mode, ctx, battletag):
         # Blizzard fucked up, temporary quick fix for #70
         # This is still temporary as of mid october.
         games, losses = 0, 0
-        wr = 0
     else:
         games = int(g[0][1].text.replace(",", ""))
 
@@ -213,7 +212,10 @@ async def bl_get_stats(mode, ctx, battletag):
                 _t_d[name] = nvl
 
     # Manually add the KPD.
-    _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+    try:
+        _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+    except KeyError:
+        _t_d["kpd"] = 0.0
 
     built_dict["game_stats"] = _t_d
     built_dict["average_stats"] = _a_d

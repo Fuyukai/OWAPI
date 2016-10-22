@@ -107,11 +107,8 @@ def bl_parse_stats(parsed, mode="quickplay"):
     if len(g) < 1:
         # Blizzard fucked up, temporary quick fix for #70
         games, losses = None, None
-        wr = 0
     else:
         games = int(g[0][1].text.replace(",", ""))
-        #losses = games - wins
-        #wr = floor((wins / games) * 100)
 
     if mode == "competitive":
         try:
@@ -123,17 +120,20 @@ def bl_parse_stats(parsed, mode="quickplay"):
             # I'm not 100% as to what causes this, but it might be because there are no ties.
             # In this case, just set ties to 0, and calculate losses manually.
             ties = 0
+            # Quickplay shit.
+            # Goddamnit blizzard.
             if games is None:
                 losses = 0
                 games = 0
                 wins = 0
             else:
+                # Competitive stats do have these values (for now...)
                 losses = games - wins
 
         if games == 0:
             wr = 0
         else:
-            wr = floor((wins / (games - ties))*100)
+            wr = floor((wins / (games - ties)) * 100)
 
         built_dict["overall_stats"]["ties"] = ties
         built_dict["overall_stats"]["games"] = games
@@ -160,7 +160,13 @@ def bl_parse_stats(parsed, mode="quickplay"):
                 _t_d[name] = nvl
 
     # Manually add the KPD.
-    _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+    try:
+        _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+    except KeyError:
+        # They don't have any eliminations/deaths.
+        # Set the KPD to 0.0.
+        # See: #106
+        _t_d["kpd"] = 0
 
     built_dict["game_stats"] = _t_d
     built_dict["average_stats"] = _a_d
@@ -248,6 +254,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
     return built_dict
 
+
 def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
     # Start the dict.
     built_dict = {}
@@ -265,13 +272,15 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
         category_name = _category_select.text
         category_id = _category_select.get("value")
 
-        _achievement_boxes = _root.xpath(".//div[@data-group-id='achievements' and @data-category-id='{0}']/ul/div/div[@data-tooltip]".format(category_id))
+        _achievement_boxes = _root.xpath(
+            ".//div[@data-group-id='achievements' and @data-category-id='{0}']/ul/div/div[@data-tooltip]".format(
+                category_id))
         n_dict = {}
 
         for _achievement_box in _achievement_boxes:
             achievement_name = _achievement_box.xpath("./div/div")[0].text
             if achievement_name == '?':
-                #Sombra ARG clue, not a real achievement
+                # Sombra ARG clue, not a real achievement
                 continue
 
             n_dict[util.sanitize_string(achievement_name)] = "m-disabled" not in _achievement_box.get("class")
