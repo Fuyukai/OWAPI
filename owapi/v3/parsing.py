@@ -179,7 +179,7 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     built_dict = {}
 
     if mode == "competitive":
-        _hero_info = parsed.findall(".//div[@id='competitive-play']/section/div/div[@data-group-id='comparisons']")[0]
+        _hero_info = parsed.findall(".//div[@data-mode='competitive']//div[@data-group-id='comparisons']")[0]
     elif mode == "quickplay":
         _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
     else:
@@ -206,7 +206,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
     built_dict = {}
 
     _root = parsed.xpath(
-        ".//div[@id='{}']".format("competitive-play" if mode == "competitive" else "quick-play")
+        ".//div[@id='{}']".format("competitive" if mode == "competitive" else "quickplay")
     )
     if not _root:
         return

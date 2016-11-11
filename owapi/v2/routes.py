@@ -316,7 +316,7 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
     built_dict = {"region": region, "battletag": battletag}
 
     _root = parsed.xpath(
-        ".//div[@id='{}']".format("competitive-play" if competitive else "quick-play")
+        ".//div[@data-mode='{}']".format("competitive" if competitive else "quickplay")
     )[0]
 
     _stat_groups = _root.xpath(
