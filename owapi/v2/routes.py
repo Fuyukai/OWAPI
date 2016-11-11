@@ -262,7 +262,7 @@ async def get_heroes(mode, ctx, battletag):
     built_dict = {"region": region, "battletag": battletag, "heroes": {}}
 
     if mode == "competitive":
-        _hero_info = parsed.findall(".//div[@id='competitive-play']/section/div/div[@data-group-id='comparisons']")[0]
+        _hero_info = parsed.findall(".//div[@id='competitive']/section/div/div[@data-group-id='comparisons']")[0]
     elif mode == "quickplay":
         _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
     else:
