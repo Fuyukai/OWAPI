@@ -70,10 +70,7 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
                 import aioredis
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.
-                ip = ctx.request.ip
-                if ip == "127.0.0.1":
-                    # We don't want to rate limit localhost.
-                    ip = ctx.request.headers.get("X-Real-IP")
+                ip = ip = ctx.request.headers.get("X-Forwarded-For") or ctx.request.ip
 
                 # Build the ratelimit string.
                 built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
