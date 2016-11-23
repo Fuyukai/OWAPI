@@ -17,6 +17,8 @@ from owapi import util
 
 B_BASE_URL = "https://playoverwatch.com/en-us/"
 B_PAGE_URL = B_BASE_URL + "career/{platform}{region}/{btag}"
+B_HEROES_URL = B_BASE_URL + "heroes"
+B_HERO_URL = B_HEROES_URL + "/{hero}"
 
 # The currently available specific regions.
 AVAILABLE_REGIONS = ["/eu", "/us", "/kr"]
@@ -148,3 +150,30 @@ async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc
     else:
         # Since we continued without returning, give back the None, None.
         return None, None
+
+async def get_hero_data(ctx: HTTPRequestContext, hero: str):
+    built_url = B_HERO_URL.format(hero = hero)
+    page_body = await get_page_body(ctx, built_url)
+    
+    if not page_body:
+        raise HTTPException(404)
+
+    parse_partial = functools.partial(_parse_page, page_body)
+    loop = asyncio.get_event_loop()
+    parsed = await loop.run_in_executor(None, parse_partial)
+    
+    return parsed
+
+async def get_all_heroes(ctx: HTTPRequestContext):
+    built_url = B_HEROES_URL
+    page_body = await get_page_body(ctx, built_url)
+    
+    if not page_body:
+        raise HTTPException(404)
+
+    parse_partial = functools.partial(_parse_page, page_body)
+    loop = asyncio.get_event_loop()
+    parsed = await loop.run_in_executor(None, parse_partial)
+    
+    return parsed
+
