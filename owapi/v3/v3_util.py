@@ -70,7 +70,8 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
                 import aioredis
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.
-                ip = ip = ctx.request.headers.get("X-Forwarded-For") or ctx.request.ip
+                ip = ctx.request.headers.get("X-Real-IP") or \
+                    ctx.request.headers.get("X-Forwarded-For") or ctx.request.ip
 
                 # Build the ratelimit string.
                 built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
