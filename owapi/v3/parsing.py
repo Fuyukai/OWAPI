@@ -81,7 +81,11 @@ def bl_parse_stats(parsed, mode="quickplay"):
             return {}
         stat_groups = hascompstats[1]
     elif mode == "quickplay":
-        stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+        try:
+            stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+        except IndexError:
+            # User has no stats...
+            return {}
     else:
         # how else to handle fallthrough case?
         stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
