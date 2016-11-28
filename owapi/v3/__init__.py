@@ -34,7 +34,7 @@ async def add__request(ctx: HTTPRequestContext, r: Response):
 async def e404(ctx: HTTPRequestContext, exc):
     return json.dumps({"error": 404, "msg": "profile not found"}), \
            404, \
-           {"Retry-After": 5,
+           {"Retry-After": 300,
             "Content-Type": "application/json"}
 
 
