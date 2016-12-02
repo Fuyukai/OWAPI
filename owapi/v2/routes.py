@@ -178,8 +178,8 @@ async def bl_get_stats(mode, ctx, battletag):
         games = int(g[0][1].text.replace(",", ""))
 
     if mode == "competitive":
-        misc_box = stat_groups[7]
         try:
+            misc_box = stat_groups[7]
             losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
             ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
         except IndexError:
