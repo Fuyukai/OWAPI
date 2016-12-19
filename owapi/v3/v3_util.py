@@ -9,7 +9,7 @@ import re
 
 import functools
 import yaml
-from kyoukai import HTTPRequestContext
+from kyoukai.asphalt import HTTPRequestContext
 
 RATES_PATH = os.path.join(os.getcwd(), "rates.yml")
 
@@ -71,13 +71,14 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.
                 ip = ctx.request.headers.get("X-Real-IP") or \
-                    ctx.request.headers.get("X-Forwarded-For") or ctx.request.ip
+                    ctx.request.headers.get("X-Forwarded-For") or ctx.request.remote_addr
 
                 # Build the ratelimit string.
                 built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
 
                 # Check the user agent before.
                 user_agent = ctx.request.headers.get("User-Agent")
+
                 if user_agent is None:
                     return BAD_USERAGENT
 

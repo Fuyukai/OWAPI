@@ -3,8 +3,9 @@ api_v3 routes.
 """
 import json
 
-from kyoukai import HTTPRequestContext
-from kyoukai import Response
+from werkzeug.wrappers import Response
+
+from kyoukai.asphalt import HTTPRequestContext
 from kyoukai import Blueprint
 
 from owapi.blizz_interface import fetch_all_user_pages
@@ -14,15 +15,15 @@ from owapi.v3 import parsing
 from owapi.blizz_interface import get_hero_data
 from owapi.blizz_interface import get_all_heroes
 
-api_v3 = Blueprint("api_v3", url_prefix="/v3", reverse_hooks=True)
+api_v3 = Blueprint("api_v3", prefix="/v3")
 
 
 @api_v3.after_request
 async def add__request(ctx: HTTPRequestContext, r: Response):
     # Edit the body, and add a _request.
-    if isinstance(r.body, dict):
+    if isinstance(r.response, dict):
         # Add a _request var to the body.
-        r.body["_request"] = {
+        r.response["_request"] = {
             "api_ver": 3,
             "route": ctx.request.path
         }
@@ -38,7 +39,7 @@ async def e404(ctx: HTTPRequestContext, exc):
             "Content-Type": "application/json"}
 
 
-@api_v3.route("/u/(.*)/blob")
+@api_v3.route("/u/<battletag>/blob")
 @with_ratelimit("blob", timelimit=5, max_reqs=1)
 async def get_blob(ctx: HTTPRequestContext, battletag: str):
     """
@@ -76,7 +77,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
 get_blob.should_convert = False
 
 
-@api_v3.route("/u/(.*)/stats")
+@api_v3.route("/u/<battletag>/stats")
 @with_ratelimit("stats")
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
@@ -106,7 +107,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
 get_stats.should_convert = False
 
 
-@api_v3.route("/u/(.*)/heroes")
+@api_v3.route("/u/<battletag>/heroes")
 @with_ratelimit("stats")
 async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
@@ -137,7 +138,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
 
 
 # Separate routes.
-@api_v3.route("/u/(.*)/heroes/quickplay")
+@api_v3.route("/u/<battletag>/heroes/quickplay")
 @with_ratelimit("stats")
 async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     """
@@ -168,7 +169,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
 get_heroes_qp.should_convert = False
 
 
-@api_v3.route("/u/(.*)/heroes/competitive")
+@api_v3.route("/u/<battletag>/heroes/competitive")
 @with_ratelimit("stats")
 async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     """
@@ -199,7 +200,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
 get_heroes_comp.should_convert = False
 
 
-@api_v3.route("/u/(.*)/achievements")
+@api_v3.route("/u/<battletag>/achievements")
 @with_ratelimit("stats")
 async def get_achievements(ctx: HTTPRequestContext, battletag: str):
     """
@@ -242,7 +243,7 @@ async def get_heroes(ctx: HTTPRequestContext):
     return built_dict
 
 
-@api_v3.route("/heroes/(.*)")
+@api_v3.route("/heroes/<hero>")
 async def get_hero(ctx: HTTPRequestContext, hero: str):
     """
     Send hero data for selected hero. 

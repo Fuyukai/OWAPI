@@ -2,18 +2,17 @@ import json
 from math import floor
 import logging
 
-import unidecode
-from kyoukai import Response
-from kyoukai import Request
-from kyoukai.blueprints import Blueprint
-from kyoukai.context import HTTPRequestContext
-from kyoukai.exc import HTTPException
+from werkzeug.wrappers import Request, Response
+from werkzeug.exceptions import HTTPException
 
+import unidecode
+from kyoukai.blueprint import Blueprint
+from kyoukai.asphalt import HTTPRequestContext
 from owapi import util
 from owapi import blizz_interface as bz
 from owapi.prestige import PRESTIGE
 
-api_v2 = Blueprint("api_v2", url_prefix="/v2", reverse_hooks=True)
+api_v2 = Blueprint("api_v2", prefix="/v2")
 
 hero_data_div_ids = {
     "reaper": "0x02E0000000000002",
@@ -47,9 +46,9 @@ hero_data_div_ids = {
 @api_v2.after_request
 async def add__request(ctx: HTTPRequestContext, r: Response):
     # Edit the body, and add a _request.
-    if isinstance(r.body, dict):
+    if isinstance(r.response, dict):
         # Add a _request var to the body.
-        r.body["_request"] = {
+        r.response["_request"] = {
             "api_ver": 2,
             "route": ctx.request.path
         }
@@ -80,7 +79,7 @@ async def root(ctx: HTTPRequestContext):
     }
 
 
-@api_v2.route("/u/(.*)/stats/competitive")
+@api_v2.route("/u/<battletag>/stats/competitive")
 async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
@@ -89,7 +88,7 @@ async def bl_get_compstats(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@api_v2.route("/u/(.*)/stats/general")
+@api_v2.route("/u/<battletag>/stats/general")
 async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
     """
     Get stats for a user using the Blizzard sources.
@@ -186,7 +185,7 @@ async def bl_get_stats(mode, ctx, battletag):
             losses = games - wins
             ties = 0
 
-        wr = floor((wins / (games - ties))*100)
+        wr = floor((wins / (games - ties)) * 100)
 
         built_dict["overall_stats"]["ties"] = ties
         built_dict["overall_stats"]["games"] = games
@@ -225,13 +224,13 @@ async def bl_get_stats(mode, ctx, battletag):
     return built_dict
 
 
-@api_v2.route("/u/(.*)/stats")
+@api_v2.route("/u/<battletag>/stats")
 async def redir_stats(ctx: HTTPRequestContext, battletag: str):
     built = "/api/v2/u/{}/stats/general".format(battletag)
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
-@api_v2.route("/u/(.*)/heroes/competitive")
+@api_v2.route("/u/<battletag>/heroes/competitive")
 async def get_heroes_competitive(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes and playtime for the battletag specified, in Competitive.
@@ -241,7 +240,7 @@ async def get_heroes_competitive(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@api_v2.route("/u/(.*)/heroes/general")
+@api_v2.route("/u/<battletag>/heroes/general")
 async def get_heroes_general(ctx: HTTPRequestContext, battletag: str):
     """
     Returns the top 5 heroes and playtime for the battletag specified, in Quickplay.
@@ -362,12 +361,12 @@ async def _get_extended_data(ctx, battletag, hero_name, competitive=False):
     return built_dict
 
 
-@api_v2.route("/u/(.*)/heroes/(.*)/competitive")
+@api_v2.route("/u/<battletag>/heroes/<hero_name>/competitive")
 async def get_extended_data_comp(ctx: HTTPRequestContext, battletag: str, hero_name: str):
     return await _get_extended_data(ctx, battletag, hero_name, competitive=True)
 
 
-@api_v2.route("/u/(.*)/heroes/(.*)/general")
+@api_v2.route("/u/<battletag>/heroes/<hero_name>/general")
 async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: str):
     """
     Gets extended information about a hero on a player.
@@ -375,13 +374,13 @@ async def get_extended_data(ctx: HTTPRequestContext, battletag: str, hero_name: 
     return await _get_extended_data(ctx, battletag, hero_name, competitive=False)
 
 
-@api_v2.route("/u/(.*)/heroes/(.*)")
+@api_v2.route("/u/<_>/heroes/<__>")
 async def redir_extended_data(ctx: HTTPRequestContext, _, __):
     built = "/api/v2/u/{}/heroes/{}/general".format(_, __)
     return {"error": 301, "loc": built}, 301, {"Location": built}
 
 
-@api_v2.route("/u/(.*)/heroes")
+@api_v2.route("/u/<battletag>/heroes")
 async def redir_heroes(ctx: HTTPRequestContext, battletag: str):
     built = "/api/v2/u/{}/heroes/general".format(battletag)
     return {"error": 301, "loc": built}, 301, {"Location": built}

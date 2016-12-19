@@ -9,15 +9,14 @@ import pstats
 import io
 import os
 
+from werkzeug.exceptions import HTTPException
+from werkzeug.routing import RequestRedirect
+from werkzeug.wrappers import Response
+
 from asphalt.core import ContainerComponent
 from kyoukai import Blueprint
-from kyoukai import HTTPException
 from kyoukai import Kyoukai
-from kyoukai.asphalt import KyoukaiComponent
-from kyoukai.context import HTTPRequestContext
-from kyoukai.response import Response
-
-from owapi.v2 import routes
+from kyoukai.asphalt import KyoukaiComponent, HTTPRequestContext
 
 # Fuck your logging config.
 from owapi.v2.routes import api_v2
@@ -27,6 +26,7 @@ logging.basicConfig(filename='/dev/null', level=logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - [%(levelname)s] %(name)s -> %(message)s')
 root = logging.getLogger()
+root.handlers = []
 
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(formatter)
@@ -53,7 +53,7 @@ class APIComponent(ContainerComponent):
             from asphalt.redis.component import RedisComponent
             self.add_component('redis', RedisComponent)
         else:
-            logger.warn('redis is disabled by config, rate limiting and caching not available')
+            logger.warning('redis is disabled by config, rate limiting and caching not available')
         await super().start(ctx)
 
         logger.info("Started OWAPI server.")
@@ -64,7 +64,7 @@ app = Kyoukai("owapi")
 
 @app.route("/")
 async def root(ctx: HTTPRequestContext):
-    return Response.redirect("https://github.com/SunDwarf/OWAPI/blob/master/api.md")
+    raise RequestRedirect("https://github.com/SunDwarf/OWAPI/blob/master/api.md")
 
 
 @app.root.errorhandler(500)
@@ -108,7 +108,7 @@ async def stop_profiling(ctx: HTTPRequestContext, response: Response):
 
 
 # Create the api blueprint and add children
-api_bp = Blueprint("api", url_prefix="/api")
+api_bp = Blueprint("api", prefix="/api")
 
 
 @api_bp.after_request
@@ -116,20 +116,20 @@ async def jsonify(ctx, response: Response):
     """
     JSONify the response.
     """
-    if isinstance(response.body, str):
+    if not isinstance(response.response, dict):
         return response
 
     # json.dump the body.
-    status_code = response.code
-    if not any(response.body.values()):
+    status_code = response.status_code
+    if not any(response.response.values()):
         status_code = 404
     if ctx.request.args.get("format", "json") == "json_pretty":
-        d = json.dumps(response.body, sort_keys=True, indent=4, separators=(',', ': '))
+        d = json.dumps(response.response, sort_keys=True, indent=4, separators=(',', ': '))
     else:
-        d = json.dumps(response.body)
-    response.body = d
+        d = json.dumps(response.response)
+    response.set_data(d)
     response.headers["Content-Type"] = "application/json"
-    response.code = status_code
+    response.status_code = status_code
     return response
 
 

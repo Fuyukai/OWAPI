@@ -7,11 +7,11 @@ import logging
 import asyncio
 import traceback
 
-from kyoukai import HTTPException
+from werkzeug.exceptions import HTTPException
 from lxml import etree
 
 import aiohttp
-from kyoukai.context import HTTPRequestContext
+from kyoukai.asphalt import HTTPRequestContext
 
 from owapi import util
 

@@ -1,4 +1,4 @@
-git+https://github.com/SunDwarf/Kyoukai.git@fab4f6fa8fb96f4ca851d61cac69f0c0987b0d92
+Kyoukai>=2.0.0
 aioredis==0.2.8
 aiohttp==0.22.5
 asphalt==2.0.0

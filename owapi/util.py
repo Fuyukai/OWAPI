@@ -6,7 +6,7 @@ import re
 
 import unidecode
 
-from kyoukai.context import HTTPRequestContext
+from kyoukai.asphalt import HTTPRequestContext
 
 logger = logging.getLogger("OWAPI")
 
