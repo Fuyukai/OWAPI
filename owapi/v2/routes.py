@@ -3,7 +3,7 @@ from math import floor
 import logging
 
 from werkzeug.wrappers import Request, Response
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, NotFound
 
 import unidecode
 from kyoukai.blueprint import Blueprint
@@ -57,7 +57,7 @@ async def add__request(ctx: HTTPRequestContext, r: Response):
 
 
 @api_v2.errorhandler(404)
-async def a404(ctx: HTTPRequestContext, exception: HTTPException):
+async def a404(ctx: HTTPRequestContext, exc: HTTPException):
     """
     Return a 404 message, probably because the battletag was not found.
     """
@@ -100,8 +100,9 @@ async def bl_get_general_stats(ctx: HTTPRequestContext, battletag: str):
 async def bl_get_stats(mode, ctx, battletag):
     data = await bz.region_helper_v2(ctx, battletag, region=ctx.request.args.get("region", None),
                                      platform=ctx.request.args.get("platform", "pc"))
+
     if data == (None, None):
-        raise HTTPException(404)
+        raise NotFound()
 
     parsed, region = data
 
@@ -255,7 +256,7 @@ async def get_heroes(mode, ctx, battletag):
                                      platform=ctx.request.args.get("platform", "pc"))
 
     if data == (None, None):
-        raise HTTPException(404)
+        raise NotFound()
 
     parsed, region = data
 
