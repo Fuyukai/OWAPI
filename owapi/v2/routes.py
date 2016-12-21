@@ -186,7 +186,10 @@ async def bl_get_stats(mode, ctx, battletag):
             losses = games - wins
             ties = 0
 
-        wr = floor((wins / (games - ties)) * 100)
+        if games == 0 or ties == 0:
+            wr = 0
+        else:
+            wr = floor((wins / (games - ties)) * 100)
 
         built_dict["overall_stats"]["ties"] = ties
         built_dict["overall_stats"]["games"] = games
