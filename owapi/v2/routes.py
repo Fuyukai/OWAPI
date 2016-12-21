@@ -186,7 +186,7 @@ async def bl_get_stats(mode, ctx, battletag):
             losses = games - wins
             ties = 0
 
-        if games == 0 or ties == 0:
+        if games == 0 or games == ties:
             wr = 0
         else:
             wr = floor((wins / (games - ties)) * 100)

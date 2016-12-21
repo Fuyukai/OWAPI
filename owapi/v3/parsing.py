@@ -135,7 +135,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
                 # Competitive stats do have these values (for now...)
                 losses = games - wins
 
-        if games == 0 or ties == 0:
+        if games == 0 or games == ties:
             wr = 0
         else:
             wr = floor((wins / (games - ties)) * 100)
