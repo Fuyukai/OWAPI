@@ -227,7 +227,7 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
 
 
 @api_v3.route("/heroes")
-async def get_heroes(ctx: HTTPRequestContext):
+async def get_hero_list(ctx: HTTPRequestContext):
     """
     Send hero list. 
     """
