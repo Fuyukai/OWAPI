@@ -229,24 +229,23 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
 @api_v3.route("/heroes")
 async def get_hero_list(ctx: HTTPRequestContext):
     """
-    Send hero list. 
+    Send hero list.
     """
     parsed = await get_all_heroes(ctx)
-    heroes = parsing.bl_parse_all_heroes(parsed)
+    heroes = parsing.bl_get_all_heroes(parsed)
 
     built_dict = {"Offense": {}, "Defense": {}, "Tank": {}, "Support": {}}
     for hero in heroes:
         _parsed = await get_hero_data(ctx, hero.lower())
-        retHero = parsing.bl_get_all_heroes(_parsed)
+        retHero = parsing.bl_find_heroes(_parsed)
         built_dict[retHero["role"]][hero] = retHero
 
     return built_dict
 
-
 @api_v3.route("/heroes/<hero>")
 async def get_hero(ctx: HTTPRequestContext, hero: str):
     """
-    Send hero data for selected hero. 
+    Send hero data for selected hero.
     """
     parsed = await get_hero_data(ctx, hero)
     _hero = parsing.bl_find_heroes(parsed)
