@@ -7,7 +7,7 @@ import logging
 import asyncio
 import traceback
 
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, NotFound
 from lxml import etree
 
 import aiohttp
@@ -93,7 +93,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
                     "eu": None, "us": None, "kr": None}
         else:
             # Raise a 404.
-            raise HTTPException(404)
+            raise NotFound()
 
     futures = []
     for region in AVAILABLE_REGIONS:

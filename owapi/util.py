@@ -15,17 +15,18 @@ MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
 SECOND_REGEX = re.compile(r"([0-9]*) seconds?")
 PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?\%")
 
+
 async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_404=False):
     """
     Run a coroutine with cache.
 
     Stores the result in redis.
 
-    Unless we don have redis.
+    Unless we don't have redis.
     """
 
     if not ctx.app.config["owapi_use_redis"]:
-        #no caching without redis, just call the function
+        # no caching without redis, just call the function
         logger.info("Loading `{}` with disabled cache".format(repr(args)))
         result = await func(ctx, *args)
         return result
@@ -78,7 +79,7 @@ def parse_time(val: str) -> float:
     if 'minute' in unit:
         # Calculate the hour.
         mins = int(val.split(" ")[0])
-        hours = round(mins/60, 3)
+        hours = round(mins / 60, 3)
         return hours
     else:
         hours = val.split(" ")[0]
@@ -146,6 +147,7 @@ def try_extract(value):
         # Just return the value.
         return value
 
+
 def sanitize_string(string):
     """
     Convert an arbitrary string into the format used for our json keys
@@ -153,4 +155,4 @@ def sanitize_string(string):
     space_converted = re.sub(r'[-\s]', '_', unidecode.unidecode(string).lower())
     removed_nonalphanumeric = re.sub(r'\W', '', space_converted)
     underscore_normalized = re.sub(r'_{2,}', '_', removed_nonalphanumeric)
-    return underscore_normalized.replace("soldier_76", "soldier76") #backwards compatability
+    return underscore_normalized.replace("soldier_76", "soldier76")  # backwards compatability
