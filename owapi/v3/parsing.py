@@ -36,6 +36,15 @@ hero_data_div_ids = {
     "sombra": "0x02E000000000012E"
 }
 
+tier_data_img_src = {
+    "rank-1.png": "bronze",
+    "rank-2.png": "silver",
+    "rank-3.png": "gold",
+    "rank-4.png": "platinum",
+    "rank-5.png": "diamond",
+    "rank-6.png": "master",
+    "rank-7.png": "grandmaster"
+}
 
 def bl_parse_stats(parsed, mode="quickplay"):
     # Start the dict.
@@ -64,6 +73,20 @@ def bl_parse_stats(parsed, mode="quickplay"):
     # Parse out the HTML.
     level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
     built_dict["overall_stats"]["level"] = level
+
+    try:
+        tier = parsed.xpath(".//div[@class='competitive-rank']/img")[0]
+        img_src = [x for x in tier.values() if 'rank-icons' in x][0]
+    except IndexError:
+        built_dict['overall_stats']['ranking'] = None
+    else:
+        for key, val in tier_data_img_src.items():
+            if key in img_src:
+                tier_str = val
+                break
+        else:
+            tier_str = None
+        built_dict["overall_stats"]["tier"] = tier_str
 
     hasrank = parsed.findall(".//div[@class='competitive-rank']/div")
     if hasrank:
