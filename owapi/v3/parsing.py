@@ -84,7 +84,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
         tier = parsed.xpath(".//div[@class='competitive-rank']/img")[0]
         img_src = [x for x in tier.values() if 'rank-icons' in x][0]
     except IndexError:
-        built_dict['overall_stats']['ranking'] = None
+        built_dict['overall_stats']['tier'] = None
     else:
         for key, val in tier_data_img_src.items():
             if key in img_src:
