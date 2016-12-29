@@ -121,7 +121,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
 
     # Check if we should raise or return.
     if not any(d[i[1:]] is not None for i in AVAILABLE_REGIONS):
-        raise HTTPException(404)
+        raise NotFound()
 
     return d
 
