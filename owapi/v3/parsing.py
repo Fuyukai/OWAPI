@@ -46,7 +46,13 @@ tier_data_img_src = {
     "rank-7.png": "grandmaster"
 }
 
+
 def bl_parse_stats(parsed, mode="quickplay"):
+    # Just a quick FYI
+    # If future me or future anyone else is looking at this, I do not how this code works.
+    # I'm really really hoping it doesn't break.
+    # Good luck!
+
     # Start the dict.
     built_dict = {"game_stats": [], "overall_stats": {}, "average_stats": []}
 

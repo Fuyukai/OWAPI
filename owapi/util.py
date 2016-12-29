@@ -12,7 +12,7 @@ logger = logging.getLogger("OWAPI")
 
 HOUR_REGEX = re.compile(r"([0-9]*) hours?")
 MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
-SECOND_REGEX = re.compile(r"([0-9]*) seconds?")
+SECOND_REGEX = re.compile(r"([0-9]*\.?[0-9]*) seconds?")
 PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?\%")
 
 
