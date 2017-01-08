@@ -50,7 +50,8 @@ async def add__request(ctx: HTTPRequestContext, r: Response):
         # Add a _request var to the body.
         r.response["_request"] = {
             "api_ver": 2,
-            "route": ctx.request.path
+            "route": ctx.request.path,
+            "note": "Warning! API v2 is UNSUPPORTED. It may break at ANY time, and WILL NOT BE FIXED."
         }
 
     return r
