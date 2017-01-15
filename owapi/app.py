@@ -18,9 +18,9 @@ from kyoukai import Blueprint
 from kyoukai import Kyoukai
 from kyoukai.asphalt import KyoukaiComponent, HTTPRequestContext
 
-# Fuck your logging config.
-from owapi.v2.routes import api_v2
 from owapi.v3 import api_v3
+
+# Fuck your logging config.
 
 logging.basicConfig(filename='/dev/null', level=logging.INFO)
 
@@ -133,7 +133,6 @@ async def jsonify(ctx, response: Response):
     return response
 
 
-api_bp.add_child(api_v2)
 api_bp.add_child(api_v3)
 
 app.register_blueprint(api_bp)
