@@ -56,8 +56,11 @@ def bl_parse_stats(parsed, mode="quickplay"):
     # Start the dict.
     built_dict = {"game_stats": [], "overall_stats": {}, "average_stats": []}
 
+    # Shortcut location for player level etc
+    mast_head = parsed.xpath(".//div[@class='masthead-player']")[0]
+
     # Get the prestige.
-    prestige = parsed.xpath(".//div[@class='player-level']")[0]
+    prestige = mast_head.xpath(".//div[@class='player-level']")[0]
     # Extract the background-image from the styles.
     try:
         bg_image = [x for x in prestige.values() if 'background-image' in x][0]
@@ -77,11 +80,11 @@ def bl_parse_stats(parsed, mode="quickplay"):
         built_dict["overall_stats"]["prestige"] = prestige_num
 
     # Parse out the HTML.
-    level = int(parsed.findall(".//div[@class='player-level']/div")[0].text)
+    level = int(mast_head.findall(".//div[@class='player-level']/div")[0].text)
     built_dict["overall_stats"]["level"] = level
 
     try:
-        tier = parsed.xpath(".//div[@class='competitive-rank']/img")[0]
+        tier = mast_head.xpath(".//div[@class='competitive-rank']/img")[0]
         img_src = [x for x in tier.values() if 'rank-icons' in x][0]
     except IndexError:
         built_dict['overall_stats']['tier'] = None
@@ -94,7 +97,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
             tier_str = None
         built_dict["overall_stats"]["tier"] = tier_str
 
-    hasrank = parsed.findall(".//div[@class='competitive-rank']/div")
+    hasrank = mast_head.findall(".//div[@class='competitive-rank']/div")
     if hasrank:
         comprank = int(hasrank[0].text)
     else:
@@ -102,7 +105,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict["overall_stats"]["comprank"] = comprank
 
     # Fetch Avatar
-    built_dict["overall_stats"]["avatar"] = parsed.find(".//img[@class='player-portrait']").attrib['src']
+    built_dict["overall_stats"]["avatar"] = mast_head.find(".//img[@class='player-portrait']").attrib['src']
 
     if mode == "competitive":
         hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
