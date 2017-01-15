@@ -80,7 +80,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
         built_dict["overall_stats"]["prestige"] = prestige_num
 
     # Parse out the HTML.
-    level = int(mast_head.findall(".//div[@class='player-level']/div")[0].text)
+    level = int(prestige.findall(".//div")[0].text)
     built_dict["overall_stats"]["level"] = level
 
     try:
