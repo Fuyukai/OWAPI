@@ -258,6 +258,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
             continue
 
         stat_groups = _stat_groups[0]
+        _average_stats = {}
 
         _t_d = {}
         hero_specific_box = stat_groups[0]
@@ -265,11 +266,14 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         # Update the dict with [0]: [1]
         for subval in trs:
             name, value = util.sanitize_string(subval[0].text), subval[1].text
-            if 'average' in name.lower():
-                # No averages, ty
-                continue
+
+            # Put averages into average_stats
+            if "average" in name:
+                into = _average_stats
+            else:
+                into = _t_d
             nvl = util.try_extract(value)
-            _t_d[name] = nvl
+            into[name] = nvl
 
         n_dict["hero_stats"] = _t_d
 
@@ -279,13 +283,16 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
             # Update the dict with [0]: [1]
             for subval in trs:
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
-                if 'average' in name.lower():
-                    # No averages, ty
-                    continue
+                # Put averages into average_stats
+                if "average" in name:
+                    into = _average_stats
+                else:
+                    into = _t_d
                 nvl = util.try_extract(value)
-                _t_d[name] = nvl
+                into[name] = nvl
 
         n_dict["general_stats"] = _t_d
+        n_dict["average_stats"] = _average_stats
 
         built_dict[hero_name] = n_dict
 
