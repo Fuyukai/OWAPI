@@ -73,6 +73,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
         for key, val in PRESTIGE.items():
             if key in bg_image:
                 prestige_num = val
+                built_dict["overall_stats"]["rank_image"] = bg_image.split("(")[1][:-1]
                 break
         else:
             # Unknown.
