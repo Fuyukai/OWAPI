@@ -50,8 +50,12 @@ OWAPI has a few requirements:
         `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev`
 
      `source ./venv/bin/activate && pip install wheel && pip install -r requirements.txt`
+
+ 5. **Copy and tweak the example config file.**
+
+    `cp config.example.yml config.yml`
      
- 5. **Start the OWAPI server.**
+ 6. **Start the OWAPI server.**
  
      `PYTHONPATH=. asphalt run config.yml`
      

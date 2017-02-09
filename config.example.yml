@@ -1,0 +1,50 @@
+---
+component:
+  # Do not change this line. Everything will break.
+  type: owapi.app:APIComponent
+
+  # Is caching via redis enabled?
+  # This will speed up the API massively for subsequent requests, but data will be stale for 300 seconds.
+  # Set to False to disable.
+  use_redis: True
+
+  # Enable profiling?
+  # This is only recommended for developers.
+  do_profiling: False
+
+  # Disable ratelimiting?
+  # This prevents spam for public instances. Private instances should set this to True.
+  disable_ratelimits: False
+
+  # Components listing. Do not edit.
+  components:
+    # The webapp component.
+    kyoukai:
+      # Do not change this line. Everything will break.
+      app: owapi.app:app
+      # Launch the app in debug mode? Recommended False for production servers.
+      debug: True
+      # The IP for Kyoukai to bind to.
+      ip: 127.0.0.1
+      # The port for Kyoukai to bind to.
+      port: 4444
+    # The redis component.
+    # This is ignored if `use_redis` is set to False.
+    redis:
+      connections:
+        redis:
+          # The address of your Redis server.
+          address: 127.0.0.1
+          # The port of your Redis server.
+          port: 6379
+          # The database to connect to on Redis.
+          db: 1
+          # The password for your Redis server.
+          # Do not uncomment if you do not have a password.
+          # password: hunter2
+
+          # Enable SSL for this redis connection?
+          # This must be enabled on the server side too.
+          ssl: False
+
+
