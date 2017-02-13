@@ -242,6 +242,7 @@ async def get_hero_list(ctx: HTTPRequestContext):
 
     return built_dict
 
+
 @api_v3.route("/heroes/<hero>")
 async def get_hero(ctx: HTTPRequestContext, hero: str):
     """
