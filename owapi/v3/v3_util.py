@@ -8,7 +8,7 @@ import shutil
 import re
 
 import functools
-import yaml
+from ruamel import yaml
 from kyoukai.asphalt import HTTPRequestContext
 
 RATES_PATH = os.path.join(os.getcwd(), "rates.yml")
