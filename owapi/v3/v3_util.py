@@ -108,6 +108,12 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
                     if tries >= max_reqs:
                         # 429 You Are Being Ratelimited.
                         ttl = await ctx.redis.ttl(built)
+
+                        if ttl == -1:
+                            # wtf
+                            await ctx.redis.expire(built, _timelimit)
+                            ttl = _timelimit
+
                         return {"error": 429, "msg": "you are being ratelimited"}, 429, {"Retry-After": ttl}
 
                     # LPUSH a `1` or something onto the edge of the list.
