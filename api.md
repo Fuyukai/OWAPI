@@ -4,19 +4,38 @@
 
 Regions and platforms can be overridden with URL parameters.
 
-#### Regions (V3)
+### Regions (V3)
 
 In V3, all regions are automatically checked. Data is returned for any regions the user is in. The other regions return 
 `null`. See V3 results below.
 
-#### Platforms
+### Platforms
 
 You can override the platform with `?platform=<pc|xbl|psn>`. This defaults to `pc`.
 
-#### Formatting
+### Formatting
 
 The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it in a more readable 
 format. (The other option is installing a browser plugin, such as [JSONView](https://jsonview.com/).
+
+#### Field formatting
+
+Field names inside the inner dict will correspond to all of the cards shown inside the
+[PlayOverwatch](https://playoverwatch.com/en-us/career/pc/eu/Downy-2877) pages corresponding to the users, with a
+slight formatting tweak:
+
+ - All nonalphanumeric characters are removed
+ - All spaces are replaced with underscores
+ - The entire fields are lowercase
+
+### Levels
+
+The levels returned by the API are **not** the final levels. To calculate the final level,
+use `(prestige * 100) + level`.
+
+### Time fields
+
+Unless otherwise specified, time fields are always in ***hours***.
 
 ---
 
@@ -59,6 +78,18 @@ See below for detailed response on `stats`, `heroes`, and `achievements`.
 `https://owapi.net/api/v3/u/Dad-12262/stats`
 
 *Result:*
+
+A `stats` key containing several subkeys:
+
+   - `competitive` - displaying your competitive statistics
+   - `quickplay` - displaying your quickplay statistics
+
+Each of these will have several other keys:
+
+   - `overall_stats` - These are useful overall stats including winrate, level, prestige, game count, competitive rank,
+   losses and avatar.
+   - `game_stats` - These show total statistics over all games.
+   - `average_stats` - These are calculated by Blizzard as the average statistics.
 
 ```json
 {
@@ -230,6 +261,8 @@ See below for detailed response on `stats`, `heroes`, and `achievements`.
 
 *Result:*
 
+This is a mapping of category -> hash which is another mapping of achievement -> unlocked (True/False).
+
 ```json
 {
 
@@ -340,6 +373,17 @@ See below for detailed response on `stats`, `heroes`, and `achievements`.
 `https://owapi.net/api/v3/u/Dad-12262/heroes`
 
 *Result:*
+
+The `heroes` key will contain two subkeys, inside the respective `quickplay` and `competitive` subkeys:
+
+   - `stats`, which signifies specific hero stats.
+
+    - Each hero that the user has played will have a key with the hero specific fields from the PlayOverwatch website
+    inside a hash mapping here.
+
+   - `playtime`, which signifies specific hero playtime.
+
+    - Each hero will have a key and the play time in hours inside a hash mapping here.
 
 ```json
 {
@@ -504,5 +548,3 @@ See below for detailed response on `stats`, `heroes`, and `achievements`.
 
 }
 ```
-
-Each hero has personal `hero_stats` keys.
