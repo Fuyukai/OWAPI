@@ -236,13 +236,11 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
             return None
 
     if mode == "competitive":
-        _root = parsed.findall(".//div[@data-mode='competitive']")
-        _hero_info = parsed.findall(".//div[@data-mode='competitive']//div[@data-group-id='comparisons']")[0]
+        _root = parsed.findall(".//div[@data-mode='competitive']")[0]
     else:
         _root = parsed
 
     _hero_info = _root.findall(".//div[@data-group-id='comparisons']")[0]
-
     hero_info = _hero_info.findall(".//div[@class='bar-text']")
 
     # Loop over each one, extracting the name and hours counted.

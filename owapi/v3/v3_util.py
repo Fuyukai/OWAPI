@@ -27,7 +27,7 @@ if not os.path.exists(RATES_PATH):
     shutil.copy(os.path.join(os.getcwd(), "rates.default.yml"), RATES_PATH)
 
 with open(RATES_PATH) as r:
-    ratelimits = yaml.load(r).get("rates")
+    ratelimits = yaml.load(r, Loader=yaml.Loader).get("rates")
 
 compiled = []
 
