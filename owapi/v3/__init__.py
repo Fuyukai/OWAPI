@@ -91,9 +91,9 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
         d = {
-            "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
+            "heroes": None,
             "stats": {},
-            "achievements": {}
+            "achievements": None,
         }
 
         d["stats"]["quickplay"] = parsing.bl_parse_stats(result)
@@ -122,8 +122,8 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {},
-            "achievements": {}
+            "stats": None,
+            "achievements": None,
         }
 
         d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
@@ -153,8 +153,8 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {},
-            "achievements": {}
+            "stats": None,
+            "achievements": None
         }
 
         d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)

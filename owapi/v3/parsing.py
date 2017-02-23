@@ -53,6 +53,15 @@ def bl_parse_stats(parsed, mode="quickplay"):
     # I'm really really hoping it doesn't break.
     # Good luck!
 
+    try:
+        # XPath for the `u-align-center` h6 which signifies there's no data.
+        no_data = parsed.xpath(".//div[@id='{}']//ul/h6[@class='u-align-center']".format(mode))[0]
+    except IndexError:
+        pass
+    else:
+        if no_data.text.strip() == "We don't have any data for this account in this mode yet.":
+            return None
+
     # Start the dict.
     built_dict = {"game_stats": [], "overall_stats": {}, "average_stats": []}
 
@@ -111,14 +120,14 @@ def bl_parse_stats(parsed, mode="quickplay"):
     if mode == "competitive":
         hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
         if len(hascompstats) != 2:
-            return {}
+            return None
         stat_groups = hascompstats[1]
     elif mode == "quickplay":
         try:
             stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
         except IndexError:
             # User has no stats...
-            return {}
+            return None
     else:
         # how else to handle fallthrough case?
         stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
@@ -216,12 +225,23 @@ def bl_parse_stats(parsed, mode="quickplay"):
 def bl_parse_all_heroes(parsed, mode="quickplay"):
     built_dict = {}
 
-    if mode == "competitive":
-        _hero_info = parsed.findall(".//div[@data-mode='competitive']//div[@data-group-id='comparisons']")[0]
-    elif mode == "quickplay":
-        _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
+    _root = parsed.xpath(".//div[@id='{}']".format(mode))
+    try:
+        # XPath for the `u-align-center` h6 which signifies there's no data.
+        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']".format(mode))[0]
+    except IndexError:
+        pass
     else:
-        _hero_info = parsed.findall(".//div[@data-group-id='comparisons']")[0]
+        if no_data.text.strip() == "We don't have any data for this account in this mode yet.":
+            return None
+
+    if mode == "competitive":
+        _root = parsed.findall(".//div[@data-mode='competitive']")
+        _hero_info = parsed.findall(".//div[@data-mode='competitive']//div[@data-group-id='comparisons']")[0]
+    else:
+        _root = parsed
+
+    _hero_info = _root.findall(".//div[@data-group-id='comparisons']")[0]
 
     hero_info = _hero_info.findall(".//div[@class='bar-text']")
 
@@ -247,7 +267,16 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         ".//div[@id='{}']".format("competitive" if mode == "competitive" else "quickplay")
     )
     if not _root:
-        return
+        return None
+
+    try:
+        # XPath for the `u-align-center` h6 which signifies there's no data.
+        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']".format(mode))[0]
+    except IndexError:
+        pass
+    else:
+        if no_data.text.strip() == "We don't have any data for this account in this mode yet.":
+            return None
 
     for hero_name, requested_hero_div_id in hero_data_div_ids.items():
         n_dict = {}
