@@ -180,7 +180,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
         if games == 0 or games == ties:
             wr = 0
         else:
-            wr = floor((wins / (games - ties)) * 100)
+            wr = round((wins / (games - ties)) * 100, 2)
 
         built_dict["overall_stats"]["ties"] = ties
         built_dict["overall_stats"]["games"] = games
@@ -218,6 +218,19 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict["game_stats"] = _t_d
     built_dict["average_stats"] = _a_d
     built_dict["competitive"] = mode == "competitive"
+
+    if not "games" in built_dict["overall_stats"]:
+        # manually calculate it
+        dmg_done = built_dict["game_stats"]["damage_done"]
+        avg_dmgd = built_dict["average_stats"]["damage_done_avg"]
+
+        # IT RETURNS
+        games = int(dmg_done // avg_dmgd)
+
+        losses = games - built_dict["overall_stats"]["wins"]
+        built_dict["overall_stats"]["games"] = games
+        built_dict["overall_stats"]["losses"] = losses
+        built_dict["overall_stats"]["win_rate"] = round((built_dict["overall_stats"]["wins"] / games) * 100, 2)
 
     return built_dict
 
