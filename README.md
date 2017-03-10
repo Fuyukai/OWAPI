@@ -1,5 +1,7 @@
 ## OW API
 
+[Donate to keep OWAPI alive](https://www.patreon.com/sundwarf)
+
 This server is a simple way to get read-only information about player statistics in the game Overwatch by Blizzard.
 **A live version runs on https://owapi.net.**  
 
