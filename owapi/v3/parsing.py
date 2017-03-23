@@ -303,24 +303,36 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         _average_stats = {}
 
         _t_d = {}
-        hero_specific_box = stat_groups[0]
-        trs = hero_specific_box.findall(".//tbody/tr")
-        # Update the dict with [0]: [1]
-        for subval in trs:
-            name, value = util.sanitize_string(subval[0].text), subval[1].text
 
-            # Put averages into average_stats
-            if "average" in name:
-                into = _average_stats
-            else:
-                into = _t_d
-            nvl = util.try_extract(value)
-            into[name] = nvl
+        # offset for subboxes
+        # if there IS a hero-specific box, we need to scan all boxes from offset to end
+        # because the hero-specific box is first.
+        # if there is NOT, we scan all boxes later.
+        # this is determined by the xpath to find the Hero Specific page.
+        subbox_offset = 0
+
+        # .find on the assumption hero box is the *first* item
+        hbtitle = stat_groups.find(".//span[@class='stat-title']").text
+        if hbtitle == "Hero Specific":
+            subbox_offset = 1
+            hero_specific_box = stat_groups[0]
+            trs = hero_specific_box.findall(".//tbody/tr")
+            # Update the dict with [0]: [1]
+            for subval in trs:
+                name, value = util.sanitize_string(subval[0].text), subval[1].text
+
+                # Put averages into average_stats
+                if "average" in name:
+                    into = _average_stats
+                else:
+                    into = _t_d
+                nvl = util.try_extract(value)
+                into[name] = nvl
 
         n_dict["hero_stats"] = _t_d
 
         _t_d = {}
-        for subbox in stat_groups[1:]:
+        for subbox in stat_groups[subbox_offset:]:
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
             for subval in trs:
