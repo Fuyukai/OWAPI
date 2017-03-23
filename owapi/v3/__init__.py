@@ -21,9 +21,13 @@ api_v3 = Blueprint("api_v3", prefix="/v3")
 @api_v3.after_request
 async def add__request(ctx: HTTPRequestContext, r: Response):
     # Edit the body, and add a _request.
-    if isinstance(r.response, dict):
+    if isinstance(r.response, list):
+        h = r.response[0]
+    else:
+        h = r.response
+    if isinstance(h, dict):
         # Add a _request var to the body.
-        r.response["_request"] = {
+        h["_request"] = {
             "api_ver": 3,
             "route": ctx.request.path
         }
@@ -39,7 +43,7 @@ async def e404(ctx: HTTPRequestContext, exc):
             "Content-Type": "application/json"}
 
 
-@api_v3.route("/u/<battletag>/blob")
+@api_v3.route("/u/<battletag>/blob", reverse_hooks=True)
 @with_ratelimit("blob", timelimit=5, max_reqs=1)
 async def get_blob(ctx: HTTPRequestContext, battletag: str):
     """
@@ -54,9 +58,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
             continue
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}}, "stats": {"competitive": {}, "quickplay": {}}},
-            "stats": {},
-            "achievements": {}
-        }
+            "stats": {}, "achievements": {}}
 
         d["stats"]["quickplay"] = parsing.bl_parse_stats(result)
         d["stats"]["competitive"] = parsing.bl_parse_stats(result, mode="competitive")
@@ -74,10 +76,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-get_blob.should_convert = False
-
-
-@api_v3.route("/u/<battletag>/stats")
+@api_v3.route("/u/<battletag>/stats", reverse_hooks=True)
 @with_ratelimit("stats")
 async def get_stats(ctx: HTTPRequestContext, battletag: str):
     """
@@ -104,10 +103,7 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-get_stats.should_convert = False
-
-
-@api_v3.route("/u/<battletag>/heroes")
+@api_v3.route("/u/<battletag>/heroes", reverse_hooks=True)
 @with_ratelimit("stats")
 async def get_heroes(ctx: HTTPRequestContext, battletag: str):
     """
@@ -138,7 +134,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
 
 
 # Separate routes.
-@api_v3.route("/u/<battletag>/heroes/quickplay")
+@api_v3.route("/u/<battletag>/heroes/quickplay", reverse_hooks=True)
 @with_ratelimit("stats")
 async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     """
@@ -166,10 +162,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-get_heroes_qp.should_convert = False
-
-
-@api_v3.route("/u/<battletag>/heroes/competitive")
+@api_v3.route("/u/<battletag>/heroes/competitive", reverse_hooks=True)
 @with_ratelimit("stats")
 async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     """
@@ -197,10 +190,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-get_heroes_comp.should_convert = False
-
-
-@api_v3.route("/u/<battletag>/achievements")
+@api_v3.route("/u/<battletag>/achievements", reverse_hooks=True)
 @with_ratelimit("stats")
 async def get_achievements(ctx: HTTPRequestContext, battletag: str):
     """
@@ -226,7 +216,7 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
     return built_dict
 
 
-@api_v3.route("/heroes")
+@api_v3.route("/heroes", reverse_hooks=True)
 async def get_hero_list(ctx: HTTPRequestContext):
     """
     Send hero list.
@@ -243,7 +233,7 @@ async def get_hero_list(ctx: HTTPRequestContext):
     return built_dict
 
 
-@api_v3.route("/heroes/<hero>")
+@api_v3.route("/heroes/<hero>", reverse_hooks=True)
 async def get_hero(ctx: HTTPRequestContext, hero: str):
     """
     Send hero data for selected hero.
