@@ -16,6 +16,12 @@ component:
   # This prevents spam for public instances. Private instances should set this to True.
   disable_ratelimits: False
 
+  # The time to cache results for.
+  # By default, this is 300.
+  # If `use_redis` is False, this statement has no effect.
+  # If this remains commented, the cache time used will be the default for functions.
+  #cache_time: 300
+
   # Components listing. Do not edit.
   components:
     # The webapp component.

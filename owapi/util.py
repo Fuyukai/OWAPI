@@ -16,7 +16,7 @@ SECOND_REGEX = re.compile(r"([0-9]*\.?[0-9]*) seconds?")
 PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?\%")
 
 
-async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_404=False):
+async def with_cache(ctx: HTTPRequestContext, func, *args, expires: int = None, cache_404=False):
     """
     Run a coroutine with cache.
 
@@ -24,6 +24,11 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
 
     Unless we don't have redis.
     """
+    if expires is None:
+        expires = 300
+
+    if ctx.app.config["owapi_cache_time"] is not None:
+        expires = ctx.app.config["owapi_cache_time"]
 
     if not ctx.app.config["owapi_use_redis"]:
         # no caching without redis, just call the function
@@ -39,6 +44,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires=300, cache_40
         got = await ctx.redis.get(built)
         if got and got != "None":
             if await ctx.redis.ttl(built) == -1:
+                logger.info("Caching `{}` for `{}` seconds".format(built, expires))
                 await ctx.redis.expire(built, expires)
 
             logger.info("Cache hit for `{}`".format(built))

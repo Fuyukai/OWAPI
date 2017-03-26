@@ -40,11 +40,13 @@ class APIComponent(ContainerComponent):
     Container for other components. I think.
     """
 
-    def __init__(self, components, use_redis=True, do_profiling=False, disable_ratelimits=False):
+    def __init__(self, components, use_redis=True, do_profiling=False, disable_ratelimits=False,
+                 cache_time: int = None):
         super().__init__(components)
         app.config["owapi_use_redis"] = use_redis
         app.config["owapi_do_profiling"] = do_profiling
         app.config["owapi_disable_ratelimits"] = disable_ratelimits
+        app.config["owapi_cache_time"] = cache_time
 
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
