@@ -6,7 +6,7 @@ Regions and platforms can be overridden with URL parameters.
 
 ### Regions (V3)
 
-In V3, all regions are automatically checked. Data is returned for any regions the user is in. The other regions return 
+In V3, all regions are automatically checked. Data is returned for any regions the user is in. The other regions return
 `null`. See V3 results below.
 
 ### Platforms
@@ -15,7 +15,7 @@ You can override the platform with `?platform=<pc|xbl|psn>`. This defaults to `p
 
 ### Formatting
 
-The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it in a more readable 
+The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it in a more readable
 format. (The other option is installing a browser plugin, such as [JSONView](https://jsonview.com/).
 
 #### Field formatting
@@ -62,7 +62,8 @@ Unless otherwise specified, time fields are always in ***hours***.
     "us": {
         "stats": {},
         "heroes": {},
-        "achievements": {},
+        "achievements": {}
+    },
     "any": null
 
 }
