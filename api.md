@@ -88,7 +88,7 @@ A `stats` key containing several subkeys:
 Each of these will have several other keys:
 
    - `overall_stats` - These are useful overall stats including winrate, level, prestige, game count, competitive rank,
-   losses, wins, games, a
+   losses, wins, games.
    - `game_stats` - These show total statistics over all games.
    - `average_stats` - These are calculated by Blizzard as the average statistics.
 
