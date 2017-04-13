@@ -42,7 +42,8 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
                 return None
             return (await req.read()).decode()
 
-    result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time, cache_404=cache_404)
+    result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time,
+                                   cache_404=cache_404)
     session.close()
     return result
 
