@@ -2,7 +2,8 @@
 
 [Donate to keep OWAPI alive](https://www.patreon.com/sundwarf)
 
-This server is a simple way to get read-only information about player statistics in the game Overwatch by Blizzard.
+This server is a simple way to get read-only information about player statistics in the game
+Overwatch by Blizzard.
 **A live version runs on https://owapi.net.**  
 
 ## Game data
@@ -37,8 +38,10 @@ OWAPI has a few requirements:
      
  3. **Setup a Redis server.**
  
-     Redis should be running on the default port - 6379. You can override this in config.yml; however.  
-     Redis is used for caching lots of data so that there's not a 10 second delay on EVERY request as the data is fetched and scraped; it is essential. 
+     Redis should be running on the default port - 6379. You can override this in config.yml;
+     however.
+     Redis is used for caching lots of data so that there's not a 10 second delay on
+     EVERY request as the data is fetched and scraped; it is essential.
      
      For Debian/Ubuntu, you can install one with:
      `sudo apt install redis-server`
