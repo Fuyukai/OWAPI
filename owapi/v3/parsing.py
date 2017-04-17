@@ -2,10 +2,6 @@
 Parsing the data returned from Blizzard.
 """
 from lxml import etree
-from math import floor
-
-import unidecode
-import re
 
 from owapi import util
 from owapi.prestige import PRESTIGE
@@ -116,22 +112,29 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict["overall_stats"]["comprank"] = comprank
 
     # Fetch Avatar
-    built_dict["overall_stats"]["avatar"] = mast_head.find(".//img[@class='player-portrait']").attrib['src']
+    built_dict["overall_stats"]["avatar"] = mast_head.find(
+        ".//img[@class='player-portrait']"
+    ).attrib['src']
 
     if mode == "competitive":
-        hascompstats = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")
+        hascompstats = parsed.xpath(
+            ".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']"
+        )
         if len(hascompstats) != 2:
             return None
         stat_groups = hascompstats[1]
     elif mode == "quickplay":
         try:
-            stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+            stat_groups = parsed.xpath(
+                ".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
         except IndexError:
             # User has no stats...
             return None
     else:
         # how else to handle fallthrough case?
-        stat_groups = parsed.xpath(".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+        stat_groups = parsed.xpath(
+            ".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']"
+        )[0]
 
     # Highlight specific stat groups.
     try:
@@ -161,8 +164,10 @@ def bl_parse_stats(parsed, mode="quickplay"):
     if mode == "competitive":
         try:
             misc_box = stat_groups[7]
-            losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", ""))
-            ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", ""))
+            losses = int(misc_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text
+                         .replace(",", ""))
+            ties = int(misc_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text
+                       .replace(",", ""))
         except IndexError:
             # Sometimes the losses and ties don't exist.
             # I'm not 100% as to what causes this, but it might be because there are no ties.
@@ -231,7 +236,9 @@ def bl_parse_stats(parsed, mode="quickplay"):
         losses = games - built_dict["overall_stats"]["wins"]
         built_dict["overall_stats"]["games"] = games
         built_dict["overall_stats"]["losses"] = losses
-        built_dict["overall_stats"]["win_rate"] = round((built_dict["overall_stats"]["wins"] / games) * 100, 2)
+        built_dict["overall_stats"]["win_rate"] = round(
+            (built_dict["overall_stats"]["wins"] / games) * 100, 2
+        )
 
     return built_dict
 
@@ -293,7 +300,8 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
     for hero_name, requested_hero_div_id in hero_data_div_ids.items():
         n_dict = {}
         _stat_groups = _root[0].xpath(
-            ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(requested_hero_div_id)
+            ".//div[@data-group-id='stats' and @data-category-id='{0}']"
+            .format(requested_hero_div_id)
         )
 
         if not _stat_groups:
@@ -364,14 +372,16 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
         return
     _root = _root[0]
 
-    _category_selects = _root.xpath(".//select[@data-group-id='achievements']")[0].xpath(".//option")
+    _category_selects = _root.xpath(".//select[@data-group-id='achievements']")[0] \
+        .xpath(".//option")
 
     for _category_select in _category_selects:
         category_name = _category_select.text
         category_id = _category_select.get("value")
 
         _achievement_boxes = _root.xpath(
-            ".//div[@data-group-id='achievements' and @data-category-id='{0}']/ul/div/div[@data-tooltip]".format(
+            ".//div[@data-group-id='achievements' and @data-category-id='{0}']"
+            "/ul/div/div[@data-tooltip]".format(
                 category_id))
         n_dict = {}
 
@@ -381,7 +391,8 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
                 # Sombra ARG clue, not a real achievement
                 continue
 
-            n_dict[util.sanitize_string(achievement_name)] = "m-disabled" not in _achievement_box.get("class")
+            n_dict[util.sanitize_string(achievement_name)] = ("m-disabled" not in
+                                                              _achievement_box.get("class"))
 
         built_dict[category_name.lower()] = n_dict
 
