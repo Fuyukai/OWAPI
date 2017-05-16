@@ -117,16 +117,22 @@ def bl_parse_stats(parsed, mode="quickplay"):
     ).attrib['src']
 
     if mode == "competitive":
-        hascompstats = parsed.xpath(
-            ".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']"
-        )
-        if len(hascompstats) != 2:
+        # the competitive overview is under a div with id='competitive'
+        # and the right category
+        try:
+            stat_groups = parsed.xpath(
+                ".//div[@id='competitive']"
+                "//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']"
+            )[0]
+        except IndexError:
+            # No stats
             return None
-        stat_groups = hascompstats[1]
     elif mode == "quickplay":
         try:
             stat_groups = parsed.xpath(
-                ".//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']")[0]
+                ".//div[@id='quickplay']"
+                "//div[@data-group-id='stats' and @data-category-id='0x02E00000FFFFFFFF']"
+            )[0]
         except IndexError:
             # User has no stats...
             return None
