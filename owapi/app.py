@@ -90,7 +90,7 @@ async def e404(ctx: HTTPRequestContext, exc: HTTPException):
 async def start_profiling(ctx: HTTPRequestContext):
     if ctx.app.config["owapi_do_profiling"]:
         pr = cProfile.Profile()
-        ctx.cfg['owapi_profiling_obj'] = pr
+        ctx.app.config['owapi_profiling_obj'] = pr
         pr.enable()
     return ctx
 
@@ -98,14 +98,16 @@ async def start_profiling(ctx: HTTPRequestContext):
 @app.root.after_request
 async def stop_profiling(ctx: HTTPRequestContext, response: Response):
     if ctx.app.config["owapi_do_profiling"]:
-        pr = ctx.cfg['owapi_profiling_obj']
+        pr = ctx.app.config['owapi_profiling_obj']
         pr.disable()
         s = io.StringIO()
         ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
         # print into s, with regex filter
         ps.print_stats("owapi")
         # strip useless part of path infos and print with logger
-        logger.info(s.getvalue().replace(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0] + "/", ""))
+        logger.info(s.getvalue().replace(
+            os.path.split(os.path.dirname(os.path.realpath(__file__)))[0] + "/", ""
+        ))
     return response
 
 

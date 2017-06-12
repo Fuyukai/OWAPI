@@ -387,8 +387,9 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
 
         _achievement_boxes = _root.xpath(
             ".//div[@data-group-id='achievements' and @data-category-id='{0}']"
-            "/ul/div/div[@data-tooltip]".format(
-                category_id))
+            "/ul/div/div[@data-tooltip]"
+            .format(category_id)
+        )
         n_dict = {}
 
         for _achievement_box in _achievement_boxes:
