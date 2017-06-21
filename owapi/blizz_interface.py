@@ -15,7 +15,7 @@ try:
     _has_html5_parser = True
 except ImportError:
     _has_html5_parser = False
-from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.exceptions import HTTPException, NotFound, InternalServerError
 
 from owapi import util
 
@@ -121,6 +121,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
     # Gather all the futures to download paralellely.
     results = await asyncio.gather(*futures, return_exceptions=True)
     d = {"any": None}
+    error = None
     for region, result in zip(AVAILABLE_REGIONS, results):
         # Remove the `/` from the front of the region.
         # This is used internally to make building the URL to get simpler.
@@ -130,14 +131,20 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
             d[region] = result
         elif isinstance(result, Exception):
             logger.error("Failed to fetch user page!\n{}".format(
-                traceback.format_exception(type(result), result, result.__traceback__)
+                ''.join(traceback.format_exception(type(result), result, result.__traceback__))
             ))
+            error = result
             d[region] = None
         else:
             d[region] = None
 
     # Check if we should raise or return.
     if not any(d[i[1:]] is not None for i in AVAILABLE_REGIONS):
+        if error is not None:
+            e = InternalServerError()
+            e.__cause__ = error
+            e.__context__ = error
+            raise e
         raise NotFound()
 
     return d
