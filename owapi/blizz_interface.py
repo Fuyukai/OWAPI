@@ -1,17 +1,15 @@
 """
 Interface that uses Blizzard's pages as the source.
 """
+import asyncio
 import functools
 import logging
-
-import asyncio
 import traceback
-
-from werkzeug.exceptions import HTTPException, NotFound
-from lxml import etree
 
 import aiohttp
 from kyoukai.asphalt import HTTPRequestContext
+from lxml import etree
+from werkzeug.exceptions import HTTPException, NotFound
 
 from owapi import util
 
@@ -30,12 +28,10 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
     """
     Downloads page body from PlayOverwatch and caches it.
     """
-    session = aiohttp.ClientSession(headers={"User-Agent": "OWAPI Scraper/1.0.1"})
-
     async def _real_get_body(_, url: str):
         # Real function.
         logger.info("GET => {}".format(url))
-        async with session.get(url) as req:
+        async with ctx.session.get(url) as req:
             assert isinstance(req, aiohttp.ClientResponse)
             logger.info("GET => {} => {}".format(url, req.status))
             if req.status != 200:
@@ -44,7 +40,6 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
 
     result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time,
                                    cache_404=cache_404)
-    session.close()
     return result
 
 

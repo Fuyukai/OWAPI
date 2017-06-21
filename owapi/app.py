@@ -9,6 +9,7 @@ import pstats
 import io
 import os
 
+from aiohttp import ClientSession
 from werkzeug.exceptions import HTTPException
 from werkzeug.routing import RequestRedirect
 from werkzeug.wrappers import Response
@@ -51,6 +52,7 @@ class APIComponent(ContainerComponent):
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
                            app="app:app", template_renderer=None)
+        ctx.session = ClientSession(headers={"User-Agent": "owapi scraper/1.0.1"})
         if app.config["owapi_use_redis"]:
             from asphalt.redis.component import RedisComponent
             self.add_component('redis', RedisComponent)
