@@ -1,23 +1,22 @@
 """
 Main OWAPI App.
 """
+import cProfile
+import io
 import json
 import logging
-import traceback
-import cProfile
-import pstats
-import io
 import os
+import pstats
+import traceback
 
 from aiohttp import ClientSession
-from werkzeug.exceptions import HTTPException
-from werkzeug.routing import RequestRedirect
-from werkzeug.wrappers import Response
-
 from asphalt.core import ContainerComponent
 from kyoukai import Blueprint
 from kyoukai import Kyoukai
 from kyoukai.asphalt import KyoukaiComponent, HTTPRequestContext
+from werkzeug.exceptions import HTTPException
+from werkzeug.routing import RequestRedirect
+from werkzeug.wrappers import Response
 
 from owapi.v3 import api_v3
 

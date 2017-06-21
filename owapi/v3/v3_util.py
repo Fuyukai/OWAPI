@@ -1,14 +1,12 @@
 """
 v3-specific utilities.
 """
-import os
-
-import shutil
-
-import re
-
 import functools
+import os
+import re
+import shutil
 from ruamel import yaml
+
 from kyoukai.asphalt import HTTPRequestContext
 
 RATES_PATH = os.path.join(os.getcwd(), "rates.yml")

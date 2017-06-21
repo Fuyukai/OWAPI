@@ -3,17 +3,15 @@ api_v3 routes.
 """
 import json
 
+from kyoukai import Blueprint
+from kyoukai.asphalt import HTTPRequestContext
 from werkzeug.wrappers import Response
 
-from kyoukai.asphalt import HTTPRequestContext
-from kyoukai import Blueprint
-
 from owapi.blizz_interface import fetch_all_user_pages
-from owapi.v3.v3_util import with_ratelimit
-from owapi.v3 import parsing
-
-from owapi.blizz_interface import get_hero_data
 from owapi.blizz_interface import get_all_heroes
+from owapi.blizz_interface import get_hero_data
+from owapi.v3 import parsing
+from owapi.v3.v3_util import with_ratelimit
 
 api_v3 = Blueprint("api_v3", prefix="/v3")
 
