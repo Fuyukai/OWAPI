@@ -9,6 +9,7 @@ import os
 import pstats
 import traceback
 
+import aiohttp
 from aiohttp import ClientSession
 from asphalt.core import ContainerComponent
 from kyoukai import Blueprint
@@ -35,6 +36,14 @@ root.addHandler(consoleHandler)
 logger = logging.getLogger("OWAPI")
 
 
+# Fucking aiohttp
+
+class AiohttpHackyClientRequest(aiohttp.ClientRequest):
+    def __init__(self, *args, **kwargs):
+        kwargs["proxy_from_env"] = True
+        super().__init__(*args, **kwargs)
+
+
 class APIComponent(ContainerComponent):
     """
     Container for other components. I think.
@@ -51,7 +60,8 @@ class APIComponent(ContainerComponent):
     async def start(self, ctx):
         self.add_component('kyoukai', KyoukaiComponent, ip="127.0.0.1", port=4444,
                            app="app:app", template_renderer=None)
-        ctx.session = ClientSession(headers={"User-Agent": "owapi scraper/1.0.1"})
+        ctx.session = ClientSession(headers={"User-Agent": "owapi scraper/1.0.1"},
+                                    request_class=AiohttpHackyClientRequest)
         if app.config["owapi_use_redis"]:
             from asphalt.redis.component import RedisComponent
             self.add_component('redis', RedisComponent)
