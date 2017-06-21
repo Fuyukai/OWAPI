@@ -52,7 +52,7 @@ OWAPI has a few requirements:
  4. **Install the requirements.**
 
      For debian-based systems:
-        `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev`
+        `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
 
      `source ./venv/bin/activate && pip install wheel && pip install -r requirements.txt`
 
