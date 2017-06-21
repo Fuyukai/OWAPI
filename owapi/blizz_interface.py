@@ -9,6 +9,12 @@ import traceback
 import aiohttp
 from kyoukai.asphalt import HTTPRequestContext
 from lxml import etree
+
+try:
+    from html5_parser import parse
+    _has_html5_parser = True
+except ImportError:
+    _has_html5_parser = False
 from werkzeug.exceptions import HTTPException, NotFound
 
 from owapi import util
@@ -28,6 +34,7 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
     """
     Downloads page body from PlayOverwatch and caches it.
     """
+
     async def _real_get_body(_, url: str):
         # Real function.
         logger.info("GET => {}".format(url))
@@ -43,16 +50,30 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
     return result
 
 
-def _parse_page(content: str) -> etree._Element:
+def _parse_page_html5(content: str) -> etree._Element:
     """
     Internal function to parse a page and return the data.
+
+    This uses html5_parser.
+    """
+    if content and content.lower() != 'none':
+        data = parse(content)
+        return data
+
+
+def _parse_page_lxml(content: str) -> etree._Element:
+    """
+    Internal function to parse a page and return the data.
+
+    This uses raw LXML.
     """
     if content and content.lower() != 'none':
         data = etree.HTML(content)
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc", region: str = "us",
+async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc",
+                        region: str = "us",
                         cache_time=300, cache_404=False) -> etree._Element:
     """
     Downloads the BZ page for a user, and parses it.
@@ -122,7 +143,8 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
     return d
 
 
-async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""):
+async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None,
+                           extra=""):
     """
     Downloads the correct page for a user in the right region.
 
@@ -147,29 +169,36 @@ async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc
         # Since we continued without returning, give back the None, None.
         return None, None
 
+
 async def get_hero_data(ctx: HTTPRequestContext, hero: str):
-    built_url = B_HERO_URL.format(hero = hero)
+    built_url = B_HERO_URL.format(hero=hero)
     page_body = await get_page_body(ctx, built_url)
-    
+
     if not page_body:
         raise HTTPException(404)
 
     parse_partial = functools.partial(_parse_page, page_body)
     loop = asyncio.get_event_loop()
     parsed = await loop.run_in_executor(None, parse_partial)
-    
+
     return parsed
+
 
 async def get_all_heroes(ctx: HTTPRequestContext):
     built_url = B_HEROES_URL
     page_body = await get_page_body(ctx, built_url)
-    
+
     if not page_body:
         raise HTTPException(404)
 
     parse_partial = functools.partial(_parse_page, page_body)
     loop = asyncio.get_event_loop()
     parsed = await loop.run_in_executor(None, parse_partial)
-    
+
     return parsed
 
+
+if _has_html5_parser:
+    _parse_page = _parse_page_html5
+else:
+    _parse_page = _parse_page_lxml
