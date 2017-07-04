@@ -231,13 +231,15 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict["average_stats"] = _a_d
     built_dict["competitive"] = mode == "competitive"
 
-    if not "games" in built_dict["overall_stats"]:
+    if "games" not in built_dict["overall_stats"]:
         # manually calculate it
-        dmg_done = built_dict["game_stats"]["damage_done"]
-        avg_dmgd = built_dict["average_stats"]["damage_done_avg"]
+        # 2017-07-04 - changed to use eliminations
+        # since damage done gave a bit of a stupid amount
+        elim_done = built_dict["game_stats"]["eliminations"]
+        avg_elim = built_dict["average_stats"]["eliminations_avg"]
 
-        # IT RETURNS
-        games = int(dmg_done // avg_dmgd)
+        # IT RETURNS		          # IT RETURNS
+        games = int(elim_done // avg_elim)
 
         losses = games - built_dict["overall_stats"]["wins"]
         built_dict["overall_stats"]["games"] = games
@@ -307,7 +309,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         n_dict = {}
         _stat_groups = _root[0].xpath(
             ".//div[@data-group-id='stats' and @data-category-id='{0}']"
-            .format(requested_hero_div_id)
+                .format(requested_hero_div_id)
         )
 
         if not _stat_groups:
@@ -388,7 +390,7 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
         _achievement_boxes = _root.xpath(
             ".//div[@data-group-id='achievements' and @data-category-id='{0}']"
             "/ul/div/div[@data-tooltip]"
-            .format(category_id)
+                .format(category_id)
         )
         n_dict = {}
 
