@@ -235,18 +235,34 @@ def bl_parse_stats(parsed, mode="quickplay"):
         # manually calculate it
         # 2017-07-04 - changed to use eliminations
         # since damage done gave a bit of a stupid amount
-        elim_done = built_dict["game_stats"]["eliminations"]
-        avg_elim = built_dict["average_stats"]["eliminations_avg"]
+        # 2017-07-11 - changed to cycle some averages
+        average_keys = ("eliminations", "healing_done", "final_blows", "objective_kills")
+        for key in average_keys:
+            try:
+                total = built_dict["game_stats"][key]
+                avg = built_dict["average_stats"][key + "_avg"]
+            except KeyError:
+                continue
+            else:
+                got = True
+                break
+        else:
+            got = False
 
-        # IT RETURNS		          # IT RETURNS
-        games = int(elim_done // avg_elim)
+        if got:
+            games = int(total // avg)
 
-        losses = games - built_dict["overall_stats"]["wins"]
-        built_dict["overall_stats"]["games"] = games
-        built_dict["overall_stats"]["losses"] = losses
-        built_dict["overall_stats"]["win_rate"] = round(
-            (built_dict["overall_stats"]["wins"] / games) * 100, 2
-        )
+            losses = games - built_dict["overall_stats"]["wins"]
+            built_dict["overall_stats"]["games"] = games
+            built_dict["overall_stats"]["losses"] = losses
+            built_dict["overall_stats"]["win_rate"] = round(
+                (built_dict["overall_stats"]["wins"] / games) * 100, 2
+            )
+        else:
+            # lol make them up
+            built_dict["overall_stats"]["games"] = 0
+            built_dict["overall_stats"]["losses"] = 0
+            built_dict["overall_stats"]["win_rate"] = 0
 
     return built_dict
 
