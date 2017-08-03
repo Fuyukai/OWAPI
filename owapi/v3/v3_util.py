@@ -18,7 +18,8 @@ DISALLOW_AGENTS = re.compile(r"(?:.*aiohttp/.*|.*python-requests/.*)")
 # Bad useragent response text.
 BAD_USERAGENT = {
                     "error": 400,
-                    "msg": "Hi! To prevent abuse of this service, it is required that you customize your user agent."
+                    "msg": "Hi! To prevent abuse of this service, it is required that you "
+                           "customize your user agent."
                 }, 400, {"Content-Type": "application/json"}
 
 if not os.path.exists(RATES_PATH):
@@ -44,7 +45,7 @@ def check_default_useragents(useragent: str):
     return DISALLOW_AGENTS.match(useragent)
 
 
-def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
+def with_ratelimit(bucket: str, timelimit: int = None, max_reqs: int = 0):
     """
     Defines a function to rate limit for.
 
@@ -69,7 +70,7 @@ def with_ratelimit(bucket: str, timelimit: int=None, max_reqs: int=0):
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.
                 ip = ctx.request.headers.get("X-Real-IP") or \
-                    ctx.request.headers.get("X-Forwarded-For") or ctx.request.remote_addr
+                     ctx.request.headers.get("X-Forwarded-For") or ctx.request.remote_addr
 
                 # Build the ratelimit string.
                 built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)

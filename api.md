@@ -1,5 +1,9 @@
 # OWAPI API Docs
 
+## Changelog
+
+    - 2017-08-03 - **Added new `rolling_averages` key. This contains averages over 10 minutes.**
+
 ## Notes
 
 Regions and platforms can be overridden with URL parameters.
@@ -15,14 +19,15 @@ You can override the platform with `?platform=<pc|xbl|psn>`. This defaults to `p
 
 ### Formatting
 
-The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it in a more readable
-format. (The other option is installing a browser plugin, such as [JSONView](https://jsonview.com/).
+The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it
+in a more readable format. (The other option is installing a browser plugin, such as
+[JSONView](https://jsonview.com/).
 
 #### Field formatting
 
 Field names inside the inner dict will correspond to all of the cards shown inside the
-[PlayOverwatch](https://playoverwatch.com/en-us/career/pc/eu/Downy-2877) pages corresponding to the users, with a
-slight formatting tweak:
+[PlayOverwatch](https://playoverwatch.com/en-us/career/pc/eu/Downy-2877) pages corresponding to
+the users, with a slight formatting tweak:
 
  - All nonalphanumeric characters are removed
  - All spaces are replaced with underscores

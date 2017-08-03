@@ -204,8 +204,10 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict["overall_stats"]["wins"] = wins
 
     # Build a dict using the stats.
-    _t_d = {}
-    _a_d = {}
+    game_stats = {}
+    average_stats = {}
+    rolling_average_stats = {}
+
     for subbox in stat_groups:
         trs = subbox.findall(".//tbody/tr")
         # Update the dict with [0]: [1]
@@ -214,22 +216,28 @@ def bl_parse_stats(parsed, mode="quickplay"):
             # Try and parse out the value. It might be a time!
             # If so, try and extract the time.
             nvl = util.try_extract(value)
+
             if 'average' in name.lower():
-                _a_d[name.replace("_average", "_avg")] = nvl
+                average_stats[name.replace("_average", "_avg")] = nvl
+            elif '_avg_per_10_min' in name.lower():
+                # 2017-08-03 - calculate rolling averages.
+                name = name.lower().replace("_avg_per_10_min", "")
+                rolling_average_stats[name] = nvl
             else:
-                _t_d[name] = nvl
+                game_stats[name] = nvl
 
     # Manually add the KPD.
     try:
-        _t_d["kpd"] = round(_t_d["eliminations"] / _t_d["deaths"], 2)
+        game_stats["kpd"] = round(game_stats["eliminations"] / game_stats["deaths"], 2)
     except KeyError:
         # They don't have any eliminations/deaths.
         # Set the KPD to 0.0.
         # See: #106
-        _t_d["kpd"] = 0
+        game_stats["kpd"] = 0
 
-    built_dict["game_stats"] = _t_d
-    built_dict["average_stats"] = _a_d
+    built_dict["game_stats"] = game_stats
+    built_dict["average_stats"] = average_stats
+    built_dict["rolling_average_stats"] = rolling_average_stats
     built_dict["competitive"] = mode == "competitive"
 
     if "games" not in built_dict["overall_stats"]:
