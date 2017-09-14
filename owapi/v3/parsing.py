@@ -353,7 +353,10 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         subbox_offset = 0
 
         # .find on the assumption hero box is the *first* item
-        hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+        try:
+            hbtitle = stat_groups.find(".//span[@class='stat-title']").text
+        except AttributeError:
+            hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
         if hbtitle == "Hero Specific":
             subbox_offset = 1
             hero_specific_box = stat_groups[0]
@@ -379,7 +382,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
             for subval in trs:
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
                 # Put averages into average_stats
-                if "_avg_" in name:
+                if "" in name:
                     into = _average_stats
                 else:
                     into = _t_d
