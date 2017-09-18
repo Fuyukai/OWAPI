@@ -376,6 +376,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         n_dict["hero_stats"] = _t_d
 
         _t_d = {}
+        _rolling_avgs = {}
         for subbox in stat_groups[subbox_offset:]:
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
@@ -383,7 +384,8 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
                 # Put averages into average_stats
                 if "_avg_" in name:
-                    into = _average_stats
+                    into = _rolling_avgs
+                    name = name.replace("_avg_per_10_min", "")
                 else:
                     into = _t_d
                 nvl = util.try_extract(value)
@@ -391,6 +393,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
         n_dict["general_stats"] = _t_d
         n_dict["average_stats"] = _average_stats
+        n_dict["rolling_average_stats"] = _rolling_avgs
 
         built_dict[hero_name] = n_dict
 
