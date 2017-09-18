@@ -382,7 +382,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
             for subval in trs:
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
                 # Put averages into average_stats
-                if "" in name:
+                if "_avg_" in name:
                     into = _average_stats
                 else:
                     into = _t_d
