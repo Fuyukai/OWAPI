@@ -31,7 +31,7 @@ hero_data_div_ids = {
     "ana": "0x02E000000000013B",
     "sombra": "0x02E000000000012E",
     "orisa": "0x02E000000000013E",
-    "doomfist": "0x02E000000000012F"
+    "doomfist": "0x02E000000000012F",
     "moira": "0x02E00000000001A2"
 }
 
