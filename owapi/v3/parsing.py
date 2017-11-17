@@ -32,6 +32,7 @@ hero_data_div_ids = {
     "sombra": "0x02E000000000012E",
     "orisa": "0x02E000000000013E",
     "doomfist": "0x02E000000000012F"
+    "moira": "0x02E00000000001A2"
 }
 
 tier_data_img_src = {
