@@ -1,5 +1,5 @@
 Kyoukai>=2.1.4,<=2.3.0
-aioredis>=0.3.0,<=1.0.0
+aioredis>=0.3.0,<1.0.0
 aiohttp>=2.2.0,<=2.2.5
 asphalt==4.0.0
 asphalt-redis==2.0.1
