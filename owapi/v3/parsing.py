@@ -343,9 +343,8 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
         stat_groups = _stat_groups[0]
         _average_stats = {}
-
         _t_d = {}
-
+        _rolling_avgs = {}
         # offset for subboxes
         # if there IS a hero-specific box, we need to scan all boxes from offset to end
         # because the hero-specific box is first.
@@ -369,6 +368,9 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                 # Put averages into average_stats
                 if "average" in name:
                     into = _average_stats
+                elif '_avg_per_10_min' in name.lower():
+                    name = name.lower().replace("_avg_per_10_min", "")
+                    into = _rolling_avgs
                 else:
                     into = _t_d
                 nvl = util.try_extract(value)
@@ -377,7 +379,6 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         n_dict["hero_stats"] = _t_d
 
         _t_d = {}
-        _rolling_avgs = {}
         for subbox in stat_groups[subbox_offset:]:
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
