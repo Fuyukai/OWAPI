@@ -95,6 +95,7 @@ def bl_parse_stats(parsed, mode="quickplay"):
     try:
         tier = mast_head.xpath(".//div[@class='competitive-rank']/img")[0]
         img_src = [x for x in tier.values() if 'rank-icons' in x][0]
+        built_dict["overall_stats"]["tier_image"] = img_src
     except IndexError:
         built_dict['overall_stats']['tier'] = None
     else:
@@ -146,10 +147,10 @@ def bl_parse_stats(parsed, mode="quickplay"):
 
     # Highlight specific stat groups.
     try:
-        game_box = stat_groups[6]
+        game_box = stat_groups[5]
     except IndexError:
         try:
-            game_box = stat_groups[5]
+            game_box = stat_groups[4]
         except IndexError:
             # edge cases...
             # we can't really extract any more stats
