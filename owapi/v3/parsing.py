@@ -300,15 +300,26 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     hero_info = _hero_info.findall(".//div[@class='bar-text']")
 
     # Loop over each one, extracting the name and hours counted.
-    for child in hero_info:
+    percent_per_second = None
+    for child in reversed(hero_info):
         name, played = child.getchildren()
         name, played = util.sanitize_string(name.text), played.text.lower()
 
-        if played == "--":
-            time = 0
-        else:
+        time = 0
+        if played != "--":
             time = util.try_extract(played)
+
+        # More accurate playtime calculation
+        # Requires reversing hero_info
+        category_item = child.getparent().getparent()
+        percent = float(category_item.attrib['data-overwatch-progress-percent'])
+        if percent_per_second is None and time < 1 and time > 0:
+            seconds = 3600 * time
+            percent_per_second = percent / seconds
+
         built_dict[name] = time
+        if percent_per_second != None:
+            built_dict[name] = (percent / percent_per_second) / float(3600)
 
     return built_dict
 
