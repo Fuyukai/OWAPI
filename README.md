@@ -32,11 +32,7 @@ OWAPI has a few requirements:
  
      `git clone https://github.com/SunDwarf/OWAPI.git`
      
- 2. **Create a new virtual environment.**
- 
-     `python3.5 -m venv ./venv`
-     
- 3. **Setup a Redis server.**
+ 2. **Setup a Redis server.**
  
      Redis should be running on the default port - 6379. You can override this in config.yml;
      however.
@@ -51,10 +47,11 @@ OWAPI has a few requirements:
      
  4. **Install the requirements.**
 
-     For debian-based systems:
+     For debian-based systems, run this first:
         `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
 
-     `source ./venv/bin/activate && pip install wheel && pip install -r requirements.txt`
+     To set up the virtualenv:
+     `pipenv install`
 
  5. **Copy and tweak the example config file.**
 
@@ -62,9 +59,9 @@ OWAPI has a few requirements:
      
  6. **Start the OWAPI server.**
  
-     `PYTHONPATH=. asphalt run config.yml`
+     `PYTHONPATH=. pipenv run asphalt run config.yml`
      
      The server is now running on http://localhost:4444/
           
      Note: If you want the full speedups from Kyoukai you must run with uvloop enabled:
-     `PYTHONPATH=. asphalt run -l uvloop config.yml`
+     `PYTHONPATH=. pipenv run asphalt run -l uvloop config.yml`
