@@ -92,6 +92,12 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str =
     loop = asyncio.get_event_loop()
     parsed = await loop.run_in_executor(None, parse_partial)
 
+    # sanity check
+    node = parsed.findall(".//section[@class='u-nav-offset']//h1[@class='u-align-center']")
+    for nodes in node:
+        if nodes.text.strip() == "Profile Not Found":
+            return None
+
     return parsed
 
 

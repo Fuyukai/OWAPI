@@ -15,7 +15,7 @@ from asphalt.core import ContainerComponent
 from kyoukai import Blueprint
 from kyoukai import Kyoukai
 from kyoukai.asphalt import KyoukaiComponent, HTTPRequestContext
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, InternalServerError
 from werkzeug.routing import RequestRedirect
 from werkzeug.wrappers import Response
 
@@ -42,6 +42,73 @@ class AiohttpHackyClientRequest(aiohttp.ClientRequest):
     def __init__(self, *args, **kwargs):
         kwargs["proxy_from_env"] = True
         super().__init__(*args, **kwargs)
+
+
+# here's some more hotpatches, this api is a massive piece of garbage
+async def handle_httpexception(self, ctx: HTTPRequestContext, exception: HTTPException,
+                               environ: dict = None) -> Response:
+    """
+    Handle a HTTP Exception.
+
+    :param ctx: The context of the request.
+    :param exception: The HTTPException to handle.
+    :param environ: The fake WSGI environment.
+
+    :return: A :class:`werkzeug.wrappers.Response` that handles this response.
+    """
+    # Try and load the error handler recursively from the ctx.route.blueprint.
+    bp = ctx.bp or self.root
+
+    if environ is None:
+        environ = ctx.environ
+
+    cbl = lambda environ: Response("Internal server error during processing. Report this.",
+                                   status=500)
+
+    error_handler = bp.get_errorhandler(exception)
+    if not error_handler:
+        # Try the root Blueprint. This may happen if the blueprint requested isn't registered
+        # properly in the root, for some reason.
+        error_handler = self.root.get_errorhandler(exception)
+        if not error_handler:
+            # Just return the Exception's get_response.
+            cbl = exception.get_response
+
+    else:
+        # Try and invoke the error handler to get the Response.
+        # Wrap it in the try/except, so we can handle a default one.
+        try:
+            res = await error_handler.invoke(ctx, args=(exception,))
+            # hacky way of unifying everything
+            cbl = lambda environ: res
+        except HTTPException as e:
+            # why tho?
+            logger.warning("Error handler function raised another error, using the "
+                           "response from that...")
+            cbl = e.get_response
+        except Exception as e:
+            logger.exception("Error in error handler!")
+            cbl = InternalServerError(e).get_response
+            # else:
+            # result = wrap_response(result, self.response_class)
+
+    try:
+        result = cbl(environ=environ)
+    except Exception:
+        # ok
+        logger.critical("Whilst handling a {}, response.get_response ({}) raised exception"
+                        .format(exception.code, cbl), exc_info=True)
+        result = Response("Critical server error. Your application is broken.",
+                          status=500)
+
+    if result.status_code != exception.code:
+        logger.warning("Error handler {} returned code {} when exception was code {}..."
+                       .format(error_handler.callable_repr, result.status_code,
+                               exception.code))
+
+    return result
+
+Kyoukai.handle_httpexception = handle_httpexception
 
 
 class APIComponent(ContainerComponent):
