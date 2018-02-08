@@ -1,0 +1,21 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+aioredis = ">=0.3.0,<1.0.0"
+aiohttp = "<=2.2.5,>=2.2.0"
+asphalt = {git = "https://github.com/asphalt-framework/asphalt.git"}
+asphalt-redis = "*"
+asyncio-extras = "<=1.4.0,>=1.3.0"
+"html5-parser" = "==0.3.3"
+unidecode = "==0.04.19"
+kyoukai = {git = "https://github.com/SuNDwarf/Kyoukai.git"}
+
+
+[dev-packages]
+
