@@ -55,6 +55,11 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//masthead-permission-level-text")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {"heroes": {"playtime": {"competitive": {}, "quickplay": {}},
                         "stats": {"competitive": {}, "quickplay": {}}},
              "stats": {},
@@ -91,6 +96,11 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {
             "stats": {},
         }
@@ -117,6 +127,11 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//masthead-permission-level-text")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}},
                        "stats": {"competitive": {}, "quickplay": {}}},
@@ -149,6 +164,11 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//masthead-permission-level-text")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {
             "heroes": {"playtime": {"competitive": {}, "quickplay": {}},
                        "stats": {"competitive": {}, "quickplay": {}}},
@@ -177,6 +197,11 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//masthead-permission-level-text")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {
             "heroes": {
                 "playtime":
@@ -216,6 +241,11 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
         if result is None:
             built_dict[region] = None
             continue
+
+        status = result.xpath(".//masthead-permission-level-text")[0].text
+        if status == "Private Profile":
+            return {"error": "Private"}, 403
+
         d = {"achievements": parsing.bl_parse_achievement_data(result)}
 
         built_dict[region] = d
