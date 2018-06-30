@@ -56,7 +56,7 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
 
-        status = result.xpath(".//masthead-permission-level-text")[0].text
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
         if status == "Private Profile":
             return {"error": "Private"}, 403
 
@@ -128,7 +128,7 @@ async def get_heroes(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
 
-        status = result.xpath(".//masthead-permission-level-text")[0].text
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
         if status == "Private Profile":
             return {"error": "Private"}, 403
 
@@ -165,7 +165,7 @@ async def get_heroes_qp(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
 
-        status = result.xpath(".//masthead-permission-level-text")[0].text
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
         if status == "Private Profile":
             return {"error": "Private"}, 403
 
@@ -198,7 +198,7 @@ async def get_heroes_comp(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
 
-        status = result.xpath(".//masthead-permission-level-text")[0].text
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
         if status == "Private Profile":
             return {"error": "Private"}, 403
 
@@ -242,7 +242,7 @@ async def get_achievements(ctx: HTTPRequestContext, battletag: str):
             built_dict[region] = None
             continue
 
-        status = result.xpath(".//masthead-permission-level-text")[0].text
+        status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
         if status == "Private Profile":
             return {"error": "Private"}, 403
 
