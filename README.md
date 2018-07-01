@@ -48,8 +48,11 @@ OWAPI has a few requirements:
  4. **Install the requirements.**
 
      For debian-based systems, run this first:
-        `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
+     `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
 
+     Install pipenv pip package:
+     `pip install pipenv`
+     
      To set up the virtualenv:
      `pipenv install`
 
