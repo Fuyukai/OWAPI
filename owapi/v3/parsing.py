@@ -47,7 +47,7 @@ tier_data_img_src = {
 }
 
 
-def bl_parse_stats(parsed, mode="quickplay"):
+def bl_parse_stats(parsed, mode="quickplay", status=None):
     # Just a quick FYI
     # If future me or future anyone else is looking at this, I do not how this code works.
     # I'm really really hoping it doesn't break.
@@ -66,6 +66,15 @@ def bl_parse_stats(parsed, mode="quickplay"):
     built_dict = {"game_stats": [], "overall_stats": {}, "average_stats": []}
 
     # Shortcut location for player level etc
+    if status:
+        hasrank = parsed.xpath('//*[@id="overview-section"]/div/div/div/div/div[2]/div/div[3]/div')
+        if hasrank:
+            comprank = int(hasrank[0].text)
+        else:
+            comprank = None
+        built_dict["overall_stats"]["comprank"] = comprank
+        return built_dict
+
     mast_head = parsed.xpath(".//div[@class='masthead-player']")[0]
 
     # Get the prestige.
