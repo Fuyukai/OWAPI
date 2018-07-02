@@ -98,8 +98,8 @@ async def get_stats(ctx: HTTPRequestContext, battletag: str):
             continue
 
         status = result.xpath(".//p[@class='masthead-permission-level-text']")[0].text
-        if status == "Private Profile":
-            return {"error": "Private"}, 403
+        # if status == "Private Profile":
+        #     return {"error": "Private"}, 403
 
         d = {
             "stats": {},
