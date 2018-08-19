@@ -19,7 +19,7 @@ You can override the platform with `?platform=<pc|xbl|psn>`. This defaults to `p
 
 ### Formatting
 
-The default output is standard JSON, but you can prettify it with `?format=json_pretty"` to have it
+The default output is standard JSON, but you can prettify it with `?format=json_pretty` to have it
 in a more readable format. (The other option is installing a browser plugin, such as
 [JSONView](https://jsonview.com/).
 
