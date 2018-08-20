@@ -117,7 +117,13 @@ Each of these will have several other keys:
                     "wins": 9,
                     "games": 17,
                     "comprank": 2395,
-                    "losses": 8
+                    "losses": 8,
+                    "endorsement_level": 2,
+                    "endorsement_shotcaller": 0,
+                    "endorsement_sportsmanship": 0,
+                    "endorsement_teammate": 0,
+                    "rank_image": "https://d1u1mce87gyfbn.cloudfront.net/game/playerlevelrewards/0x025000000000092A_Border.png",
+                    "tier": null
                 },
                 "game_stats": {
                     "objective_kills": 121.0,
@@ -183,7 +189,13 @@ Each of these will have several other keys:
                     "wins": 373,
                     "games": null,
                     "comprank": 2395,
-                    "losses": null
+                    "losses": null,
+                    "endorsement_level": 2,
+                    "endorsement_shotcaller": 0,
+                    "endorsement_sportsmanship": 0,
+                    "endorsement_teammate": 0,
+                    "rank_image": "https://d1u1mce87gyfbn.cloudfront.net/game/playerlevelrewards/0x025000000000092A_Border.png",
+                    "tier": null
                 },
                 "game_stats": {
                     "objective_kills": 3127.0,
