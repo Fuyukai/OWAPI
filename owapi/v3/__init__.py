@@ -65,8 +65,9 @@ async def get_blob(ctx: HTTPRequestContext, battletag: str):
              "stats": {},
              "achievements": {}}
 
-        d["stats"]["quickplay"] = parsing.bl_parse_stats(result)
-        d["stats"]["competitive"] = parsing.bl_parse_stats(result, mode="competitive")
+        d["stats"]["quickplay"] = parsing.bl_parse_stats(result, status=status)
+        d["stats"]["competitive"] = parsing.bl_parse_stats(result, mode="competitive",
+                                                           status=status)
 
         d["heroes"]["stats"]["quickplay"] = parsing.bl_parse_hero_data(result)
         d["heroes"]["playtime"]["quickplay"] = parsing.bl_parse_all_heroes(result)
