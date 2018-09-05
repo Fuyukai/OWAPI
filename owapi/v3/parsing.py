@@ -67,7 +67,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     built_dict = {"game_stats": [], "overall_stats": {}, "average_stats": []}
 
     # Shortcut location for player level etc
-    if status:
+    if status.lower() != "public profile":
         hasrank = parsed.xpath('//*[@id="overview-section"]/div/div/div/div/div[2]/div/div[3]/div')
         if hasrank:
             comprank = int(hasrank[0].text)
