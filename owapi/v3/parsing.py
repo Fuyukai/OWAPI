@@ -38,13 +38,13 @@ hero_data_div_ids = {
 }
 
 tier_data_img_src = {
-    "rank-1.png": "bronze",
-    "rank-2.png": "silver",
-    "rank-3.png": "gold",
-    "rank-4.png": "platinum",
-    "rank-5.png": "diamond",
-    "rank-6.png": "master",
-    "rank-7.png": "grandmaster"
+    "rank-BronzeTier.png": "bronze",
+    "rank-SilverTier.png": "silver",
+    "rank-GoldTier.png": "gold",
+    "rank-PlatinumTier.png": "platinum",
+    "rank-DiamondTier.png": "diamond",
+    "rank-MasterTier.png": "master",
+    "rank-GrandmasterTier.png": "grandmaster"
 }
 
 
