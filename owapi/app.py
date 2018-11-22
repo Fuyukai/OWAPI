@@ -2,12 +2,14 @@
 Main OWAPI App.
 """
 import cProfile
+import datetime
 import io
 import json
 import logging
 import os
 import pstats
 import traceback
+from email.utils import format_datetime
 
 import aiohttp
 from aiohttp import ClientSession
@@ -211,6 +213,12 @@ async def jsonify(ctx, response: Response):
         d = json.dumps(response.response)
     response.set_data(d)
     response.headers["Content-Type"] = "application/json"
+
+    # 261
+    response.headers["Cache-Control"] = "public, max-age=300"
+    expires = (datetime.datetime.utcnow() + datetime.timedelta(seconds=300))\
+        .astimezone(datetime.timezone.utc)
+    response.headers["Expires"] = format_datetime(expires, usegmt=True)
     response.status_code = status_code
     return response
 
