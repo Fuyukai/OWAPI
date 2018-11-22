@@ -340,7 +340,7 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
         _root = parsed
 
     _hero_info = _root.findall(".//div[@data-group-id='comparisons']")[0]
-    hero_info = _hero_info.findall(".//div[@class='bar-text']")
+    hero_info = _hero_info.findall(".//div[@class='ProgressBar-textWrapper']")
 
     # Loop over each one, extracting the name and hours counted.
     percent_per_second = None
