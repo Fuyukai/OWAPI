@@ -217,7 +217,7 @@ async def jsonify(ctx, response: Response):
     # 261
     response.headers["Cache-Control"] = "public, max-age=300"
     expires = (datetime.datetime.utcnow() + datetime.timedelta(seconds=300))\
-        .astimezone(datetime.timezone.utc)
+        .replace(tzinfo=datetime.timezone.utc)
     response.headers["Expires"] = format_datetime(expires, usegmt=True)
     response.status_code = status_code
     return response
