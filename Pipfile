@@ -7,14 +7,14 @@ name = "pypi"
 
 [packages]
 
-aioredis = ">=0.3.0,<1.0.0"
-aiohttp = "<=2.2.5,>=2.2.0"
+aioredis = "==1.2.0"
+aiohttp = "==3.5.4"
 asphalt = {git = "https://github.com/asphalt-framework/asphalt.git"}
-asphalt-redis = "*"
+asphalt-redis = "==2.1.1"
 asyncio-extras = "<=1.4.0,>=1.3.0"
 "html5-parser" = "==0.3.3"
 unidecode = "==0.04.19"
-kyoukai = {git = "https://github.com/SuNDwarf/Kyoukai.git"}
+kyoukai = {git = "https://github.com/Fuyukai/Kyoukai.git"}
 yarl = "<1.2"
 uvloop = "==0.9.1"
 

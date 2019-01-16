@@ -105,29 +105,36 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     # Get and parse out endorsement level.
     endorsement = mast_head.xpath(".//div[@class='endorsement-level']")[0]
-    built_dict["overall_stats"]["endorsement_level"] = int(endorsement.findall(".//div[@class='u-center']")[0].text)
+    built_dict["overall_stats"]["endorsement_level"] = int(
+        endorsement.findall(".//div[@class='u-center']")[0].text)
 
     # Get endorsement circle.
-    endorsement_icon_inner = mast_head.xpath(".//div[@class='endorsement-level']/div[@class='EndorsementIcon']/div[@class='EndorsementIcon-inner']")[0]
+    endorsement_icon_inner = mast_head.xpath(
+        ".//div[@class='endorsement-level']/div[@class='EndorsementIcon']/div["
+        "@class='EndorsementIcon-inner']")[
+        0]
 
     # Get individual endorsement segments.
     try:
-        endorsement_shotcaller_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--shotcaller']")[0]
+        endorsement_shotcaller_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--shotcaller']")[0]
         endorsement_shotcaller_level = endorsement_shotcaller_image.get('data-value')
     except:
         endorsement_shotcaller_level = 0
 
     try:
-        endorsement_teammate_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--teammate']")[0]
+        endorsement_teammate_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--teammate']")[0]
         endorsement_teammate_level = endorsement_teammate_image.get('data-value')
     except:
         endorsement_teammate_level = 0
 
     try:
-        endorsement_sportsmanship_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--sportsmanship']")[0]
+        endorsement_sportsmanship_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--sportsmanship']")[0]
         endorsement_sportsmanship_level = endorsement_sportsmanship_image.get('data-value')
     except:
-        endorsement_sportsmanship_level = 0    
+        endorsement_sportsmanship_level = 0
 
     # Parse out endorsement segements.
     built_dict["overall_stats"]["endorsement_shotcaller"] = endorsement_shotcaller_level
@@ -193,7 +200,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         game_box = stat_groups[3]
     except IndexError:
         try:
-            game_box = stat_groups[2] # I guess use 2?
+            game_box = stat_groups[2]  # I guess use 2?
         except IndexError:
             # edge cases...
             # we can't really extract any more stats
@@ -338,13 +345,18 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     else:
         _root = parsed
 
-    _hero_info = _root.findall(".//div[@data-group-id='comparisons']")[0]
+    _hero_info = _root.xpath(".//div[@data-group-id='comparisons' and "
+                             "@data-category-id='0x0860000000000021']")[0]
     hero_info = _hero_info.findall(".//div[@class='ProgressBar-textWrapper']")
+    print(etree.tostring(_hero_info))
 
     # Loop over each one, extracting the name and hours counted.
     percent_per_second = None
     for child in reversed(hero_info):
         name, played = child.getchildren()
+        if not name.text:
+            continue
+
         name, played = util.sanitize_string(name.text), played.text.lower()
 
         time = 0
@@ -355,12 +367,12 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
         # Requires reversing hero_info
         category_item = child.getparent().getparent()
         percent = float(category_item.attrib['data-overwatch-progress-percent'])
-        if percent_per_second is None and time < 1 and time > 0:
+        if percent_per_second is None and 1 > time > 0:
             seconds = 3600 * time
             percent_per_second = percent / seconds
 
         built_dict[name] = time
-        if percent_per_second != None:
+        if percent_per_second is not None:
             built_dict[name] = (percent / percent_per_second) / float(3600)
 
     return built_dict
