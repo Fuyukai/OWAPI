@@ -4,7 +4,7 @@ Parsing the data returned from Blizzard.
 from lxml import etree
 
 from owapi import util
-from owapi.prestige import PRESTIGE
+from owapi.prestige import PRESTIGE_BORDERS, PRESTIGE_STARS
 
 hero_data_div_ids = {
     "reaper": "0x02E0000000000002",
@@ -79,8 +79,28 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     mast_head = parsed.xpath(".//div[@class='masthead-player']")[0]
 
-    # Get the prestige.
+    # Rank images are now based on 2 separate images. Prestige now also relies on 'player-rank' element
+    prestige_rank = mast_head.xpath(".//div[@class='player-rank']")[0]
+    prestige_stars = None
+    try:
+        bg_image = [x for x in prestige_rank.values() if 'background-image' in x][0]
+    except IndexError:
+        # No stars
+        prestige_stars = 0
+    else:
+        for key, val in PRESTIGE_STARS.items():
+            if key in bg_image:
+                prestige_stars = val
+                # Adds a new dict key called "prestige_image". Left the old name below of "rank_image" for compatibility
+                built_dict["overall_stats"]["prestige_image"] = bg_image.split("(")[1][:-1]
+                break
+            else:
+                # Unknown prestige image
+                prestige_stars = None
+
+    # Get the player-level base (border).
     prestige = mast_head.xpath(".//div[@class='player-level']")[0]
+    prestige_num = None
     # Extract the background-image from the styles.
     try:
         bg_image = [x for x in prestige.values() if 'background-image' in x][0]
@@ -90,15 +110,20 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         # Don't set a prestige.
         built_dict["overall_stats"]["prestige"] = 0
     else:
-        for key, val in PRESTIGE.items():
+        for key, val in PRESTIGE_BORDERS.items():
             if key in bg_image:
                 prestige_num = val
                 built_dict["overall_stats"]["rank_image"] = bg_image.split("(")[1][:-1]
                 break
         else:
-            # Unknown.
+            # Unknown rank image
             prestige_num = None
-        built_dict["overall_stats"]["prestige"] = prestige_num
+
+    # If we have prestige values, return them. Otherwise, return None
+    if prestige_num and prestige_stars:
+        built_dict["overall_stats"]["prestige"] = prestige_num + prestige_stars
+    else:
+        built_dict["overall_stats"]["prestige"] = None
 
     # Parse out the HTML.
     level = int(prestige.findall(".//div")[0].text)
