@@ -445,10 +445,15 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         subbox_offset = 0
 
         # .find on the assumption hero box is the *first* item
+        hbtitle = None
         try:
             hbtitle = stat_groups.find(".//span[@class='stat-title']").text
         except AttributeError:
-            hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+            try:
+                hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+            except AttributeError:
+                # Unable to parse stat boxes. This is likely due to 0 playtime on a hero, so there are no stats
+                pass
         if hbtitle == "Hero Specific":
             subbox_offset = 1
             hero_specific_box = stat_groups[0]
