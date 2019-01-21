@@ -80,9 +80,9 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     mast_head = parsed.xpath(".//div[@class='masthead-player']")[0]
 
     # Rank images are now based on 2 separate images. Prestige now also relies on 'player-rank' element
-    prestige_rank = mast_head.xpath(".//div[@class='player-rank']")[0]
-    prestige_stars = None
+    prestige_stars = 0
     try:
+        prestige_rank = mast_head.xpath(".//div[@class='player-rank']")[0]
         bg_image = [x for x in prestige_rank.values() if 'background-image' in x][0]
     except IndexError:
         # No stars
@@ -98,11 +98,11 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
                 # Unknown prestige image
                 prestige_stars = None
 
-    # Get the player-level base (border).
-    prestige = mast_head.xpath(".//div[@class='player-level']")[0]
-    prestige_num = None
     # Extract the background-image from the styles.
+    prestige_num = 0
     try:
+        # Get the player-level base (border).
+        prestige = mast_head.xpath(".//div[@class='player-level']")[0]
         bg_image = [x for x in prestige.values() if 'background-image' in x][0]
     except IndexError:
         # Cannot find background-image.
@@ -120,7 +120,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
             prestige_num = None
 
     # If we have prestige values, return them. Otherwise, return None
-    if prestige_num and prestige_stars:
+    if prestige_num is not None or prestige_stars is not None:
         built_dict["overall_stats"]["prestige"] = prestige_num + prestige_stars
     else:
         built_dict["overall_stats"]["prestige"] = None
