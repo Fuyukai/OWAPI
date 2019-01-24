@@ -1,69 +1,11 @@
-"""
-Useful utilities.
-"""
-import logging
 import re
 
 import unidecode
-from kyoukai.asphalt import HTTPRequestContext
-
-logger = logging.getLogger("OWAPI")
 
 HOUR_REGEX = re.compile(r"([0-9]*) hours?")
 MINUTE_REGEX = re.compile(r"([0-9]*) minutes?")
 SECOND_REGEX = re.compile(r"([0-9]*\.?[0-9]*) seconds?")
-PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?\%")
-
-
-async def with_cache(ctx: HTTPRequestContext, func, *args, expires: int = None, cache_404=False):
-    """
-    Run a coroutine with cache.
-
-    Stores the result in redis.
-
-    Unless we don't have redis.
-    """
-    if expires is None:
-        expires = 300
-
-    if ctx.app.config["owapi_cache_time"] is not None:
-        expires = ctx.app.config["owapi_cache_time"]
-
-    if not ctx.app.config["owapi_use_redis"]:
-        # no caching without redis, just call the function
-        logger.info("Loading `{}` with disabled cache".format(repr(args)))
-        result = await func(ctx, *args)
-        return result
-    else:
-        import aioredis
-        assert isinstance(ctx.redis, aioredis.Redis)
-        built = func.__name__ + repr(args)
-        # Check for the key.
-        # Uses a simple func name + repr(args) as the key to use.
-        got = await ctx.redis.get(built)
-        if got and got != "None":
-            if await ctx.redis.ttl(built) == -1:
-                logger.info("Caching `{}` for `{}` seconds".format(built, expires))
-                await ctx.redis.expire(built, expires)
-
-            logger.info("Cache hit for `{}`".format(built))
-            return got.decode()
-
-        logger.info("Cache miss for `{}`".format(built))
-
-        # Call the function.
-        result = await func(ctx, *args)
-        if result is None and not cache_404:
-            # return None, no caching for 404s.
-            return None
-
-        # Store the result as cached.
-        to_set = result if result else "None"
-        logger.info("Storing {} with expiration {}".format(built, expires))
-        await ctx.redis.set(built, to_set, expire=expires)
-        if to_set == "None":
-            return None
-        return result
+PERCENT_REGEX = re.compile(r"([0-9]{1,3})\s?%")
 
 
 def int_or_string(val: str):

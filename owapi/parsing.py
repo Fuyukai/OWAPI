@@ -4,7 +4,7 @@ Parsing the data returned from Blizzard.
 from lxml import etree
 
 from owapi import util
-from owapi.prestige import PRESTIGE
+from owapi.prestige import PRESTIGE_BORDERS, PRESTIGE_STARS
 
 hero_data_div_ids = {
     "reaper": "0x02E0000000000002",
@@ -34,7 +34,8 @@ hero_data_div_ids = {
     "doomfist": "0x02E000000000012F",
     "moira": "0x02E00000000001A2",
     "brigitte": "0x02E0000000000195",
-    "wrecking_ball": "0x02E00000000001CA"
+    "wrecking_ball": "0x02E00000000001CA",
+    "ashe": "0x02E0000000000200"
 }
 
 tier_data_img_src = {
@@ -78,10 +79,30 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     mast_head = parsed.xpath(".//div[@class='masthead-player']")[0]
 
-    # Get the prestige.
-    prestige = mast_head.xpath(".//div[@class='player-level']")[0]
-    # Extract the background-image from the styles.
+    # Rank images are now based on 2 separate images. Prestige now also relies on 'player-rank' element
+    prestige_stars = 0
     try:
+        prestige_rank = mast_head.xpath(".//div[@class='player-rank']")[0]
+        bg_image = [x for x in prestige_rank.values() if 'background-image' in x][0]
+    except IndexError:
+        # No stars
+        prestige_stars = 0
+    else:
+        for key, val in PRESTIGE_STARS.items():
+            if key in bg_image:
+                prestige_stars = val
+                # Adds a new dict key called "prestige_image". Left the old name below of "rank_image" for compatibility
+                built_dict["overall_stats"]["prestige_image"] = bg_image.split("(")[1][:-1]
+                break
+            else:
+                # Unknown prestige image
+                prestige_stars = None
+
+    # Extract the background-image from the styles.
+    prestige_num = 0
+    try:
+        # Get the player-level base (border).
+        prestige = mast_head.xpath(".//div[@class='player-level']")[0]
         bg_image = [x for x in prestige.values() if 'background-image' in x][0]
     except IndexError:
         # Cannot find background-image.
@@ -89,15 +110,20 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         # Don't set a prestige.
         built_dict["overall_stats"]["prestige"] = 0
     else:
-        for key, val in PRESTIGE.items():
+        for key, val in PRESTIGE_BORDERS.items():
             if key in bg_image:
                 prestige_num = val
                 built_dict["overall_stats"]["rank_image"] = bg_image.split("(")[1][:-1]
                 break
         else:
-            # Unknown.
+            # Unknown rank image
             prestige_num = None
-        built_dict["overall_stats"]["prestige"] = prestige_num
+
+    # If we have prestige values, return them. Otherwise, return None
+    if prestige_num is not None or prestige_stars is not None:
+        built_dict["overall_stats"]["prestige"] = prestige_num + prestige_stars
+    else:
+        built_dict["overall_stats"]["prestige"] = None
 
     # Parse out the HTML.
     level = int(prestige.findall(".//div")[0].text)
@@ -105,29 +131,36 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     # Get and parse out endorsement level.
     endorsement = mast_head.xpath(".//div[@class='endorsement-level']")[0]
-    built_dict["overall_stats"]["endorsement_level"] = int(endorsement.findall(".//div[@class='u-center']")[0].text)
+    built_dict["overall_stats"]["endorsement_level"] = int(
+        endorsement.findall(".//div[@class='u-center']")[0].text)
 
     # Get endorsement circle.
-    endorsement_icon_inner = mast_head.xpath(".//div[@class='endorsement-level']/div[@class='EndorsementIcon']/div[@class='EndorsementIcon-inner']")[0]
+    endorsement_icon_inner = mast_head.xpath(
+        ".//div[@class='endorsement-level']/div[@class='EndorsementIcon']/div["
+        "@class='EndorsementIcon-inner']")[
+        0]
 
     # Get individual endorsement segments.
     try:
-        endorsement_shotcaller_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--shotcaller']")[0]
+        endorsement_shotcaller_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--shotcaller']")[0]
         endorsement_shotcaller_level = endorsement_shotcaller_image.get('data-value')
     except:
         endorsement_shotcaller_level = 0
 
     try:
-        endorsement_teammate_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--teammate']")[0]
+        endorsement_teammate_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--teammate']")[0]
         endorsement_teammate_level = endorsement_teammate_image.get('data-value')
     except:
         endorsement_teammate_level = 0
 
     try:
-        endorsement_sportsmanship_image = endorsement_icon_inner.findall(".//svg[@class='EndorsementIcon-border EndorsementIcon-border--sportsmanship']")[0]
+        endorsement_sportsmanship_image = endorsement_icon_inner.findall(
+            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--sportsmanship']")[0]
         endorsement_sportsmanship_level = endorsement_sportsmanship_image.get('data-value')
     except:
-        endorsement_sportsmanship_level = 0    
+        endorsement_sportsmanship_level = 0
 
     # Parse out endorsement segements.
     built_dict["overall_stats"]["endorsement_shotcaller"] = endorsement_shotcaller_level
@@ -193,7 +226,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         game_box = stat_groups[3]
     except IndexError:
         try:
-            game_box = stat_groups[2] # I guess use 2?
+            game_box = stat_groups[2]  # I guess use 2?
         except IndexError:
             # edge cases...
             # we can't really extract any more stats
@@ -338,13 +371,18 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     else:
         _root = parsed
 
-    _hero_info = _root.findall(".//div[@data-group-id='comparisons']")[0]
+    _hero_info = _root.xpath(".//div[@data-group-id='comparisons' and "
+                             "@data-category-id='0x0860000000000021']")[0]
     hero_info = _hero_info.findall(".//div[@class='ProgressBar-textWrapper']")
+    print(etree.tostring(_hero_info))
 
     # Loop over each one, extracting the name and hours counted.
     percent_per_second = None
     for child in reversed(hero_info):
         name, played = child.getchildren()
+        if not name.text:
+            continue
+
         name, played = util.sanitize_string(name.text), played.text.lower()
 
         time = 0
@@ -355,12 +393,12 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
         # Requires reversing hero_info
         category_item = child.getparent().getparent()
         percent = float(category_item.attrib['data-overwatch-progress-percent'])
-        if percent_per_second is None and time < 1 and time > 0:
+        if percent_per_second is None and 1 > time > 0:
             seconds = 3600 * time
             percent_per_second = percent / seconds
 
         built_dict[name] = time
-        if percent_per_second != None:
+        if percent_per_second is not None:
             built_dict[name] = (percent / percent_per_second) / float(3600)
 
     return built_dict
@@ -407,10 +445,15 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         subbox_offset = 0
 
         # .find on the assumption hero box is the *first* item
+        hbtitle = None
         try:
             hbtitle = stat_groups.find(".//span[@class='stat-title']").text
         except AttributeError:
-            hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+            try:
+                hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+            except AttributeError:
+                # Unable to parse stat boxes. This is likely due to 0 playtime on a hero, so there are no stats
+                pass
         if hbtitle == "Hero Specific":
             subbox_offset = 1
             hero_specific_box = stat_groups[0]
