@@ -120,7 +120,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
             prestige_num = None
 
     # If we have prestige values, return them. Otherwise, return None
-    if prestige_num is not None or prestige_stars is not None:
+    if prestige_num is not None and prestige_stars is not None:
         built_dict["overall_stats"]["prestige"] = prestige_num + prestige_stars
     else:
         built_dict["overall_stats"]["prestige"] = None
