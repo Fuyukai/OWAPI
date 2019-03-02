@@ -8,6 +8,9 @@ export interface OWAPIBlob {
   eu: Region?;
   kr: Region?;
   us: Region?;
+
+  msg?: String;
+  error?: Number | "Private";
 }
 
 interface Region {
@@ -160,10 +163,6 @@ interface Region {
     quickplay: StatsQuick
   }
 }
-
-let t: Region;
-return t.heroes.stats.competitive.zenyatta.rolling_average_stats;
-
 interface Hours extends Number { }
 interface HeroesPlaytime {
   ana?: Hours
