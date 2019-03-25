@@ -35,7 +35,8 @@ hero_data_div_ids = {
     "moira": "0x02E00000000001A2",
     "brigitte": "0x02E0000000000195",
     "wrecking_ball": "0x02E00000000001CA",
-    "ashe": "0x02E0000000000200"
+    "ashe": "0x02E0000000000200",
+    "baptiste": "0x02E0000000000221"
 }
 
 tier_data_img_src = {
