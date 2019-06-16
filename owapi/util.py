@@ -125,7 +125,7 @@ def try_extract(value):
         val = matched.groups()[0]
         val = float(val)
         val = (val / 60 / 60)
-        
+
         return val
 
     matched = PERCENT_REGEX.match(value)
@@ -133,7 +133,7 @@ def try_extract(value):
         val = matched.groups()[0]
         val = float(val)
         val = (val / 100)
-        
+
         return val
 
     # Check if there's an ':' in it.
