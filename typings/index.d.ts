@@ -1,7 +1,8 @@
 /* HOW TO MAINTAIN THIS FILE:
- * every time a new hero is realeased, update HeroesPlaytime and HeroesStats by adding:
- * heroname?: Hours (if in the first) or HeroesHeroStats (if in the second)
+ * Every time a new hero is realeased, update the Hero type by adding the new hero name like this: 'previous hero' | 'new hero' | 'following hero'
  */
+
+type Hero = 'ana' | 'baptiste' | 'bastion' | 'brigitte' | 'dva' | 'genji' | 'hanzo' | 'junkrat' | 'lucio' | 'mccree' | 'mei' | 'mercy' | 'moira' | 'orisa' | 'pharah' | 'reaper' | 'reinhardt' | 'roadhog' | 'soldier76' | 'sombra' | 'symmetra' | 'tracer' | 'widowmaker' | 'wrecking_ball' | 'zarya' | 'zenyatta'
 
 export interface OWAPIBlob {
   _request: {
@@ -160,12 +161,12 @@ export interface Region {
 
   heroes: {
     playtime: {
-      competitive: HeroesPlaytime
-      quickplay: HeroesPlaytime
+      competitive: Record<Hero, Hours>
+      quickplay: Record<Hero, Hours>
     }
     stats: {
-      competitive: HeroesStats
-      quickplay: HeroesStats
+      competitive: Record<Hero, HeroStats>
+      quickplay: Record<Hero, HeroStats>
     }
   }
 
@@ -175,63 +176,7 @@ export interface Region {
   }
 }
 interface Hours extends Number { }
-interface HeroesPlaytime {
-  ana?: Hours
-  baptiste?: Hours
-  bastion?: Hours
-  brigitte?: Hours
-  dva?: Hours
-  genji?: Hours
-  hanzo?: Hours
-  junkrat?: Hours
-  lucio?: Hours
-  mccree?: Hours
-  mei?: Hours
-  mercy?: Hours
-  moira?: Hours
-  orisa?: Hours
-  pharah?: Hours
-  reaper?: Hours
-  reinhardt?: Hours
-  roadhog?: Hours
-  soldier76?: Hours
-  sombra?: Hours
-  symmetra?: Hours
-  tracer?: Hours
-  widowmaker?: Hours
-  wrecking_ball?: Hours
-  zarya?: Hours
-  zenyatta?: Hours
-}
-interface HeroesStats {
-  ana?: HeroesHeroStats
-  baptiste?: HeroesHeroStats
-  bastion?: HeroesHeroStats
-  brigitte?: HeroesHeroStats
-  dva?: HeroesHeroStats
-  genji?: HeroesHeroStats
-  hanzo?: HeroesHeroStats
-  junkrat?: HeroesHeroStats
-  lucio?: HeroesHeroStats
-  mccree?: HeroesHeroStats
-  mei?: HeroesHeroStats
-  mercy?: HeroesHeroStats
-  moira?: HeroesHeroStats
-  orisa?: HeroesHeroStats
-  pharah?: HeroesHeroStats
-  reaper?: HeroesHeroStats
-  reinhardt?: HeroesHeroStats
-  roadhog?: HeroesHeroStats
-  soldier76?: HeroesHeroStats
-  sombra?: HeroesHeroStats
-  symmetra?: HeroesHeroStats
-  tracer?: HeroesHeroStats
-  widowmaker?: HeroesHeroStats
-  wrecking_ball?: HeroesHeroStats
-  zarya?: HeroesHeroStats
-  zenyatta?: HeroesHeroStats
-}
-interface HeroesHeroStats {
+interface HeroStats {
   general_stats: {
     [x: string]: number
     all_damage_done: number
