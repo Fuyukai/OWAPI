@@ -36,7 +36,8 @@ hero_data_div_ids = {
     "brigitte": "0x02E0000000000195",
     "wrecking_ball": "0x02E00000000001CA",
     "ashe": "0x02E0000000000200",
-    "baptiste": "0x02E0000000000221"
+    "baptiste": "0x02E0000000000221",
+    "sigma": "0x02E000000000023B"
 }
 
 tier_data_img_src = {
@@ -489,13 +490,13 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
         n_dict["hero_stats"] = _t_d
         _t_d = {}
-        
+
         for subbox in stat_groups[subbox_offset:]:
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
             for subval in trs:
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
-                
+
                 if "_avg_per_10_min" in name:
                     into = _rolling_avgs
                     name = name.replace("_avg_per_10_min", "")
@@ -503,7 +504,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                     into = None
                 else:
                     into = _t_d
-                    
+
                 nvl = util.try_extract(value)
 
                 # Correct Blizzard Singular Plural Bug

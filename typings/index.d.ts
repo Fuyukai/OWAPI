@@ -2,7 +2,7 @@
  * Every time a new hero is realeased, update the Hero type by adding the new hero name like this: 'previous hero' | 'new hero' | 'following hero'
  */
 
-type Hero = 'ana' | 'baptiste' | 'bastion' | 'brigitte' | 'dva' | 'genji' | 'hanzo' | 'junkrat' | 'lucio' | 'mccree' | 'mei' | 'mercy' | 'moira' | 'orisa' | 'pharah' | 'reaper' | 'reinhardt' | 'roadhog' | 'soldier76' | 'sombra' | 'symmetra' | 'tracer' | 'widowmaker' | 'wrecking_ball' | 'zarya' | 'zenyatta'
+type Hero = 'ana' | 'baptiste' | 'bastion' | 'brigitte' | 'dva' | 'genji' | 'hanzo' | 'junkrat' | 'lucio' | 'mccree' | 'mei' | 'mercy' | 'moira' | 'orisa' | 'pharah' | 'reaper' | 'reinhardt' | 'roadhog' | 'sigma' | 'soldier76' | 'sombra' | 'symmetra' | 'tracer' | 'widowmaker' | 'wrecking_ball' | 'zarya' | 'zenyatta'
 
 export interface OWAPIBlob {
   _request: {
@@ -156,6 +156,8 @@ export interface Region {
       storm_earth_and_fire: boolean
       strike: boolean
       the_power_of_attraction: boolean
+      event_horizon: boolean
+      conservation_of_energy: boolean
     }
   }
 
