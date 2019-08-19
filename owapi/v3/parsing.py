@@ -205,10 +205,19 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
             else:
                 comprank = None
             built_dict["overall_stats"][role_str + "_comprank"] = comprank
-    except IndexError:
-        built_dict['overall_stats']['tank_tier'] = None
-        built_dict['overall_stats']['damage_tier'] = None
-        built_dict['overall_stats']['support_tier'] = None
+            
+    except IndexError as exc:
+        print(str(exc))
+    finally:
+        for role in ['tank', 'damage', 'support']:
+            if role + "_role_image" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_role_image'] = None
+            if role + "_tier_image" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_tier_image'] = None
+            if role + "_tier" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_tier'] = None
+            if role + "_comprank" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_comprank'] = None
 
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = mast_head.find(
