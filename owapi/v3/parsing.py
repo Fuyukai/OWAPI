@@ -50,6 +50,11 @@ tier_data_img_src = {
     "rank-GrandmasterTier.png": "grandmaster"
 }
 
+role_data_img_src = {
+    "icon-tank-8a52daaf01.png": "tank",
+    "icon-offense-6267addd52.png": "damage",
+    "icon-support-46311a4210.png": "support"
+}
 
 def bl_parse_stats(parsed, mode="quickplay", status=None):
     # Just a quick FYI
@@ -132,9 +137,8 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     built_dict["overall_stats"]["level"] = level
 
     # Get and parse out endorsement level.
-    endorsement = mast_head.xpath(".//div[@class='endorsement-level']")[0]
-    built_dict["overall_stats"]["endorsement_level"] = int(
-        endorsement.findall(".//div[@class='u-center']")[0].text)
+    endorsement_level = int(mast_head.xpath(".//div[@class='EndorsementIcon-tooltip']/div[@class='u-center']")[0].text)
+    built_dict["overall_stats"]["endorsement_level"] = endorsement_level
 
     # Get endorsement circle.
     endorsement_icon_inner = mast_head.xpath(
@@ -171,26 +175,50 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     # Get comp rank.
     try:
-        tier = mast_head.xpath(".//div[@class='competitive-rank']/img")[0]
-        img_src = [x for x in tier.values() if 'rank-icons' in x][0]
-        built_dict["overall_stats"]["tier_image"] = img_src
-    except IndexError:
-        built_dict['overall_stats']['tier'] = None
-    else:
-        for key, val in tier_data_img_src.items():
-            if key in img_src:
-                tier_str = val
-                break
-        else:
-            tier_str = None
-        built_dict["overall_stats"]["tier"] = tier_str
+        for role in mast_head.xpath(".//div[@class='competitive-rank']")[0]:
+            role_img = role.findall(
+                ".//img[@class='competitive-rank-role-icon']")[0]
+            role_img_src = role_img.values()[1]
+            role_str = ""
+            for key, val in role_data_img_src.items():
+                if key in role_img_src:
+                    role_str = val
+                    break
+            built_dict["overall_stats"][
+                role_str + "_role_image"] = role_img_src
 
-    hasrank = mast_head.findall(".//div[@class='competitive-rank']/div")
-    if hasrank:
-        comprank = int(hasrank[0].text)
-    else:
-        comprank = None
-    built_dict["overall_stats"]["comprank"] = comprank
+            tier_img = role.findall(
+                ".//img[@class='competitive-rank-tier-icon']")[0]
+            tier_img_src = tier_img.values()[1]
+            tier_str = ""
+            for key, val in tier_data_img_src.items():
+                if key in tier_img_src:
+                    tier_str = val
+                    break
+            built_dict["overall_stats"][
+                role_str + "_tier_image"] = tier_img_src
+
+            built_dict["overall_stats"][role_str + "_tier"] = tier_str
+
+            hasrank = role.findall(".//div[@class='competitive-rank-level']")
+            if hasrank:
+                comprank = int(hasrank[0].text)
+            else:
+                comprank = None
+            built_dict["overall_stats"][role_str + "_comprank"] = comprank
+            
+    except IndexError as exc:
+        print(str(exc))
+    finally:
+        for role in ['tank', 'damage', 'support']:
+            if role + "_role_image" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_role_image'] = None
+            if role + "_tier_image" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_tier_image'] = None
+            if role + "_tier" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_tier'] = None
+            if role + "_comprank" not in built_dict['overall_stats']:
+                built_dict['overall_stats'][role + '_comprank'] = None
 
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = mast_head.find(
@@ -368,7 +396,7 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     _root = parsed.xpath(".//div[@id='{}']".format(mode))
     try:
         # XPath for the `u-align-center` h6 which signifies there's no data.
-        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']".format(mode))[0]
+        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']")[0]
     except IndexError:
         pass
     else:
@@ -425,7 +453,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
     try:
         # XPath for the `u-align-center` h6 which signifies there's no data.
-        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']".format(mode))[0]
+        no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']")[0]
     except IndexError:
         pass
     else:
