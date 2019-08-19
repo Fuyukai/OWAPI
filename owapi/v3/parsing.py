@@ -481,15 +481,15 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
         subbox_offset = 0
 
         # .find on the assumption hero box is the *first* item
-        # hbtitle = None
-        # try:
-            # hbtitle = stat_groups.find(".//span[@class='stat-title']").text
-        # except AttributeError:
-            # try:
-                # hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
-            # except AttributeError:
+        hbtitle = None
+        try:
+            hbtitle = stat_groups.find(".//span[@class='stat-title']").text
+        except AttributeError:
+            try:
+                hbtitle = stat_groups.find(".//h5[@class='stat-title']").text
+            except AttributeError:
                 # Unable to parse stat boxes. This is likely due to 0 playtime on a hero, so there are no stats
-                # pass
+                pass
 
         for idx, sg in enumerate(stat_groups):
             stat_group_hero_specific = stat_groups[idx].find('.//*[@class="stat-title"]').text
@@ -517,13 +517,13 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
 
         n_dict["hero_stats"] = _t_d
         _t_d = {}
-
+        
         for subbox in stat_groups[subbox_offset:]:
             trs = subbox.findall(".//tbody/tr")
             # Update the dict with [0]: [1]
             for subval in trs:
                 name, value = util.sanitize_string(subval[0].text), subval[1].text
-
+                
                 if "_avg_per_10_min" in name:
                     into = _rolling_avgs
                     name = name.replace("_avg_per_10_min", "")
@@ -531,7 +531,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                     into = None
                 else:
                     into = _t_d
-
+                    
                 nvl = util.try_extract(value)
 
                 # Correct Blizzard Singular Plural Bug
