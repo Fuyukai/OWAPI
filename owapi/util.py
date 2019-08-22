@@ -36,6 +36,7 @@ async def with_cache(ctx: HTTPRequestContext, func, *args, expires: int = None, 
         return result
     else:
         import aioredis
+
         assert isinstance(ctx.redis, aioredis.Redis)
         built = func.__name__ + repr(args)
         # Check for the key.
@@ -84,7 +85,7 @@ def parse_time(val: str) -> float:
     Parse the time out into minutes.
     """
     unit = val.split(" ")[1]
-    if 'minute' in unit:
+    if "minute" in unit:
         # Calculate the hour.
         mins = int(val.split(" ")[0])
         hours = round(mins / 60, 3)
@@ -124,7 +125,7 @@ def try_extract(value):
     if matched:
         val = matched.groups()[0]
         val = float(val)
-        val = (val / 60 / 60)
+        val = val / 60 / 60
 
         return val
 
@@ -132,13 +133,13 @@ def try_extract(value):
     if matched:
         val = matched.groups()[0]
         val = float(val)
-        val = (val / 100)
+        val = val / 100
 
         return val
 
     # Check if there's an ':' in it.
-    if ':' in value:
-        sp = value.split(':')
+    if ":" in value:
+        sp = value.split(":")
         # If it's only two, it's mm:ss.
         # Formula is (minutes + (seconds / 60)) / 60
         if len(sp) == 2:
@@ -154,15 +155,15 @@ def try_extract(value):
                 hours, mins, seconds = map(int, sp)
             except ValueError:
                 # weird thousands values
-                if ',' in sp[0]:
+                if "," in sp[0]:
                     sp[0] = sp[0].replace(",", "")
                 else:
                     raise
 
                 hours, mins, seconds = map(int, sp)
 
-            mins += (seconds / 60)
-            hours += (mins / 60)
+            mins += seconds / 60
+            hours += mins / 60
             return hours
     else:
         # Just return the value.
@@ -173,9 +174,9 @@ def sanitize_string(string):
     """
     Convert an arbitrary string into the format used for our json keys
     """
-    space_converted = re.sub(r'[-\s]', '_', unidecode.unidecode(string).lower())
-    removed_nonalphanumeric = re.sub(r'\W', '', space_converted)
-    underscore_normalized = re.sub(r'_{2,}', '_', removed_nonalphanumeric)
+    space_converted = re.sub(r"[-\s]", "_", unidecode.unidecode(string).lower())
+    removed_nonalphanumeric = re.sub(r"\W", "", space_converted)
+    underscore_normalized = re.sub(r"_{2,}", "_", removed_nonalphanumeric)
     return underscore_normalized.replace("soldier_76", "soldier76")  # backwards compatability
 
 
@@ -183,10 +184,10 @@ def correct_plural_name(name: str, value):
     """
     Convert the argument for Plural Bug
     """
-    one = name[name.find('_one_') + 5:name.find('_other_')]
-    other = name[name.find('_other_') + 7:name.rfind(one) + len(one) + 1]
+    one = name[name.find("_one_") + 5 : name.find("_other_")]
+    other = name[name.find("_other_") + 7 : name.rfind(one) + len(one) + 1]
 
     if value == 1:
-        return name[:name.find('count_')] + one + name[name.find(other) + len(other):]
+        return name[: name.find("count_")] + one + name[name.find(other) + len(other) :]
 
-    return name[:name.find('count_')] + other + name[name.find(other) + len(other):]
+    return name[: name.find("count_")] + other + name[name.find(other) + len(other) :]

@@ -12,6 +12,7 @@ from lxml import etree
 
 try:
     from html5_parser import parse
+
     _has_html5_parser = True
 except ImportError:
     _has_html5_parser = False
@@ -45,8 +46,9 @@ async def get_page_body(ctx: HTTPRequestContext, url: str, cache_time=300, cache
                 return None
             return (await req.read()).decode()
 
-    result = await util.with_cache(ctx, _real_get_body, url, expires=cache_time,
-                                   cache_404=cache_404)
+    result = await util.with_cache(
+        ctx, _real_get_body, url, expires=cache_time, cache_404=cache_404
+    )
     return result
 
 
@@ -56,7 +58,7 @@ def _parse_page_html5(content: str) -> etree._Element:
 
     This uses html5_parser.
     """
-    if content and content.lower() != 'none':
+    if content and content.lower() != "none":
         data = parse(content)
         return data
 
@@ -67,21 +69,27 @@ def _parse_page_lxml(content: str) -> etree._Element:
 
     This uses raw LXML.
     """
-    if content and content.lower() != 'none':
+    if content and content.lower() != "none":
         data = etree.HTML(content)
         return data
 
 
-async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str = "pc",
-                        region: str = "us",
-                        cache_time=300, cache_404=False) -> etree._Element:
+async def get_user_page(
+    ctx: HTTPRequestContext,
+    battletag: str,
+    platform: str = "pc",
+    region: str = "us",
+    cache_time=300,
+    cache_404=False,
+) -> etree._Element:
     """
     Downloads the BZ page for a user, and parses it.
     """
     if platform != "pc":
         region = ""
     built_url = B_PAGE_URL.format(
-        region=region, btag=battletag.replace("#", "-"), platform=platform)
+        region=region, btag=battletag.replace("#", "-"), platform=platform
+    )
     page_body = await get_page_body(ctx, built_url, cache_time=cache_time, cache_404=cache_404)
 
     if not page_body:
@@ -101,8 +109,7 @@ async def get_user_page(ctx: HTTPRequestContext, battletag: str, platform: str =
     return parsed
 
 
-async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
-                               platform="pc"):
+async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *, platform="pc"):
     """
     Fetches all user pages for a specified user.
 
@@ -112,8 +119,7 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
         coro = get_user_page(ctx, battletag, region="", platform=platform, cache_404=True)
         result = await coro
         if isinstance(result, etree._Element):
-            return {"any": result,
-                    "eu": None, "us": None, "kr": None}
+            return {"any": result, "eu": None, "us": None, "kr": None}
         else:
             # Raise a 404.
             raise NotFound()
@@ -136,9 +142,11 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
         if isinstance(result, etree._Element):
             d[region] = result
         elif isinstance(result, Exception):
-            logger.error("Failed to fetch user page!\n{}".format(
-                ''.join(traceback.format_exception(type(result), result, result.__traceback__))
-            ))
+            logger.error(
+                "Failed to fetch user page!\n{}".format(
+                    "".join(traceback.format_exception(type(result), result, result.__traceback__))
+                )
+            )
             error = result
             d[region] = None
         else:
@@ -156,8 +164,9 @@ async def fetch_all_user_pages(ctx: HTTPRequestContext, battletag: str, *,
     return d
 
 
-async def region_helper_v2(ctx: HTTPRequestContext, battletag: str, platform="pc", region=None,
-                           extra=""):
+async def region_helper_v2(
+    ctx: HTTPRequestContext, battletag: str, platform="pc", region=None, extra=""
+):
     """
     Downloads the correct page for a user in the right region.
 

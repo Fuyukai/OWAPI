@@ -37,7 +37,7 @@ hero_data_div_ids = {
     "wrecking_ball": "0x02E00000000001CA",
     "ashe": "0x02E0000000000200",
     "baptiste": "0x02E0000000000221",
-    "sigma": "0x02E000000000023B"
+    "sigma": "0x02E000000000023B",
 }
 
 tier_data_img_src = {
@@ -47,14 +47,15 @@ tier_data_img_src = {
     "rank-PlatinumTier.png": "platinum",
     "rank-DiamondTier.png": "diamond",
     "rank-MasterTier.png": "master",
-    "rank-GrandmasterTier.png": "grandmaster"
+    "rank-GrandmasterTier.png": "grandmaster",
 }
 
 role_data_img_src = {
     "icon-tank-8a52daaf01.png": "tank",
     "icon-offense-6267addd52.png": "damage",
-    "icon-support-46311a4210.png": "support"
+    "icon-support-46311a4210.png": "support",
 }
+
 
 def bl_parse_stats(parsed, mode="quickplay", status=None):
     # Just a quick FYI
@@ -90,7 +91,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     prestige_stars = 0
     try:
         prestige_rank = mast_head.xpath(".//div[@class='player-rank']")[0]
-        bg_image = [x for x in prestige_rank.values() if 'background-image' in x][0]
+        bg_image = [x for x in prestige_rank.values() if "background-image" in x][0]
     except IndexError:
         # No stars
         prestige_stars = 0
@@ -110,7 +111,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     try:
         # Get the player-level base (border).
         prestige = mast_head.xpath(".//div[@class='player-level']")[0]
-        bg_image = [x for x in prestige.values() if 'background-image' in x][0]
+        bg_image = [x for x in prestige.values() if "background-image" in x][0]
     except IndexError:
         # Cannot find background-image.
         # Yikes!
@@ -137,14 +138,16 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     built_dict["overall_stats"]["level"] = level
 
     # Get and parse out endorsement level.
-    endorsement_level = int(mast_head.xpath(".//div[@class='EndorsementIcon-tooltip']/div[@class='u-center']")[0].text)
+    endorsement_level = int(
+        mast_head.xpath(".//div[@class='EndorsementIcon-tooltip']/div[@class='u-center']")[0].text
+    )
     built_dict["overall_stats"]["endorsement_level"] = endorsement_level
 
     # Get endorsement circle.
     endorsement_icon_inner = mast_head.xpath(
         ".//div[@class='endorsement-level']/div[@class='EndorsementIcon']/div["
-        "@class='EndorsementIcon-inner']")[
-        0]
+        "@class='EndorsementIcon-inner']"
+    )[0]
 
     # Get individual endorsement segments.
     names = ("shotcaller", "teammate", "sportsmanship")
@@ -152,7 +155,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         try:
             endorsement_value = endorsement_icon_inner.findall(
                 f".//svg[@class='EndorsementIcon-border EndorsementIcon-border--{name}']"
-            )[0].get('data-value')
+            )[0].get("data-value")
         except:  # TODO: don't do this...
             endorsement_value = 0
 
@@ -162,27 +165,23 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
     # Get comp rank.
     try:
         for role in mast_head.xpath(".//div[@class='competitive-rank']")[0]:
-            role_img = role.findall(
-                ".//img[@class='competitive-rank-role-icon']")[0]
+            role_img = role.findall(".//img[@class='competitive-rank-role-icon']")[0]
             role_img_src = role_img.values()[1]
             role_str = ""
             for key, val in role_data_img_src.items():
                 if key in role_img_src:
                     role_str = val
                     break
-            built_dict["overall_stats"][
-                role_str + "_role_image"] = role_img_src
+            built_dict["overall_stats"][role_str + "_role_image"] = role_img_src
 
-            tier_img = role.findall(
-                ".//img[@class='competitive-rank-tier-icon']")[0]
+            tier_img = role.findall(".//img[@class='competitive-rank-tier-icon']")[0]
             tier_img_src = tier_img.values()[1]
             tier_str = ""
             for key, val in tier_data_img_src.items():
                 if key in tier_img_src:
                     tier_str = val
                     break
-            built_dict["overall_stats"][
-                role_str + "_tier_image"] = tier_img_src
+            built_dict["overall_stats"][role_str + "_tier_image"] = tier_img_src
 
             built_dict["overall_stats"][role_str + "_tier"] = tier_str
 
@@ -192,24 +191,24 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
             else:
                 comprank = None
             built_dict["overall_stats"][role_str + "_comprank"] = comprank
-            
+
     except IndexError as exc:
         print(str(exc))
     finally:
-        for role in ['tank', 'damage', 'support']:
-            if role + "_role_image" not in built_dict['overall_stats']:
-                built_dict['overall_stats'][role + '_role_image'] = None
-            if role + "_tier_image" not in built_dict['overall_stats']:
-                built_dict['overall_stats'][role + '_tier_image'] = None
-            if role + "_tier" not in built_dict['overall_stats']:
-                built_dict['overall_stats'][role + '_tier'] = None
-            if role + "_comprank" not in built_dict['overall_stats']:
-                built_dict['overall_stats'][role + '_comprank'] = None
+        for role in ["tank", "damage", "support"]:
+            if role + "_role_image" not in built_dict["overall_stats"]:
+                built_dict["overall_stats"][role + "_role_image"] = None
+            if role + "_tier_image" not in built_dict["overall_stats"]:
+                built_dict["overall_stats"][role + "_tier_image"] = None
+            if role + "_tier" not in built_dict["overall_stats"]:
+                built_dict["overall_stats"][role + "_tier"] = None
+            if role + "_comprank" not in built_dict["overall_stats"]:
+                built_dict["overall_stats"][role + "_comprank"] = None
 
     # Fetch Avatar
     built_dict["overall_stats"]["avatar"] = mast_head.find(
         ".//img[@class='player-portrait']"
-    ).attrib['src']
+    ).attrib["src"]
 
     if mode == "competitive":
         # the competitive overview is under a div with id='competitive'
@@ -264,10 +263,12 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
 
     if mode == "competitive":
         try:
-            losses = int(game_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text
-                         .replace(",", ""))
-            ties = int(game_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text
-                       .replace(",", ""))
+            losses = int(
+                game_box.xpath(".//text()[. = 'Games Lost']/../..")[0][1].text.replace(",", "")
+            )
+            ties = int(
+                game_box.xpath(".//text()[. = 'Games Tied']/../..")[0][1].text.replace(",", "")
+            )
         except IndexError:
             # Sometimes the losses and ties don't exist.
             # I'm not 100% as to what causes this, but it might be because there are no ties.
@@ -310,10 +311,10 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
             # If so, try and extract the time.
             nvl = util.try_extract(value)
 
-            if 'average' in name.lower():
+            if "average" in name.lower():
                 name = name.replace("_average", "_avg")
                 into = average_stats
-            elif '_avg_per_10_min' in name.lower():
+            elif "_avg_per_10_min" in name.lower():
                 # 2017-08-03 - calculate rolling averages.
                 name = name.lower().replace("_avg_per_10_min", "")
                 into = rolling_average_stats
@@ -321,7 +322,7 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
                 into = game_stats
 
             # Correct Blizzard Singular Plural Bug
-            if '_plural_' in name:
+            if "_plural_" in name:
                 name = util.correct_plural_name(name, nvl)
 
             into[name] = nvl
@@ -401,8 +402,9 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     else:
         _root = parsed
 
-    _hero_info = _root.xpath(".//div[@data-group-id='comparisons' and "
-                             "@data-category-id='0x0860000000000021']")[0]
+    _hero_info = _root.xpath(
+        ".//div[@data-group-id='comparisons' and " "@data-category-id='0x0860000000000021']"
+    )[0]
     hero_info = _hero_info.findall(".//div[@class='ProgressBar-textWrapper']")
 
     # Loop over each one, extracting the name and hours counted.
@@ -421,7 +423,7 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
         # More accurate playtime calculation
         # Requires reversing hero_info
         category_item = child.getparent().getparent()
-        percent = float(category_item.attrib['data-overwatch-progress-percent'])
+        percent = float(category_item.attrib["data-overwatch-progress-percent"])
         if percent_per_second is None and 1 > time > 0:
             seconds = 3600 * time
             percent_per_second = percent / seconds
@@ -455,8 +457,9 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
     for hero_name, requested_hero_div_id in hero_data_div_ids.items():
         n_dict = {}
         _stat_groups = _root[0].xpath(
-            ".//div[@data-group-id='stats' and @data-category-id='{0}']"
-                .format(requested_hero_div_id)
+            ".//div[@data-group-id='stats' and @data-category-id='{0}']".format(
+                requested_hero_div_id
+            )
         )
 
         if not _stat_groups:
@@ -497,7 +500,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                         name, value = util.sanitize_string(subval[0].text), subval[1].text
 
                         # Put averages into average_stats
-                        if '_avg_per_10_min' in name.lower():
+                        if "_avg_per_10_min" in name.lower():
                             into = _rolling_avgs
                             name = name.lower().replace("_avg_per_10_min", "")
                         else:
@@ -528,7 +531,7 @@ def bl_parse_hero_data(parsed: etree._Element, mode="quickplay"):
                 nvl = util.try_extract(value)
 
                 # Correct Blizzard Singular Plural Bug
-                if '_plural_' in name:
+                if "_plural_" in name:
                     name = util.correct_plural_name(name, nvl)
 
                 if into != None:
@@ -547,15 +550,14 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
     # Start the dict.
     built_dict = {}
 
-    _root = parsed.xpath(
-        ".//section[@id='achievements-section']"
-    )
+    _root = parsed.xpath(".//section[@id='achievements-section']")
     if not _root:
         return
     _root = _root[0]
 
-    _category_selects = _root.xpath(".//select[@data-group-id='achievements']")[0] \
-        .xpath(".//option")
+    _category_selects = _root.xpath(".//select[@data-group-id='achievements']")[0].xpath(
+        ".//option"
+    )
 
     for _category_select in _category_selects:
         category_name = _category_select.text
@@ -563,19 +565,19 @@ def bl_parse_achievement_data(parsed: etree._Element, mode="quickplay"):
 
         _achievement_boxes = _root.xpath(
             ".//div[@data-group-id='achievements' and @data-category-id='{0}']"
-            "/ul/div/div[@data-tooltip]"
-                .format(category_id)
+            "/ul/div/div[@data-tooltip]".format(category_id)
         )
         n_dict = {}
 
         for _achievement_box in _achievement_boxes:
             achievement_name = _achievement_box.xpath("./div/div")[0].text
-            if achievement_name == '?':
+            if achievement_name == "?":
                 # Sombra ARG clue, not a real achievement
                 continue
 
-            n_dict[util.sanitize_string(achievement_name)] = ("m-disabled" not in
-                                                              _achievement_box.get("class"))
+            n_dict[
+                util.sanitize_string(achievement_name)
+            ] = "m-disabled" not in _achievement_box.get("class")
 
         built_dict[category_name.lower()] = n_dict
 

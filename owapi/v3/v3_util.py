@@ -16,11 +16,15 @@ RATES_PATH = os.path.join(os.getcwd(), "rates.yml")
 DISALLOW_AGENTS = re.compile(r"(?:.*aiohttp/.*|.*python-requests/.*)")
 
 # Bad useragent response text.
-BAD_USERAGENT = {
-                    "error": 400,
-                    "msg": "Hi! To prevent abuse of this service, it is required that you "
-                           "customize your user agent."
-                }, 400, {"Content-Type": "application/json"}
+BAD_USERAGENT = (
+    {
+        "error": 400,
+        "msg": "Hi! To prevent abuse of this service, it is required that you "
+        "customize your user agent.",
+    },
+    400,
+    {"Content-Type": "application/json"},
+)
 
 if not os.path.exists(RATES_PATH):
     shutil.copy(os.path.join(os.getcwd(), "rates.default.yml"), RATES_PATH)
@@ -67,10 +71,14 @@ def with_ratelimit(bucket: str, timelimit: int = None, max_reqs: int = 0):
             # outer functions because they are called before globalsettings are set
             if ctx.app.config["owapi_use_redis"]:
                 import aioredis
+
                 assert isinstance(ctx.redis, aioredis.Redis)
                 # Get the IP.
-                ip = ctx.request.headers.get("X-Real-IP") or \
-                     ctx.request.headers.get("X-Forwarded-For") or ctx.request.remote_addr
+                ip = (
+                    ctx.request.headers.get("X-Real-IP")
+                    or ctx.request.headers.get("X-Forwarded-For")
+                    or ctx.request.remote_addr
+                )
 
                 # Build the ratelimit string.
                 built = "{bucket}:{ip}:ratelimit".format(bucket=bucket, ip=ip)
@@ -113,8 +121,11 @@ def with_ratelimit(bucket: str, timelimit: int = None, max_reqs: int = 0):
                             await ctx.redis.expire(built, _timelimit)
                             ttl = _timelimit
 
-                        return {"error": 429, "msg": "you are being ratelimited",
-                                "retry": ttl}, 429, {"Retry-After": ttl}
+                        return (
+                            {"error": 429, "msg": "you are being ratelimited", "retry": ttl},
+                            429,
+                            {"Retry-After": ttl},
+                        )
 
                     # LPUSH a `1` or something onto the edge of the list.
                     # The actual value doesn't matter.
