@@ -98,7 +98,7 @@ def try_extract(value):
     """
     Attempt to extract a meaningful value from the time.
     """
-    if value == "--":
+    if value.lower() in ("--", "null"):
         return 0
 
     get_float = int_or_string(value)
@@ -150,7 +150,17 @@ def try_extract(value):
         # If it's three, it's hh:mm:ss.
         # Formula is hours + ((minutes + (seconds / 60)) / 60).
         elif len(sp) == 3:
-            hours, mins, seconds = map(int, sp)
+            try:
+                hours, mins, seconds = map(int, sp)
+            except ValueError:
+                # weird thousands values
+                if ',' in sp[0]:
+                    sp[0] = sp[0].replace(",", "")
+                else:
+                    raise
+
+                hours, mins, seconds = map(int, sp)
+
             mins += (seconds / 60)
             hours += (mins / 60)
             return hours
