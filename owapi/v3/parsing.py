@@ -147,31 +147,17 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
         0]
 
     # Get individual endorsement segments.
-    try:
-        endorsement_shotcaller_image = endorsement_icon_inner.findall(
-            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--shotcaller']")[0]
-        endorsement_shotcaller_level = endorsement_shotcaller_image.get('data-value')
-    except:
-        endorsement_shotcaller_level = 0
+    names = ("shotcaller", "teammate", "sportsmanship")
+    for name in names:
+        try:
+            endorsement_value = endorsement_icon_inner.findall(
+                f".//svg[@class='EndorsementIcon-border EndorsementIcon-border--{name}']"
+            )[0].get('data-value')
+        except:  # TODO: don't do this...
+            endorsement_value = 0
 
-    try:
-        endorsement_teammate_image = endorsement_icon_inner.findall(
-            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--teammate']")[0]
-        endorsement_teammate_level = endorsement_teammate_image.get('data-value')
-    except:
-        endorsement_teammate_level = 0
-
-    try:
-        endorsement_sportsmanship_image = endorsement_icon_inner.findall(
-            ".//svg[@class='EndorsementIcon-border EndorsementIcon-border--sportsmanship']")[0]
-        endorsement_sportsmanship_level = endorsement_sportsmanship_image.get('data-value')
-    except:
-        endorsement_sportsmanship_level = 0
-
-    # Parse out endorsement segements.
-    built_dict["overall_stats"]["endorsement_shotcaller"] = endorsement_shotcaller_level
-    built_dict["overall_stats"]["endorsement_teammate"] = endorsement_teammate_level
-    built_dict["overall_stats"]["endorsement_sportsmanship"] = endorsement_sportsmanship_level
+        val = float(endorsement_value)
+        built_dict["overall_stats"][f"endorsement_{name}"] = val
 
     # Get comp rank.
     try:
