@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "owapi"
+version = "v3"
+description = "Overwatch API"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+aiohttp = "==3.5.4"
+aioredis = "==1.2.0"
+asphalt = {git = "https://github.com/asphalt-framework/asphalt.git"}
+asphalt-redis = "==2.1.1"
+asyncio-extras = "<=1.4.0,>=1.3.0"
+html5-parser = "==0.3.3"
+"Kyoukai" = {git = "https://github.com/Fuyukai/kyoukai.git"}
+unidecode = "==0.04.19"
+uvloop = "==0.9.1"
+yarl = "<1.2"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

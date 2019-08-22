@@ -4,6 +4,7 @@
 
 This server is a simple way to get read-only information about player statistics in the game
 Overwatch by Blizzard.
+
 **A live version runs on https://owapi.net.**  
 
 ## Game data
@@ -23,14 +24,14 @@ See the [doc](/api.md) for more information.
 
 OWAPI has a few requirements:
 
- - A Python version >3.5
+ - A Python version >3.6
  - Probably a Linux-based server; I don't know about the viability of running it on Windows.
  
 **Installation steps:**
 
  1. **Clone the repository.**
  
-     `git clone https://github.com/SunDwarf/OWAPI.git`
+     `git clone https://github.com/Fuyukai/OWAPI.git`
      
  2. **Setup a Redis server.**
  
@@ -49,12 +50,9 @@ OWAPI has a few requirements:
 
      For debian-based systems, run this first:
      `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
-
-     Install pipenv pip package:
-     `pip install pipenv`
      
      To set up the virtualenv:
-     `pipenv install`
+     `poetry install`
 
  5. **Copy and tweak the example config file.**
 
@@ -62,9 +60,9 @@ OWAPI has a few requirements:
      
  6. **Start the OWAPI server.**
  
-     `PYTHONPATH=. pipenv run asphalt run config.yml`
+     `PYTHONPATH=. poetry run asphalt run config.yml`
      
      The server is now running on http://localhost:4444/
           
      Note: If you want the full speedups from Kyoukai you must run with uvloop enabled:
-     `PYTHONPATH=. pipenv run asphalt run -l uvloop config.yml`
+     `PYTHONPATH=. poetry run asphalt run -l uvloop config.yml`
