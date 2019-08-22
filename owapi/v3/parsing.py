@@ -394,6 +394,8 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
     built_dict = {}
 
     _root = parsed.xpath(".//div[@id='{}']".format(mode))
+
+    # maybe this isn't needed anymore??
     try:
         # XPath for the `u-align-center` h6 which signifies there's no data.
         no_data = _root[0].xpath(".//ul/h6[@class='u-align-center']")[0]
@@ -404,7 +406,12 @@ def bl_parse_all_heroes(parsed, mode="quickplay"):
             return None
 
     if mode == "competitive":
-        _root = parsed.findall(".//div[@data-mode='competitive']")[0]
+        # Fix for #287. The competitive play section doesn't exist if the user doesn't have any
+        # competitive playtime.
+        try:
+            _root = parsed.findall(".//div[@data-mode='competitive']")[0]
+        except IndexError:
+            return None
     else:
         _root = parsed
 
