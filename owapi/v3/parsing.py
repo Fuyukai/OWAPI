@@ -206,9 +206,18 @@ def bl_parse_stats(parsed, mode="quickplay", status=None):
                 built_dict["overall_stats"][role + "_comprank"] = None
 
     # Fetch Avatar
-    built_dict["overall_stats"]["avatar"] = mast_head.find(
-        ".//img[@class='player-portrait']"
-    ).attrib["src"]
+    avatar_root = mast_head.find(".//img[@class='player-portrait']")
+    # some profiles don't have an avatar url?
+    # it's just a <img class="player-portrait"> ???
+    if avatar_root is not None:
+        try:
+            avatar_url = avatar_root.attrib["src"]
+        except KeyError:
+            avatar_url = None
+    else:
+        avatar_url = None
+
+    built_dict["overall_stats"]["avatar"] = avatar_url
 
     if mode == "competitive":
         # the competitive overview is under a div with id='competitive'
