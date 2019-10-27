@@ -49,7 +49,9 @@ OWAPI has a few requirements:
  4. **Install the requirements.**
 
      For debian-based systems, run this first:
-     `sudo apt install libxslt-dev python3-dev build-essential zlib1g-dev pkg-config`
+     `sudo apt install libxslt-dev python3-dev python3-venv build-essential zlib1g-dev pkg-config`
+     
+     Install poetry packaging and dependency manager by following the [installation documentation](https://poetry.eustace.io/docs/#installation).
      
      To set up the virtualenv:
      `poetry install`
