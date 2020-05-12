@@ -38,6 +38,7 @@ hero_data_div_ids = {
     "ashe": "0x02E0000000000200",
     "baptiste": "0x02E0000000000221",
     "sigma": "0x02E000000000023B",
+    "echo": "0x02E0000000000206",
 }
 
 tier_data_img_src = {

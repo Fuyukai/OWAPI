@@ -2,7 +2,7 @@
  * Every time a new hero is realeased, update the Hero type by adding the new hero name like this: 'previous hero' | 'new hero' | 'following hero'
  */
 
-type Hero = 'ana' | 'baptiste' | 'bastion' | 'brigitte' | 'dva' | 'genji' | 'hanzo' | 'junkrat' | 'lucio' | 'mccree' | 'mei' | 'mercy' | 'moira' | 'orisa' | 'pharah' | 'reaper' | 'reinhardt' | 'roadhog' | 'sigma' | 'soldier76' | 'sombra' | 'symmetra' | 'tracer' | 'widowmaker' | 'wrecking_ball' | 'zarya' | 'zenyatta'
+type Hero = 'ana' | 'baptiste' | 'bastion' | 'brigitte' | 'dva' | 'echo' | 'genji' | 'hanzo' | 'junkrat' | 'lucio' | 'mccree' | 'mei' | 'mercy' | 'moira' | 'orisa' | 'pharah' | 'reaper' | 'reinhardt' | 'roadhog' | 'sigma' | 'soldier76' | 'sombra' | 'symmetra' | 'tracer' | 'widowmaker' | 'wrecking_ball' | 'zarya' | 'zenyatta'
 
 export interface OWAPIBlob {
   _request: {
@@ -29,6 +29,7 @@ export interface Region {
   achievements: {
     damage: {
       [x: string]: boolean
+      adaptability: boolean
       air_strike: boolean
       armor_up: boolean
       charge: boolean
@@ -38,6 +39,7 @@ export interface Region {
       death_from_above: boolean
       did_that_sting: boolean
       die_die_die_die: boolean
+      focused: boolean
       hack_the_planet: boolean
       huge_success: boolean
       ice_blocked: boolean
